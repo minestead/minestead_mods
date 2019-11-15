@@ -1,0 +1,79 @@
+# Configurações aplicaveis para o menu gráfico
+
+#
+# Saciamento
+#
+
+# Quantidade de saude restaurada ou saciada.
+# (1 equivale a meio coração)
+sunos_item_broa_frutas_eat (Saciamento da Broa de Frutas) int 7
+
+# Quantidade de saude restaurada ou saciada.
+# (1 equivale a meio coração)
+sunos_item_salada_frutas_eat (Saciamento da Salada de Frutas) int 5
+
+# Quantidade de saude restaurada ou saciada.
+# (1 equivale a meio coração)
+sunos_item_nectar_eat (Saciamento da Nectar de Frutas) int 4
+
+# Quantidade de saude restaurada ou saciada.
+# (1 equivale a meio coração)
+sunos_item_petisco_eat (Saciamento do Petisco de Frutas) int 1
+
+#
+# Vendas
+#
+
+# Deve ser o itemstring do item
+sunos_moeda (Moeda de troca dos Sunos) string default:apple
+
+# Quantia de Moedas de troca cobradas pelo item
+sunos_item_bau_custo (Custo de compra de Bau dos Sunos) int 20
+
+# Quantia de Moedas de troca cobradas pelo item
+sunos_item_bancada_custo (Custo de compra de Bancada dos Sunos) int 15
+
+# Quantia de Moedas de troca cobradas pelo item
+sunos_item_kit_culinario_custo (Custo de compra de Kit Culinario) int 30
+
+# Quantia de Moedas de troca cobradas pelo item
+sunos_item_tear_palha_custo (Custo de compra de Tear de Palha) int 25
+
+# Quantia de Moedas de troca cobradas pelo item
+sunos_item_bancada_de_trabalho_custo (Custo de compra de Bancada de Trabalho) int 20
+
+# Quantia de Moedas de troca cobradas pelo item
+sunos_item_petisco_custo (Custo de compra de Petisco de Frutas) int 1
+
+# Quantia de Moedas de troca cobradas pelo item
+sunos_item_broa_frutas_custo (Custo de compra de Broa de Frutas) int 8
+
+# Quantia de Moedas de troca cobradas pelo item
+sunos_item_nectar_custo (Custo de compra de Nectar de Frutas) int 6
+
+#
+# Outros
+#
+
+# Construir estruturas instantaneamente
+# Ignora o tempo de construção
+sunos_instant_structure_build (Construcao instantanea) bool false
+
+# Probabilidade de surgirem vilas no mapa (em porcentagem)
+# - 100 para surgir sempre que possivel
+# - 0 para nunca surgir
+sunos_chance (Probabilidade de surgimento de vilas) int 100 0 100
+
+# Tempo em segundos para cada verificação de um fundamento ativo no mapa
+# Valores baixos aumentam a demanda por processamento e melhoram 
+# as dinamicas de reconhecimento das vilas
+# Valores altos reduzem a demanda por processamento e pioram as dinamicas 
+# de reconhecimento das vilas
+sunos_verif_fundamento (Tempo de verificador do Fundamentos) int 120
+
+# Habilita mensagens no depurador (para desenvolvimento)
+sunos_enable_debug_notify (Depurador) bool false
+
+
+
+

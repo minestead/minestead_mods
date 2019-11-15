@@ -1,0 +1,16 @@
+{
+    "name": "sociedades",
+    "description": "Adiciona sociedades em Minetest",
+    "keywords": [
+        "sociedades",
+        "societies"
+    ],
+    "homepage": "https://github.com/BrunoMine/sociedades",
+    "forum": "https://forum.minetest.net/viewtopic.php?t=15382",
+    "screenshots": [
+        "https://raw.githubusercontent.com/BrunoMine/sociedades/master/screenshot.png"
+    ],
+    "authors": [
+        "BrunoMine"
+    ]
+}

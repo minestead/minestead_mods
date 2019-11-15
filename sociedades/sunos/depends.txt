@@ -1,0 +1,12 @@
+mobs
+intllib?
+hbhunger?
+default
+vessels
+flowers
+xpanes
+stairs
+doors
+farming
+sociedades_compost
+advanced_npc

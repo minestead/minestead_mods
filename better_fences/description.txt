@@ -1,0 +1,1 @@
+A Minetest mod which improves the usability of fences by making fences which connect to less than 2 other fences connect to all nodes.

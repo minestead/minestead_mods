@@ -1,0 +1,1 @@
+arvore.lua compatibilidade.lua craftitens.lua diretrizes.lua init.lua mapgen.lua npc.lua nodes/bancada.lua nodes/bau.lua nodes/jungleleaves.lua nodes/totem.lua

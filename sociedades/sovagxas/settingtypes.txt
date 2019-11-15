@@ -1,0 +1,7 @@
+# Configurações aplicaveis para o menu gráfico
+
+# Probabilidade de surgirem árvores sovagxas 
+# no mapa (em porcentagem)
+# - 100 para surgir sempre que possivel
+# - 0 para nunca surgir
+sovagxas_chance (Probabilidade de surgimento de vilas) int 75 0 100

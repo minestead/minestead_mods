@@ -1,0 +1,23 @@
+API do Mod Sovagxas 1.0
+
+
+Tabelas Globais
+-----------------
+Alguns aspectos do mod podem ser dinamicamente alterados sem que haja a necessidade de alteração no código desse mod.
+Para isso basta que mods terceiros modifiquem as tabelas globais que estão aqui mostradas.
+
+* `sovagxas.itens_bau`
+	* itens que aparecem periodicamente de forma aleatoria no bau dos sovagxas
+	* tabela ordenada com subtabelas no formato
+		{
+			"default:stick", : itemstring
+			10, : quantidade mínima por slot
+			25, : quantidade máxima por slot
+			65 : chacne de raridade em porcentagem (0.1 - 100%) (isso não é seguido exato)
+		}
+
+	
+### Exemplo
+`
+table.insert(sovagxas.itens_bau, {"default:dirt", 5, 10, 30})
+`

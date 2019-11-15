@@ -1,0 +1,58 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-06-21 12:27-0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: craftitens.lua
+msgid "Muda de Arvore Sovagxa"
+msgstr ""
+
+#: nodes/bancada.lua
+msgid "Craftador"
+msgstr ""
+
+#: nodes/bancada.lua
+msgid "Bancada de Trabalho Sovagxa"
+msgstr ""
+
+#: nodes/bancada.lua nodes/totem.lua
+msgid "Sem Drop"
+msgstr ""
+
+#: nodes/bau.lua
+msgid "Bau Sovagxa"
+msgstr ""
+
+#: nodes/bau.lua
+msgid "Inventario lotado. Esvazie um pouco"
+msgstr ""
+
+#: nodes/bau.lua
+msgid "Bau vazio no momento"
+msgstr ""
+
+#: nodes/bau.lua
+msgid "Aguarde ate que um sovagxa coloque algo dentro"
+msgstr ""
+
+#: nodes/jungleleaves.lua
+msgid "de arvore sovagxa"
+msgstr ""
+
+#: nodes/totem.lua
+msgid "Totem Sovagxa"
+msgstr ""

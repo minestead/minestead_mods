@@ -1,0 +1,10 @@
+minetest.register_on_dieplayer(function(player)
+    local pname = player:get_player_name()
+    local pos = player:getpos()
+    pos.x = math.floor(pos.x)
+    pos.y = math.floor(pos.y)
+    pos.z = math.floor(pos.z)
+
+    minetest.chat_send_player(pname, "You died at " ..pos.x.. ", " ..pos.y.. ", " ..pos.z)
+    minetest.log("action", "Player '" ..pname.. "' died at: " ..pos.x.. ", " ..pos.y.. ", " ..pos.z)
+end)

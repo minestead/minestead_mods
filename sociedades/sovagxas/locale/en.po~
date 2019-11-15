@@ -1,0 +1,55 @@
+# English translations for Sovagxas package.
+# Copyright (C) 2017 BrunoMine
+# This file is distributed under the same license as the Sovagxa package.
+# BrunoMine <borgesdossantosbruno@gmail.com>, 2017.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-06-20 16:28-0300\n"
+"PO-Revision-Date: 2018-06-20 16:30-0300\n"
+"Last-Translator: BrunoMine <borgesdossantosbruno@gmail.com>\n"
+"Language-Team: English\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ASCII\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 2.0.6\n"
+
+#: craftitens.lua
+msgid "Muda de Arvore Sovagxa"
+msgstr "Sovagxian Tree Sapling"
+
+#: nodes/bancada.lua
+msgid "Bancada de Trabalho Sovagxa"
+msgstr "Sovagxian Workbench"
+
+#: nodes/bancada.lua nodes/totem.lua
+msgid "Sem Drop"
+msgstr "No Drop"
+
+#: nodes/bau.lua
+msgid "Bau Sovagxa"
+msgstr "Sovagxian Chest"
+
+#: nodes/bau.lua
+msgid "Inventario lotado. Esvazie um pouco"
+msgstr "Full inventory. Empty a little"
+
+#: nodes/bau.lua
+msgid "Bau vazio no momento"
+msgstr "Empty"
+
+#: nodes/bau.lua
+msgid "Aguarde ate que um sovagxa coloque algo dentro"
+msgstr "Wait until a sovagxe puts something here"
+
+#: nodes/jungleleaves.lua
+msgid "de arvore sovagxa"
+msgstr "for sovagxian tree"
+
+#: nodes/totem.lua
+msgid "Totem Sovagxa"
+msgstr "Sovagxian Totem"
