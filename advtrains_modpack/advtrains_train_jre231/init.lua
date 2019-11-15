@@ -5,7 +5,7 @@ else
     S = function(s,a,...)a={a,...}return s:gsub("@(%d+)",function(n)return a[tonumber(n)]end)end
 end
 
-advtrains.register_wagon("KuHa_E231 engine", {
+advtrains.register_wagon("KuHa_E231", {
 	mesh="advtrains_KuHa_E231.b3d",
 	textures = {"advtrains_KuHa_E231.png"},
 	drives_on={default=true},
@@ -60,11 +60,13 @@ advtrains.register_wagon("KuHa_E231 engine", {
 	doors={
 		open={
 			[-1]={frames={x=0, y=40}, time=1},
-			[1]={frames={x=80, y=120}, time=1}
+			[1]={frames={x=80, y=120}, time=1},
+			sound="advtrains_electric_door"
 		},
 		close={
 			[-1]={frames={x=40, y=80}, time=1},
-			[1]={frames={x=120, y=160}, time=1}
+			[1]={frames={x=120, y=160}, time=1},
+			sound="advtrains_electric_door"
 		}
 	},
 	custom_on_velocity_change=function(self, velocity)
@@ -103,7 +105,7 @@ minetest.register_craft({
 	},
 })
 
-advtrains.register_wagon("SaHa_E231 wagon", {
+advtrains.register_wagon("SaHa_E231", {
 	mesh="advtrains_SaHa_E231.b3d",
 	textures = {"advtrains_SaHa_E231.png"},
 	drives_on={default=true},
@@ -157,11 +159,13 @@ advtrains.register_wagon("SaHa_E231 wagon", {
 	doors={
 		open={
 			[-1]={frames={x=0, y=40}, time=1},
-			[1]={frames={x=80, y=120}, time=1}
+			[1]={frames={x=80, y=120}, time=1},
+			sound="advtrains_electric_door"
 		},
 		close={
 			[-1]={frames={x=40, y=80}, time=1},
-			[1]={frames={x=120, y=160}, time=1}
+			[1]={frames={x=120, y=160}, time=1},
+			sound="advtrains_electric_door"
 		}
 	},
 	door_entry={-1, 1},
