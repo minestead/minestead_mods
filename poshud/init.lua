@@ -56,7 +56,7 @@ end
 local function updatehud(player, text)
 	local name = player:get_player_name()
 
-	if player_hud_enabled[name]==false then
+	if player_hud_enabled[name]~=true then
 		-- check if the player enabled the hud
 		return
 	end
