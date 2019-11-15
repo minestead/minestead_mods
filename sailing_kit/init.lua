@@ -258,6 +258,39 @@ local paint_sail=function(self,puncher,ttime, toolcaps, dir, damage)
 	end
 end
 
+local function take_boat(self, puncher)
+	if not puncher or not puncher:is_player() or self.removed then
+		return
+	end
+	local name = puncher:get_player_name()
+	if self.driver and name == self.driver then
+		self.driver = nil
+		puncher:set_detach()
+		player_api.player_attached[name] = false
+	end
+	if not self.driver then
+		self.removed = true
+		local inv = puncher:get_inventory()
+		if not (creative and creative.is_enabled_for
+				and creative.is_enabled_for(name))
+				or not inv:contains_item("main", "sailing_kit:boat") then
+			local leftover = inv:add_item("main", "sailing_kit:boat")
+			-- if no room in inventory add a replacement boat to the world
+			if not leftover:is_empty() then
+				minetest.add_item(self.object:get_pos(), leftover)
+			end
+		end
+		-- delay remove to ensure player is detached
+		minetest.after(0.1, function()
+			self.mast:remove()
+			self.rudder:remove()
+			if self.sail then self.sail:remove() end
+			self.object:remove()
+		end)
+	end
+end
+
+
 minetest.register_entity('sailing_kit:boat',{
 --[[ initial_properties = {
 	physical = true,
@@ -309,7 +342,12 @@ end,
 
 get_staticdata = mobkit.statfunc,
 
-on_punch = paint_sail,
+on_punch = function(self, puncher, ...)
+	if puncher:is_player() and puncher:get_player_control().sneak then
+		return paint_sail(self, puncher,...)
+	end
+	return take_boat(self, puncher, ...)
+end
 
 })
 
