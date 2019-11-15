@@ -14,14 +14,14 @@ advtrains.register_wagon("newlocomotive", {
 	seats = {
 		{
 			name=S("Driver Stand (left)"),
-			attach_offset={x=-5, y=10, z=-10},
-			view_offset={x=0, y=6, z=0},
+			attach_offset={x=-5, y=4, z=-10},
+			view_offset={x=-5, y=2, z=0},
 			group = "dstand",
 		},
 		{
 			name=S("Driver Stand (right)"),
-			attach_offset={x=5, y=10, z=-10},
-			view_offset={x=0, y=6, z=0},
+			attach_offset={x=5, y=4, z=-10},
+			view_offset={x=5, y=2, z=0},
 			group = "dstand",
 		},
 	},
@@ -84,14 +84,14 @@ advtrains.register_wagon("detailed_steam_engine", {
 	seats = {
 		{
 			name=S("Driver Stand (left)"),
-			attach_offset={x=-5, y=10, z=-10},
-			view_offset={x=9, y=-2, z=-6},
+			attach_offset={x=-5, y=3, z=-10},
+			view_offset={x = -5, y=0, z=0},
 			group = "dstand",
 		},
 		{
 			name=S("Driver Stand (right)"),
-			attach_offset={x=5, y=10, z=-10},
-			view_offset={x=0, y=6, z=0},
+			attach_offset={x=5, y=3, z=-10},
+			view_offset={x=5, y=0, z=0},
 			group = "dstand",
 		},
 	},
