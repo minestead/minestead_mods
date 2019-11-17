@@ -33,3 +33,8 @@ dofile(path.."/extractor.lua")
 dofile(path.."/compressor.lua")
 dofile(path.."/centrifuge.lua")
 dofile(path.."/freezer.lua")
+
+
+-- distiller by Irremann
+dofile(path.."/distiller_recipes.lua")
+dofile(path.."/distiller.lua")

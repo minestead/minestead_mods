@@ -33,3 +33,4 @@ dofile(path.."/freezer.lua")
 --dofile(path.."/power_radiator.lua")
 --dofile(path.."/lighting.lua")
 
+dofile(path.."/distiller.lua") -- patch by Irremann

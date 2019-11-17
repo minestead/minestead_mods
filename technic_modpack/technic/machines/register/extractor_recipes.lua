@@ -69,3 +69,22 @@ if minetest.get_modpath("dye") then
 		})
 	end
 end
+
+local recipes = {
+	{"default:apple",          "farming:sugar"},
+	{"default:papyrus",        "farming:sugar 2"},
+	{"farming:potato",          "farming:sugar"},
+	{"farming:beetroot",          "farming:sugar 3"},
+	{"farming:corn",          "farming:sugar 2"},
+	{"farming:grapes",          "farming:sugar 2"},
+	{"farming:melon_8",          "farming:sugar 4"},
+	{"farming:melon_slice",          "farming:sugar"},
+	{"farming:pepper",          "farming:sugar"},
+	{"farming:pineapple",          "farming:sugar 3"},
+	{"farming:pumpkin_8",          "farming:sugar 2"},
+	{"farming:raspberries",          "farming:sugar"},
+}
+
+for _, data in pairs(recipes) do
+	technic.register_extractor_recipe({input = {data[1]}, output = data[2]})
+end
