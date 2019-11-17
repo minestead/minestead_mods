@@ -6,11 +6,11 @@ minetest.register_craft({
 	recipe = {
 		{'default:stone',            'basic_materials:motor',          'default:stone'},
 		{'mesecons:piston',          'technic:machine_casing', 'mesecons:piston'},
-		{'basic_materials:gold_wire', 'technic:lv_cable',       'basic_materials:gold_wire'},
+		{'basic_materials:silver_wire', 'technic:lv_cable',       'basic_materials:silver_wire'},
 	},
 	replacements = {
-		{"basic_materials:gold_wire", "basic_materials:empty_spool"},
-		{"basic_materials:gold_wire", "basic_materials:empty_spool"}
+		{"basic_materials:silver_wire", "basic_materials:empty_spool"},
+		{"basic_materials:silver_wire", "basic_materials:empty_spool"}
 	},
 })
 

@@ -47,13 +47,6 @@ technic_cnc.register_all("default:sandstone",
                 {"default_sandstone.png"},
                 S("Sandstone"))
 
--- SILVER SANDSTONE
-------------
-technic_cnc.register_all("default:silver_sandstone",
-                {crumbly=2, cracky=3, not_in_creative_inventory=1},
-                {"default_silver_sandstone.png"},
-                S("Silver Sandstone"))
-
 -- LEAVES
 ---------
 technic_cnc.register_all("default:leaves",

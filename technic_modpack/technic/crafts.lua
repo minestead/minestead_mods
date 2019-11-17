@@ -82,9 +82,9 @@ minetest.register_craft({
 minetest.register_craft({
 	output = 'technic:red_energy_crystal',
 	recipe = {
-		{'default:gold_ingot', 'technic:battery', 'dye:red'},
+		{'moreores:silver_ingot', 'technic:battery', 'dye:red'},
 		{'technic:battery', 'basic_materials:energy_crystal_simple', 'technic:battery'},
-		{'dye:red', 'technic:battery', 'default:gold_ingot'},
+		{'dye:red', 'technic:battery', 'moreores:silver_ingot'},
 	}
 })
 

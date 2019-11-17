@@ -9,7 +9,7 @@ minetest.register_craft({
 	output = 'technic:solar_panel',
 	recipe = {
 		{'technic:doped_silicon_wafer', 'technic:doped_silicon_wafer', 'technic:doped_silicon_wafer'},
-		{'basic_materials:gold_wire',    'technic:lv_cable',            'mesecons_materials:glue'},
+		{'basic_materials:silver_wire',    'technic:lv_cable',            'mesecons_materials:glue'},
 	},
 	replacements = { {"basic_materials:silver_wire", "basic_materials:empty_spool"}, },
 })
