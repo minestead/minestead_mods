@@ -5,7 +5,7 @@ local buildable_to_nodes = {}
 minetest.after(4, function()
 	local count = 0
 	for name, node in pairs(minetest.registered_nodes) do
-		if node.buildable_to then
+		if node.buildable_to and node.drawtype == "airlike" then
 			count = count + 1
 			local id = minetest.get_content_id(name)
 			buildable_to_nodes[id] = true
