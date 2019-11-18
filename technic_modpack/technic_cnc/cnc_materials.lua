@@ -33,6 +33,15 @@ technic_cnc.register_all("default:cobble",
                 {cracky=3, not_in_creative_inventory=1},
                 {"default_cobble.png"},
                 S("Cobble"))
+
+-- DESERT COBBLE
+---------
+technic_cnc.register_all("default:desert_cobble",
+                {cracky=3, not_in_creative_inventory=1},
+                {"default_desert_cobble.png"},
+                S("Desert Cobble"))
+
+
 -- BRICK
 --------
 technic_cnc.register_all("default:brick",
@@ -46,6 +55,21 @@ technic_cnc.register_all("default:sandstone",
                 {crumbly=2, cracky=3, not_in_creative_inventory=1},
                 {"default_sandstone.png"},
                 S("Sandstone"))
+
+-- SILVER SANDSTONE
+------------
+technic_cnc.register_all("default:silver_sandstone",
+                {crumbly=2, cracky=3, not_in_creative_inventory=1},
+                {"default_silver_sandstone.png"},
+                S("silver Sandstone"))
+
+-- DESERT SANDSTONE
+------------
+technic_cnc.register_all("default:desert_sandstone",
+                {crumbly=2, cracky=3, not_in_creative_inventory=1},
+                {"default_desert_sandstone.png"},
+                S("Desert Sandstone"))
+
 
 -- LEAVES
 ---------
