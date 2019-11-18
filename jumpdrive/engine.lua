@@ -25,7 +25,7 @@ minetest.register_node("jumpdrive:engine", {
 	connect_sides = {"bottom", "top", "left", "right", "front", "back"},
 
 	light_source = 13,
-	groups = {cracky=3,oddly_breakable_by_hand=3,tubedevice=1, tubedevice_receiver=1,technic_machine = 1, technic_hv = 1},
+	groups = {cracky=2,oddly_breakable_by_hand=2,tubedevice=1, tubedevice_receiver=1,technic_machine = 1, technic_hv = 1},
 
 	sounds = default.node_sound_glass_defaults(),
 

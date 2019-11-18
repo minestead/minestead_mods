@@ -42,7 +42,7 @@ minetest.register_node("jumpdrive:fleet_controller", {
 	description = "Jumpdrive Fleet controller",
 
 	tiles = {"jumpdrive_fleet_controller_top.png", "jumpdrive_fleet_controller.png"},
-	groups = {cracky=3,oddly_breakable_by_hand=3},
+	groups = {cracky=2,oddly_breakable_by_hand=2},
 	sounds = default.node_sound_glass_defaults(),
 
 	light_source = 13,
