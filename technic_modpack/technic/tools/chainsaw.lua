@@ -228,10 +228,10 @@ local function iterSawTries(pos)
 		return pos
 	end
 end
-
+local SAW_RADIUS = 8
 -- This function does all the hard work. Recursively we dig the node at hand
 -- if it is in the table and then search the surroundings for more stuff to dig.
-local function recursive_dig(pos, remaining_charge)
+local function recursive_dig(pos, remaining_charge, spos)
 	if remaining_charge < chainsaw_charge_per_node then
 		return remaining_charge
 	end
@@ -240,7 +240,11 @@ local function recursive_dig(pos, remaining_charge)
 	if not timber_nodenames[node.name] then
 		return remaining_charge
 	end
-
+	local dx = math.abs(pos.x - spos.x)
+	local dz = math.abs(pos.z - spos.z)
+	if dx >= SAW_RADIUS or dz >= SAW_RADIUS then
+		return remaining_charge
+	end
 	-- Wood found - cut it
 	handle_drops(minetest.get_node_drops(node.name, ""))
 	minetest.remove_node(pos)
@@ -252,7 +256,7 @@ local function recursive_dig(pos, remaining_charge)
 			break
 		end
 		if timber_nodenames[minetest.get_node(npos).name] then
-			remaining_charge = recursive_dig(npos, remaining_charge)
+			remaining_charge = recursive_dig(npos, remaining_charge, spos)
 		end
 	end
 	return remaining_charge
@@ -295,7 +299,8 @@ end
 -- Chainsaw entry point
 local function chainsaw_dig(pos, current_charge)
 	-- Start sawing things down
-	local remaining_charge = recursive_dig(pos, current_charge)
+	local spos = vector.new(pos)
+	local remaining_charge = recursive_dig(pos, current_charge, spos)
 	minetest.sound_play("chainsaw", {pos = pos, gain = 1.0,
 			max_hear_distance = 10})
 
