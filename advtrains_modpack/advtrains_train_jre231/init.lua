@@ -79,12 +79,6 @@ advtrains.register_wagon("KuHa_E231", {
 			end
 		end 
 	end,
-	update_animation=function(self, velocity)
-		if self.old_anim_velocity~=advtrains.abs_ceil(velocity) then
-			self.object:set_animation({x=1,y=80}, advtrains.abs_ceil(velocity)*15, 0, true)
-			self.old_anim_velocity=advtrains.abs_ceil(velocity)
-		end
-	end,
 	door_entry={-1},
 	assign_to_seat_group = {"dstand", "pass"},
 	visual_size = {x=1, y=1},
