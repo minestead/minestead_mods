@@ -128,10 +128,10 @@ local sailstep = function(self)
 					end
 				else	-- paddle
 					local paddleacc
-					if longit_speed < 1.0 and ctrl.up then
-						paddleacc = 0.5
-					elseif longit_speed >  -1.0 and ctrl.down then
-						paddleacc = -0.5
+					if longit_speed < 2 and ctrl.up then
+						paddleacc = 1
+					elseif longit_speed >  -2 and ctrl.down then
+						paddleacc = -1
 					end
 					if paddleacc then accel=vct.add(accel,vct.multiply(hdir,paddleacc)) end
 				end
@@ -148,9 +148,9 @@ local sailstep = function(self)
 				end
 				-- rudder
 				if ctrl.right then
-					rudder_angle = max(self.rudder_angle-20*dtime,-RUDDER_LIMIT)
+					rudder_angle = max(self.rudder_angle-40*dtime,-RUDDER_LIMIT)
 				elseif ctrl.left then
-					rudder_angle = min(self.rudder_angle+20*dtime,RUDDER_LIMIT)
+					rudder_angle = min(self.rudder_angle+40*dtime,RUDDER_LIMIT)
 				end	
 			end
 		end
