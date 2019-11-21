@@ -29,4 +29,8 @@ if minetest.get_modpath("moremesecons_wireless") then
 	table.insert(jumpdrive.blacklist, "moremesecons_wireless:jammer_off")
 end
 
+if minetest.get_modpath("tubelib_addons3") then
+	table.insert(jumpdrive.blacklist, "tubelib_addons3:teleporter")
+	table.insert(jumpdrive.blacklist, "tubelib_addons3:teleporter 2")
+end
 -- TODO bedrock, advtrains tracks
