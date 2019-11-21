@@ -137,6 +137,7 @@ jumpdrive.move = function(source_pos1, source_pos2, target_pos1, target_pos2)
 	manip:write_to_map()
 	manip:update_map()
 
+	tubelib.jump(delta_vector)
 	t1 = minetest.get_us_time()
 	minetest.log("action", "[jumpdrive] step V took " .. (t1 - t0) .. " us")
 

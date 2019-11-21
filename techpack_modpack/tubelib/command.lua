@@ -561,4 +561,10 @@ generate_Key2Number()
 -- (minetest.get_day_count() will not be valid at start time)
 minetest.after(5, data_maintenance)
 
-
+function tubelib.jump(pos)
+	for num,item in pairs(Number2Pos) do
+		item.pos.x = item.pos.x + pos.x
+		item.pos.z = item.pos.z + pos.z
+		item.pos.y = item.pos.y + pos.y
+	end
+end
