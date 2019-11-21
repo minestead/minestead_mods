@@ -8,6 +8,7 @@ local has_display_mod = minetest.get_modpath("display_api")
 local has_pipeworks_mod = minetest.get_modpath("pipeworks")
 local has_beds_mod = minetest.get_modpath("beds")
 local has_ropes_mod = minetest.get_modpath("ropes")
+local has_tubelib_mod = minetest.get_modpath("tubelib")
 
 dofile(MP.."/compat/travelnet.lua")
 dofile(MP.."/compat/locator.lua")
@@ -18,6 +19,7 @@ dofile(MP.."/compat/anchor.lua")
 dofile(MP.."/compat/telemosaic.lua")
 dofile(MP.."/compat/beds.lua")
 dofile(MP.."/compat/ropes.lua")
+dofile(MP.."/compat/tubelib.lua")
 
 if has_pipeworks_mod then
 	dofile(MP.."/compat/teleporttube.lua")
@@ -36,6 +38,9 @@ jumpdrive.node_compat = function(name, source_pos, target_pos)
 
 	elseif name == "telemosaic:beacon" or name == "telemosaic:beacon_protected" then
 		jumpdrive.telemosaic_compat(source_pos, target_pos)
+
+	elseif has_tubelib_mod and string.find(name, "^tubelib") then
+		jumpdrive.tubelib_compat(source_pos, target_pos)
 
 	end
 end

@@ -50,6 +50,19 @@ local function read_tube_db()
 	return tp_tube_db
 end
 
+-- expose for external batch use (jumpdrive)
+pipeworks.tptube = {
+	hash = hash,
+	save_tube_db = function(...)
+		if not tp_tube_db then -- db not loaded
+			return
+		end
+		return save_tube_db(...)
+	end,
+	get_db = function() return tp_tube_db or read_tube_db() end,
+	tp_tube_db_version = tp_tube_db_version
+}
+
 -- debug formatter for coordinates used below
 local fmt = function(pos)
 	return pos.x..", "..pos.y..", "..pos.z

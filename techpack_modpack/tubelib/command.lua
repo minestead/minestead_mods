@@ -562,3 +562,19 @@ generate_Key2Number()
 minetest.after(5, data_maintenance)
 
 
+function tubelib.jump(pos, to)
+	local num = tubelib.get_node_number(pos)
+	if not num then
+		return
+	end
+
+	local key = get_key_str(pos)
+	local new_key = get_key_str(to)
+
+	Key2Number[key] = nil
+	Key2Number[new_key] = num
+
+	Number2Pos[num].pos.x = to.x
+	Number2Pos[num].pos.y = to.y
+	Number2Pos[num].pos.z = to.z
+end
