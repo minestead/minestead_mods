@@ -31,6 +31,5 @@ end
 
 if minetest.get_modpath("tubelib_addons3") then
 	table.insert(jumpdrive.blacklist, "tubelib_addons3:teleporter")
-	table.insert(jumpdrive.blacklist, "tubelib_addons3:teleporter 2")
 end
 -- TODO bedrock, advtrains tracks
