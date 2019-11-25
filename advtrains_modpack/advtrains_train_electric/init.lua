@@ -48,6 +48,7 @@ advtrains.register_wagon("engine_electric", {
 			name = "Driver Stand",
 			access_to = {"pass"},
 			require_doors_open=true,
+			driving_ctrl_access=true,
 		},
 		pass={
 			name = "Passenger area",
