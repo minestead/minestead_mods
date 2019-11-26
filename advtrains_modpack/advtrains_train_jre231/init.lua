@@ -13,32 +13,32 @@ advtrains.register_wagon("KuHa_E231", {
 	seats = {
 		{
 			name=S("Driver stand"),
-			attach_offset={x=0, y=8, z=18},
+			attach_offset={x=0, y=4, z=18},
 			view_offset={x=0, y=0, z=0},
 			driving_ctrl_access=true,
 			group="dstand",
 		},
 		{
 			name="1",
-			attach_offset={x=-4, y=8, z=0},
+			attach_offset={x=-4, y=4, z=0},
 			view_offset={x=0, y=0, z=0},
 			group="pass",
 		},
 		{
 			name="2",
-			attach_offset={x=4, y=8, z=0},
+			attach_offset={x=4, y=4, z=0},
 			view_offset={x=0, y=0, z=0},
 			group="pass",
 		},
 		{
 			name="3",
-			attach_offset={x=-4, y=8, z=-8},
+			attach_offset={x=-4, y=4, z=-8},
 			view_offset={x=0, y=0, z=0},
 			group="pass",
 		},
 		{
 			name="4",
-			attach_offset={x=4, y=8, z=-8},
+			attach_offset={x=4, y=4, z=-8},
 			view_offset={x=0, y=0, z=0},
 			group="pass",
 		},
@@ -86,7 +86,7 @@ advtrains.register_wagon("KuHa_E231", {
 	is_locomotive=true,
 	collisionbox = {-1.0,-0.5,-1.0, 1.0,2.5,1.0},
 	drops={"advtrains:KuHa_E231"},
-	glow = 5,
+	glow = 2,
 }, S("KuHa_E231"), "advtrains_KuHa_E231_inv.png")
 
 
@@ -107,37 +107,37 @@ advtrains.register_wagon("SaHa_E231", {
 	seats = {
 		{
 			name="1",
-			attach_offset={x=-4, y=8, z=8},
+			attach_offset={x=-4, y=4, z=8},
 			view_offset={x=0, y=0, z=0},
 			group="pass",
 		},
 		{
 			name="2",
-			attach_offset={x=4, y=8, z=8},
+			attach_offset={x=4, y=4, z=8},
 			view_offset={x=0, y=0, z=0},
 			group="pass",
 		},
 		{
 			name="1a",
-			attach_offset={x=-4, y=8, z=0},
+			attach_offset={x=-4, y=4, z=0},
 			view_offset={x=0, y=0, z=0},
 			group="pass",
 		},
 		{
 			name="2a",
-			attach_offset={x=4, y=8, z=0},
+			attach_offset={x=4, y=4, z=0},
 			view_offset={x=0, y=0, z=0},
 			group="pass",
 		},
 		{
 			name="3",
-			attach_offset={x=-4, y=8, z=-8},
+			attach_offset={x=-4, y=4, z=-8},
 			view_offset={x=0, y=0, z=0},
 			group="pass",
 		},
 		{
 			name="4",
-			attach_offset={x=4, y=8, z=-8},
+			attach_offset={x=4, y=4, z=-8},
 			view_offset={x=0, y=0, z=0},
 			group="pass",
 		},
@@ -167,6 +167,7 @@ advtrains.register_wagon("SaHa_E231", {
 	wagon_span=2.3,
 	collisionbox = {-1.0,-0.5,-1.0, 1.0,2.5,1.0},
 	drops={"advtrains:SaHa_E231"},
+	glow = 2,
 }, S("SaHa_E231"), "advtrains_SaHa_E231_inv.png")
 
 minetest.register_craft({
