@@ -12,7 +12,7 @@ function technic.register_distiller_recipe(data)
 end
 
 local recipes = {
-	{"farming:sugar", "vessels:glass_bottle", "farming:bottle_ethanol"},
+	{"farming:sugar 3", "vessels:glass_bottle", "farming:bottle_ethanol"},
 	{"mobs:honey", "vessels:glass_bottle", "farming:bottle_ethanol"},
 }
 
