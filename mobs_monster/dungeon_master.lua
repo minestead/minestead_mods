@@ -61,7 +61,7 @@ mobs:register_mob("mobs_monster:dungeon_master", {
 	},
 })
 
-
+--[[
 mobs:spawn({
 	name = "mobs_monster:dungeon_master",
 	nodes = {"default:stone"},
@@ -70,7 +70,7 @@ mobs:spawn({
 	active_object_count = 1,
 	max_height = -70,
 })
-
+]]--
 
 mobs:register_egg("mobs_monster:dungeon_master", S("Dungeon Master"), "fire_basic_flame.png", 1, true)
 
