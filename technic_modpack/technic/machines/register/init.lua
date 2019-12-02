@@ -38,3 +38,6 @@ dofile(path.."/freezer.lua")
 -- distiller by Irremann
 dofile(path.."/distiller_recipes.lua")
 dofile(path.."/distiller.lua")
+-- transmutator by Irremann
+dofile(path.."/transmutator_recipes.lua")
+dofile(path.."/transmutator.lua")
