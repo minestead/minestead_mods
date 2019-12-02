@@ -2,6 +2,29 @@
 --crafting.lua
 --registers crafting recipes
 
+
+
+if minetest.get_modpath("technic") then
+	minetest.register_craft({
+		output = 'advtrains:dtrack_placer 49',
+		recipe = {
+			{'technic:zinc_ingot', 'group:stick', 'technic:zinc_ingot'},
+			{'technic:zinc_ingot', 'group:stick', 'technic:zinc_ingot'},
+			{'technic:zinc_ingot', 'group:stick', 'technic:zinc_ingot'},
+		},
+	})
+
+	minetest.register_craft({
+		output = 'advtrains:dtrack_placer 49',
+		recipe = {
+			{'technic:lead_ingot', 'group:stick', 'technic:lead_ingot'},
+			{'technic:lead_ingot', 'group:stick', 'technic:lead_ingot'},
+			{'technic:lead_ingot', 'group:stick', 'technic:lead_ingot'},
+		},
+	})
+end
+
+
 --tracks
 minetest.register_craft({
 	output = 'advtrains:dtrack_placer 49',
@@ -11,6 +34,8 @@ minetest.register_craft({
 		{'default:steel_ingot', 'group:stick', 'default:steel_ingot'},
 	},
 })
+
+
 minetest.register_craft({
 	type = "shapeless",
 	output = 'advtrains:dtrack_slopeplacer 2',
