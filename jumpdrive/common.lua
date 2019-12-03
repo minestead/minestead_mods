@@ -37,7 +37,7 @@ jumpdrive.simulate_jump = function(pos, player, show_marker)
 	end
 
 
-	if player:get_physics_override().gravity == 0 then
+	if player ~= nil and player:get_physics_override().gravity == 0 then
 		return false, "Error: jump is not finished!"
 	end
 
