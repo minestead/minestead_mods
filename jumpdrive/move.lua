@@ -107,10 +107,13 @@ jumpdrive.move = function(source_pos1, source_pos2, target_pos1, target_pos2)
 		if xMatch and yMatch and zMatch and player:is_player() then
 			minetest.log("action", "[jumpdrive] moving player: " .. player:get_player_name())
 			local new_player_pos = vector.add(playerPos, delta_vector)
-			player:set_pos( new_player_pos );
 			local op = player:get_physics_override()
 			player:set_physics_override({speed = 0, gravity = 0, jump = 0})
-			minetest.after(3, function(o) player:set_physics_override({gravity = o.gravity, jump = o.jump, speed = o.speed}) end, op)
+			player:set_pos( new_player_pos );
+			minetest.after(3, function(o, pos)
+				player:set_physics_override({gravity = o.gravity, jump = o.jump, speed = o.speed})
+				player:set_pos( pos );
+			end, op, new_player_pos)
 		end
 	end
 

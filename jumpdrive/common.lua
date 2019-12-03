@@ -36,6 +36,11 @@ jumpdrive.simulate_jump = function(pos, player, show_marker)
 		return false, "Error: mapgen was active in this area, please try again later for your own safety!"
 	end
 
+
+	if player:get_physics_override().gravity == 0 then
+		return false, "Error: jump is not finished!"
+	end
+
 	local meta = minetest.get_meta(pos)
 	local radius = jumpdrive.get_radius(pos)
 	local distance = vector.distance(pos, targetPos)
