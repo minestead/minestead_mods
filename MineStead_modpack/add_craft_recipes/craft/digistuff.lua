@@ -1,7 +1,6 @@
 local wire = 'digilines:wire_std_00000000'
 
-if minetest.get_modpath("digistuff") then
-  if minetest.get_modpath("mesecons_noteblock") then
+if minetest.get_modpath("mesecons_noteblock") then
     -- digistuff noteblock
     minetest.register_craft({
         type = "shapeless",
@@ -10,9 +9,9 @@ if minetest.get_modpath("digistuff") then
                 "mesecons_noteblock:noteblock", wire
         }
     })
-  end
+end
 
-  if minetest.get_modpath("homedecor_electronics") then
+if minetest.get_modpath("homedecor_electronics") then
     -- digistuff piezo
     minetest.register_craft({
         type = "shapeless",
@@ -21,9 +20,9 @@ if minetest.get_modpath("digistuff") then
                 "homedecor:speaker_driver", wire
         }
     })
-  end
+end
 
-  if minetest.get_modpath("mesecons_mvps") then
+if minetest.get_modpath("mesecons_mvps") then
     -- digistuff piston
     minetest.register_craft({
         type = "shapeless",
@@ -32,13 +31,12 @@ if minetest.get_modpath("digistuff") then
                 "mesecons_pistons:piston_normal_off", wire
         }
     })
-  end
+end
 
-  minetest.register_craft({
+minetest.register_craft({
         type = "shapeless",
         output = "digistuff:wall_knob",
         recipe = {
                 "digistuff:button", wire
         }
-  })
-end
+})

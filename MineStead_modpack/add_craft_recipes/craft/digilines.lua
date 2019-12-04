@@ -17,4 +17,3 @@ minetest.register_craft({
                 "basic_materials:ic", wire
         }
 })
-
