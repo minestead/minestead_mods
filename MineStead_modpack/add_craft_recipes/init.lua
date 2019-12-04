@@ -12,3 +12,7 @@ end
 if minetest.get_modpath("nixie_tubes") then
   dofile(MP.."/craft/nixie_tubes.lua")
 end
+
+if minetest.get_modpath("advtrains_luaautomation") then
+  dofile(MP.."/craft/advtrains_luaautomation.lua")
+end
