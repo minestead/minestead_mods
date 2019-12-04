@@ -109,3 +109,37 @@ minetest.register_craft({
     {body, body, wire}
 	}
 })
+
+
+-- scifi monitors
+
+minetest.register_craft({
+  output = "digiterms:scifi_glassscreen",
+  recipe = {
+    {glass, glass, glass},
+    {glass, "digiterms:lcd_monitor", glass},
+  }
+})
+
+minetest.register_craft({
+  output = "digiterms:scifi_widescreen",
+  recipe = {
+    {glass, glass, glass},
+    {body, "digiterms:lcd_monitor", body},
+  }
+})
+
+minetest.register_craft({
+  output = "digiterms:scifi_tallscreen",
+  recipe = {
+    {body, glass, ''},
+    {"digiterms:lcd_monitor", glass, ''},
+    {body, glass, ''},
+  }
+})
+
+minetest.register_craft({
+  output = "digiterms:scifi_keysmonitor",
+  type = "shapeless",
+  recipe = { "digiterms:lcd_monitor", "digiterms:black_keyboard" }
+})
