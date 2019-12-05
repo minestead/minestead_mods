@@ -162,7 +162,9 @@ local sailstep = function(self)
 		end
 		if abs(self.rudder_angle)>5 then 
 --			newyaw = yaw+dtime*RUDDER_TURN_RATE*longit_speed*self.rudder_angle/30 
-			newyaw = yaw+dtime*(1-1/(longit_speed*0.5+1))*self.rudder_angle/30*RUDDER_TURN_RATE
+			local d = 1 - 1 / (math.abs(longit_speed * 0.5) + 1)
+			if longit_speed < 0 then d = -d end
+			newyaw = yaw+dtime*d*self.rudder_angle/30*RUDDER_TURN_RATE
 		end
 		
 		if self.sail_set then
@@ -199,13 +201,17 @@ local sailstep = function(self)
 		end
 		
 		local bob = minmax(dot(accel,hdir),1)	-- vertical bobbing
-		
+
 		if self.isinliquid then
-			accel.y = accel_y+bob
+			accel.y = (accel_y+bob)
+			if not self.driver then
+				accel.y = 0
+				self.object:set_velocity({x = vel.x, y = 0, z = vel.z})
+			end
 			newpitch = vel.y * rad(6)
 			self.object:set_acceleration(accel)
 		end
-		
+
 		if abs(newroll-roll)>ROLL_RATE*dtime then newroll=roll+ROLL_RATE*dtime*sign(newroll-roll) end
 		if newroll~=roll or newyaw~=yaw or newpitch~=pitch then self.object:set_rotation({x=newpitch,y=newyaw,z=newroll}) end
 		
@@ -267,6 +273,8 @@ local function take_boat(self, puncher)
 		self.driver = nil
 		puncher:set_detach()
 		player_api.player_attached[name] = false
+		puncher:set_eye_offset({x=0,y=0,z=0},{x=0,y=0,z=0})
+		player_api.set_animation(puncher, "stand" , 30)
 	end
 	if not self.driver then
 		self.removed = true
