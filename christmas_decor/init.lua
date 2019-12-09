@@ -505,6 +505,23 @@ minetest.register_craft({
 	recipe = {"christmas_decor:candycane_base", "dye:red", "dye:white"},
 })
 
+minetest.register_craft({
+	output = "christmas_decor:candycane_block",
+	recipe = {
+	    { "christmas_decor:candycane_edible", "christmas_decor:candycane_edible", "christmas_decor:candycane_edible" },
+	    { "christmas_decor:candycane_edible", "christmas_decor:candycane_edible", "christmas_decor:candycane_edible" },
+	    { "christmas_decor:candycane_edible", "christmas_decor:candycane_edible", "christmas_decor:candycane_edible" },
+	}
+})
+
+
+minetest.register_craft({
+	output = "christmas_decor:candycane_edible",
+	type = "shapeless",
+	recipe = {"christmas_decor:candycane_base", "dye:red", "dye:white"},
+})
+
+
 -- Mistletoe
 minetest.register_node("christmas_decor:mistletoe", {
 	description = "Mistletoe",
