@@ -83,6 +83,8 @@ local recipes = {
 	{"farming:pineapple",          "farming:sugar 3"},
 	{"farming:pumpkin_8",          "farming:sugar 2"},
 	{"farming:raspberries",          "farming:sugar"},
+	{"farming:carrot",          "farming:sugar 2"},
+	{"farming:carrot_gold",          "farming:sugar 2"},
 }
 
 for _, data in pairs(recipes) do
