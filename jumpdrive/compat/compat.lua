@@ -19,6 +19,7 @@ dofile(MP.."/compat/anchor.lua")
 dofile(MP.."/compat/telemosaic.lua")
 dofile(MP.."/compat/beds.lua")
 dofile(MP.."/compat/ropes.lua")
+dofile(MP.."/compat/switching_station.lua")
 dofile(MP.."/compat/tubelib.lua")
 
 if has_pipeworks_mod then
@@ -41,6 +42,9 @@ jumpdrive.node_compat = function(name, source_pos, target_pos)
 
 	elseif has_tubelib_mod and string.find(name, "^tubelib") then
 		jumpdrive.tubelib_compat(source_pos, target_pos)
+
+	elseif has_technic_mod and name == "technic:switching_station" then
+		jumpdrive.switching_station_compat(source_pos, target_pos)
 
 	end
 end
