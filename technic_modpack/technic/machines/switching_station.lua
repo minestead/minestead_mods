@@ -269,6 +269,7 @@ minetest.register_abm({
 		if meta:get_int("active") ~= 1 then
 			minetest.forceload_free_block(pos)
 			minetest.forceload_free_block(pos1)
+			meta:set_int('is_forceloaded', 0)
 			meta:set_string("infotext",S("%s Already Present"):format(machine_name))
 
 			local poshash = minetest.hash_node_position(pos)
@@ -284,14 +285,18 @@ minetest.register_abm({
 		local tier = technic.get_cable_tier(name)
 		if tier then
 			-- Forceload switching station
-			minetest.forceload_block(pos)
-			minetest.forceload_block(pos1)
+			if meta:get_int('is_forceloaded') ~= 1 then
+			    minetest.forceload_block(pos)
+			    minetest.forceload_block(pos1)
+			    meta:set_int('is_forceloaded', 1)
+			end
 			PR_nodes, BA_nodes, RE_nodes = get_network(pos, pos1, tier)
 		else
 			--dprint("Not connected to a network")
 			meta:set_string("infotext", S("%s Has No Network"):format(machine_name))
 			minetest.forceload_free_block(pos)
 			minetest.forceload_free_block(pos1)
+			meta:set_int('is_forceloaded', 0)
 			return
 		end
 

@@ -20,6 +20,7 @@ dofile(MP.."/compat/anchor.lua")
 dofile(MP.."/compat/telemosaic.lua")
 dofile(MP.."/compat/beds.lua")
 dofile(MP.."/compat/ropes.lua")
+dofile(MP.."/compat/switching_station.lua")
 dofile(MP.."/compat/tubelib.lua")
 dofile(MP.."/compat/ham_radio.lua")
 
@@ -47,6 +48,9 @@ jumpdrive.node_compat = function(name, source_pos, target_pos)
 
 	elseif (name == "ham_radio:transmitter" or name == "ham_radio:beacon") and has_ham_radio_mod then
 		jumpdrive.ham_radio_compat(source_pos, target_pos)
+
+	elseif has_technic_mod and name == "technic:switching_station" then
+		jumpdrive.switching_station_compat(source_pos, target_pos)
 
 	end
 end
