@@ -327,6 +327,7 @@ minetest.register_craft({
 dofile(minetest.get_modpath("christmas_decor").."/stocking.lua")
 
 -- Apparel
+--[[
 minetest.register_tool("christmas_decor:helmet_santa_hat", {
 		description = "Santa Hat",
 		inventory_image = "inv_helmet_santa_hat.png",
@@ -337,6 +338,15 @@ minetest.register_tool("christmas_decor:helmet_santa_hat", {
 		},
 		wear = 0,
 })
+]]--
+        armor:register_armor("christmas_decor:helmet_santa_hat", {
+                description = "Santa Hat",
+                inventory_image = "inv_helmet_santa_hat.png",
+                groups = {armor_head=1, armor_heal=1, armor_use=1},
+                armor_groups = {fleshy=1},
+                damage_groups = {cracky=1, snappy=1, choppy=1, crumbly=1, level=1},
+        })
+
 
 minetest.register_craft({
 	output = "christmas_decor:helmet_santa_hat",
