@@ -5,6 +5,8 @@ else
     S = function(s,a,...)a={a,...}return s:gsub("@(%d+)",function(n)return a[tonumber(n)]end)end
 end
 
+local SND_LOOP_LEN = 5
+
 advtrains.register_wagon("engine_electric", {
 	mesh="advtrains_engine_electric.b3d",
 	textures = {"advtrains_engine_electric.png"},
@@ -69,16 +71,20 @@ advtrains.register_wagon("engine_electric", {
 			sound="advtrains_electric_door"
 		}
 	},
-	custom_on_velocity_change=function(self, velocity)
-        if velocity > 0 and not self.sound_loop_handle then
-			self.sound_loop_handle = minetest.sound_play("advtrains_electric_loop", {gain=0.01, max_hear_distance=4, object = self.object, loop=true})
-		elseif velocity==0 then
-			if self.sound_loop_handle then
-				minetest.sound_stop(self.sound_loop_handle)
-				self.sound_loop_handle = nil
-			end
-		end 
-	end,
+        custom_on_step=function(self, dtime)
+                if self:train().velocity > 0 then -- First make sure that the train isn't standing
+                        if not self.sound_loop_tmr or self.sound_loop_tmr <= 0 then
+                                -- start the sound if it was never started or has expired
+                                self.sound_loop_handle = minetest.sound_play({name="advtrains_electric_loop", gain=2}, {object=self.object})
+                                self.sound_loop_tmr = SND_LOOP_LEN
+                        end
+                        --decrease the sound timer
+                        self.sound_loop_tmr = self.sound_loop_tmr - dtime
+                else
+                        -- If the train is standing, the sound will be stopped in some time. We do not need to interfere with it.
+                        self.sound_loop_tmr = nil
+                end
+        end,
 	update_animation=function(self, velocity)
 		if self.old_anim_velocity~=advtrains.abs_ceil(velocity) then
 			self.object:set_animation({x=1,y=80}, advtrains.abs_ceil(velocity)*15, 0, true)
