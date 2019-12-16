@@ -45,6 +45,7 @@ local wagon={
 	textures = {"black.png"},
 	is_wagon=true,
 	wagon_span=1,--how many index units of space does this wagon consume
+	wagon_width=3, -- Wagon width in meters
 	has_inventory=false,
 	static_save=false,
 }
@@ -113,6 +114,12 @@ function wagon:set_id(wid)
 	
 	minetest.after(0.2, function() self:reattach_all() end)
 	
+	
+	
+	if self.set_textures then
+		self:set_textures(data)
+	end
+	
 	if self.custom_on_activate then
 		self:custom_on_activate()
 	end
@@ -166,23 +173,30 @@ function wagon:on_punch(puncher, time_from_last_punch, tool_capabilities, direct
 		   minetest.chat_send_player(puncher:get_player_name(), attrans("This wagon is owned by @1, you can't destroy it.", data.owner));
 		   return
 		end
-		if #(self:train().trainparts)>1 then
-		   minetest.chat_send_player(puncher:get_player_name(), attrans("Wagon needs to be decoupled from other wagons in order to destroy it."));
-		   return
-		end
-		
-		local pc=puncher:get_player_control()
-		if not pc.sneak then
-			minetest.chat_send_player(puncher:get_player_name(), attrans("Warning: If you destroy this wagon, you only get some steel back! If you are sure, hold Sneak and left-click the wagon."))
-			return
-		end
 		
 		if self.custom_may_destroy then
 			if not self.custom_may_destroy(self, puncher, time_from_last_punch, tool_capabilities, direction) then
 				return
 			end
 		end
+		local itemstack = puncher:get_wielded_item()
+		-- WARNING: This part of the API is guaranteed to change! DO NOT USE!
+		if self.set_livery and itemstack:get_name() == "bike:painter" then
+			self:set_livery(puncher, itemstack, data)
+			return
+		end
+		if #(self:train().trainparts)>1 then
+		   minetest.chat_send_player(puncher:get_player_name(), attrans("Wagon needs to be decoupled from other wagons in order to destroy it."));
+		   return
+		end
 
+		local pc=puncher:get_player_control()
+		if not pc.sneak then
+			minetest.chat_send_player(puncher:get_player_name(), attrans("Warning: If you destroy this wagon, you only get some steel back! If you are sure, hold Sneak and left-click the wagon."))
+			return
+		end
+		
+		
 		if not self:destroy() then return end
 
 		local inv = puncher:get_inventory()
@@ -418,17 +432,10 @@ function wagon:on_step(dtime)
 				end
 			end
 			if collides then
-				if self.collision_count and self.collision_count>10 then
-					--enable collision mercy to get trains stuck in walls out of walls
-					--actually do nothing except limiting the velocity to 1
-					train.velocity=math.min(train.velocity, 1)
-				else
-					train.recently_collided_with_env=true
-					train.velocity=0
-					self.collision_count=(self.collision_count or 0)+1
-				end
-			else
-				self.collision_count=nil
+				-- screw collision mercy
+				train.recently_collided_with_env=true
+				train.velocity=0
+				advtrains.atc.train_reset_command(train)
 			end
 		end
 		
@@ -694,12 +701,17 @@ function wagon:get_off(seatno)
 				local fct=data.wagon_flipped and -1 or 1
 				local aci = advtrains.path_get_index_by_offset(train, index, ino*fct)
 				local ix1, ix2 = advtrains.path_get_adjacent(train, aci)
+				local d = train.door_open
+				if self.wagon_width then
+					d = d * math.floor(self.wagon_width/2)
+				end
 				-- the two wanted positions are ix1 and ix2 + (2nd-1st rotated by 90deg)
 				-- (x z) rotated by 90deg is (-z x)  (http://stackoverflow.com/a/4780141)
-				local add = { x = (ix2.z-ix1.z)*train.door_open, y = 0, z = (ix1.x-ix2.x)*train.door_open }
-				local oadd = { x = (ix2.z-ix1.z)*train.door_open*2, y = 1, z = (ix1.x-ix2.x)*train.door_open*2}
+				local add = { x = (ix2.z-ix1.z)*d, y = 0, z = (ix1.x-ix2.x)*d }
+				local oadd = { x = (ix2.z-ix1.z)*(d+train.door_open), y = 1, z = (ix1.x-ix2.x)*(d+train.door_open)}
 				local platpos=vector.round(vector.add(ix1, add))
 				local offpos=vector.round(vector.add(ix1, oadd))
+				
 				--atdebug("platpos:", platpos, "offpos:", offpos)
 				if minetest.get_item_group(minetest.get_node(platpos).name, "platform")>0 then
 					minetest.after(GETOFF_TP_DELAY, function() clicker:setpos(offpos) end)

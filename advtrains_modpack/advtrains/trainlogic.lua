@@ -116,8 +116,10 @@ function advtrains.tp_player_to_train(player)
 		player:setpos(train.last_pos)
 	end
 end
-minetest.register_on_joinplayer(function()
+minetest.register_on_joinplayer(function(player)
 	return advtrains.pcall(function()
+		advtrains.hud[player:get_player_name()] = nil
+		advtrains.hhud[player:get_player_name()] = nil
 		--independent of this, cause all wagons of the train which are loaded to reattach their players
 		--needed because already loaded wagons won't call reattach_all()
 		for _,wagon in pairs(minetest.luaentities) do
@@ -472,7 +474,8 @@ function advtrains.train_step_b(id, train, dtime)
 	
 	--- 4. move train ---
 	
-	local pdist = train.path_dist[math.floor(train.index)] or 1
+	local idx_floor = math.floor(train.index)
+	local pdist = (train.path_dist[idx_floor+1] - train.path_dist[idx_floor])
 	local distance = (train.velocity*dtime) / pdist
 	
 	--debugging code
@@ -702,40 +705,6 @@ advtrains.te_register_on_remove(function(id, train)
 	end
 	--atdebug(id,"tnc remove",train.index,train.end_index)
 end)
-
--- Calculates the indices where the window borders of the occupation windows are.
--- TODO adapt this code to new system, probably into a callback (probably only the brake distance code is needed)
-local function calc_occwindows(id, train)
-	local end_index = advtrains.path_get_index_by_offset(train, train.index, -train.trainlen)
-	train.end_index = end_index
-	local cpl_b = end_index - COUPLE_ZONE
-	local safety_b = advtrains.path_get_index_by_offset(train, cpl_b, -SAFETY_ZONE)
-	local cpl_f = end_index + COUPLE_ZONE
-	local safety_f = advtrains.path_get_index_by_offset(train, cpl_f, SAFETY_ZONE)
-	
-	-- calculate brake distance
-	local acc_all = t_accel_all[1]
-	local acc_eng = t_accel_eng[1]
-	local nwagons = #train.trainparts
-	local acc = acc_all + (acc_eng*train.locomotives_in_train)/nwagons
-	local vel = train.velocity
-	local brakedst = (vel*vel) / (2*acc)
-	
-	local brake_i = math.max(advtrains.path_get_index_by_offset(train, train.index, brakedst + BRAKE_SPACE), safety_f)
-	local aware_i = advtrains.path_get_index_by_offset(train, brake_i, AWARE_ZONE)
-	
-	return {
-		safety_b,
-		cpl_b,
-		end_index,
-		train.index,
-		cpl_f,
-		safety_f,
-		brake_i,
-		aware_i,
-	}
-end
-
 
 --returns new id
 function advtrains.create_new_train_at(pos, connid, ioff, trainparts)
@@ -985,21 +954,23 @@ function advtrains.train_check_couples(train)
 	if not train.cpl_front then
 		-- recheck front couple
 		local front_trains, pos = advtrains.occ.get_occupations(train, atround(train.index) + CPL_CHK_DST)
-		for tid, idx in pairs(front_trains) do
-			local other_train = advtrains.trains[tid]
-			if not advtrains.train_ensure_init(tid, other_train) then
-				atwarn("Train",tid,"is not initialized! Couldn't check couples!")
-				return
-			end
-			--atdebug(train.id,"front: ",idx,"on",tid,atround(other_train.index),atround(other_train.end_index))
-			if other_train.velocity == 0 then
-				if idx>=other_train.index and idx<=other_train.index + CPL_ZONE then
-					createcouple(pos, train, true, other_train, true)
-					break
+		if minetest.get_node_or_nil(pos) then -- if the position is loaded...
+			for tid, idx in pairs(front_trains) do
+				local other_train = advtrains.trains[tid]
+				if not advtrains.train_ensure_init(tid, other_train) then
+					atwarn("Train",tid,"is not initialized! Couldn't check couples!")
+					return
 				end
-				if idx<=other_train.end_index and idx>=other_train.end_index - CPL_ZONE then
-					createcouple(pos, train, true, other_train, false)
-					break
+				--atdebug(train.id,"front: ",idx,"on",tid,atround(other_train.index),atround(other_train.end_index))
+				if other_train.velocity == 0 then
+					if idx>=other_train.index and idx<=other_train.index + CPL_ZONE then
+						createcouple(pos, train, true, other_train, true)
+						break
+					end
+					if idx<=other_train.end_index and idx>=other_train.end_index - CPL_ZONE then
+						createcouple(pos, train, true, other_train, false)
+						break
+					end
 				end
 			end
 		end
@@ -1013,20 +984,22 @@ function advtrains.train_check_couples(train)
 	if not train.cpl_back then
 		-- recheck back couple
 		local back_trains, pos = advtrains.occ.get_occupations(train, atround(train.end_index) - CPL_CHK_DST)
-		for tid, idx in pairs(back_trains) do
-			local other_train = advtrains.trains[tid]
-			if not advtrains.train_ensure_init(tid, other_train) then
-				atwarn("Train",tid,"is not initialized! Couldn't check couples!")
-				return
-			end
-			if other_train.velocity == 0 then
-				if idx>=other_train.index and idx<=other_train.index + CPL_ZONE then
-					createcouple(pos, train, false, other_train, true)
-					break
+		if minetest.get_node_or_nil(pos) then -- if the position is loaded...
+			for tid, idx in pairs(back_trains) do
+				local other_train = advtrains.trains[tid]
+				if not advtrains.train_ensure_init(tid, other_train) then
+					atwarn("Train",tid,"is not initialized! Couldn't check couples!")
+					return
 				end
-				if idx<=other_train.end_index and idx>=other_train.end_index - CPL_ZONE then
-					createcouple(pos, train, false, other_train, false)
-					break
+				if other_train.velocity == 0 then
+					if idx>=other_train.index and idx<=other_train.index + CPL_ZONE then
+						createcouple(pos, train, false, other_train, true)
+						break
+					end
+					if idx<=other_train.end_index and idx>=other_train.end_index - CPL_ZONE then
+						createcouple(pos, train, false, other_train, false)
+						break
+					end
 				end
 			end
 		end
