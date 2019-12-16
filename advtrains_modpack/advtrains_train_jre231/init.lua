@@ -5,6 +5,8 @@ else
     S = function(s,a,...)a={a,...}return s:gsub("@(%d+)",function(n)return a[tonumber(n)]end)end
 end
 
+local SND_LOOP_LEN = 2
+
 advtrains.register_wagon("KuHa_E231", {
 	mesh="advtrains_KuHa_E231.b3d",
 	textures = {"advtrains_KuHa_E231.png"},

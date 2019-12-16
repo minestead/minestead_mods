@@ -5,7 +5,7 @@ else
     S = function(s,a,...)a={a,...}return s:gsub("@(%d+)",function(n)return a[tonumber(n)]end)end
 end
 
-local SND_LOOP_LEN = 5
+local SND_LOOP_LEN = 2
 
 advtrains.register_wagon("engine_electric", {
 	mesh="advtrains_engine_electric.b3d",
