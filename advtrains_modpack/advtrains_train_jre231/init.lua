@@ -75,7 +75,7 @@ advtrains.register_wagon("KuHa_E231", {
                 if self:train().velocity > 0 then -- First make sure that the train isn't standing
                         if not self.sound_loop_tmr or self.sound_loop_tmr <= 0 then
                                 -- start the sound if it was never started or has expired
-                                self.sound_loop_handle = minetest.sound_play({name="advtrains_electric_loop", gain=0.01, max_hear_distance=4}, {object=self.object})
+                                self.sound_loop_handle = minetest.sound_play({name="advtrains_electric_loop", gain=0.04, max_hear_distance=4}, {object=self.object})
                                 self.sound_loop_tmr = SND_LOOP_LEN
                         end
                         --decrease the sound timer
