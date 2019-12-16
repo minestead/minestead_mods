@@ -22,18 +22,6 @@ dofile(modpath.."railwaytime.lua")
 dofile(modpath.."scheduler.lua")
 dofile(modpath.."stoprail.lua")
 
-minetest.register_craft({
-	type="shapeless",
-	output = 'advtrains_line_automation:dtrack_stop_placer',
-	recipe = {
-		"advtrains:dtrack_placer",
-		"technic:control_logic_unit",
-		"dye:black",
-		"dye:yellow",
-	},
-})
-
-
 
 function advtrains.lines.load(data)
 	if data then

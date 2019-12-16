@@ -21,6 +21,10 @@ if minetest.get_modpath("advtrains_interlocking") then
   dofile(MP.."/craft/advtrains_interlocking.lua")
 end
 
+if minetest.get_modpath("advtrains_line_automation") then
+  dofile(MP.."/craft/advtrains_line_automation.lua")
+end
+
 if minetest.get_modpath("advtrains_luaautomation") then
   dofile(MP.."/craft/advtrains_luaautomation.lua")
 end
