@@ -4,7 +4,7 @@
 
 --tracks
 minetest.register_craft({
-	output = 'advtrains:dtrack_placer 50',
+	output = 'advtrains:dtrack_placer 49',
 	recipe = {
 		{'default:steel_ingot', 'group:stick', 'default:steel_ingot'},
 		{'default:steel_ingot', 'group:stick', 'default:steel_ingot'},
