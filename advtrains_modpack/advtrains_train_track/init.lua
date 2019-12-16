@@ -246,35 +246,3 @@ minetest.register_lbm({
 		action = function(pos, node, active_object_count, active_object_count_wider) minetest.set_node(pos, {name="advtrains:dtrack_st_45", param2=node.param2}) end,
 	})
 end
-
--- ADD CRAFTING
-
-minetest.register_craft({
-	type="shapeless",
-	output = 'advtrains:dtrack_atc_placer',
-	recipe = {
-		"advtrains:dtrack_placer",
-		"technic:control_logic_unit",
-		"dye:blue"
-	},
-})
-
-minetest.register_craft({
-	type="shapeless",
-	output = 'advtrains:dtrack_load_placer',
-	recipe = {
-		"advtrains:dtrack_placer",
-		"technic:control_logic_unit",
-		"dye:red"
-	},
-})
-
-minetest.register_craft({
-	type="shapeless",
-	output = 'advtrains:dtrack_unload_placer',
-	recipe = {
-		"advtrains:dtrack_placer",
-		"technic:control_logic_unit",
-		"dye:green"
-	},
-})

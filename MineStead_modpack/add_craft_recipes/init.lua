@@ -28,3 +28,7 @@ end
 if minetest.get_modpath("advtrains_luaautomation") then
   dofile(MP.."/craft/advtrains_luaautomation.lua")
 end
+
+if minetest.get_modpath("advtrains_train_track") then
+  dofile(MP.."/craft/advtrains_train_track.lua")
+end
