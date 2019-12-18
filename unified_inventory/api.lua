@@ -1,5 +1,5 @@
-local S = minetest.get_translator("unified_inventory")
-local F = minetest.formspec_escape
+local S = unified_inventory.gettext
+local F = unified_inventory.fgettext
 
 -- Create detached creative inventory after loading all mods
 minetest.after(0.01, function()
@@ -187,7 +187,7 @@ end
 function unified_inventory.go_home(player)
 	local pos = unified_inventory.home_pos[player:get_player_name()]
 	if pos then
-		player:set_pos(pos)
+		player:setpos(pos)
 	end
 end
 
@@ -233,7 +233,7 @@ end
 
 
 unified_inventory.register_craft_type("normal", {
-	description = F(S("Crafting")),
+	description = F("Crafting"),
 	icon = "ui_craftgrid_icon.png",
 	width = 3,
 	height = 3,
@@ -249,7 +249,7 @@ unified_inventory.register_craft_type("normal", {
 
 
 unified_inventory.register_craft_type("shapeless", {
-	description = F(S("Mixing")),
+	description = F("Mixing"),
 	icon = "ui_craftgrid_icon.png",
 	width = 3,
 	height = 3,
@@ -264,7 +264,7 @@ unified_inventory.register_craft_type("shapeless", {
 
 
 unified_inventory.register_craft_type("cooking", {
-	description = F(S("Cooking")),
+	description = F("Cooking"),
 	icon = "default_furnace_front.png",
 	width = 1,
 	height = 1,
@@ -272,7 +272,7 @@ unified_inventory.register_craft_type("cooking", {
 
 
 unified_inventory.register_craft_type("digging", {
-	description = F(S("Digging")),
+	description = F("Digging"),
 	icon = "default_tool_steelpick.png",
 	width = 1,
 	height = 1,
@@ -303,5 +303,6 @@ end
 
 function unified_inventory.is_creative(playername)
 	return minetest.check_player_privs(playername, {creative=true})
-		or minetest.settings:get_bool("creative_mode")
+	or minetest.setting_getbool("creative_mode")
 end
+
