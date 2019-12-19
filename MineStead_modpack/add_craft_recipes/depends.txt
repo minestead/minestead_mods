@@ -2,6 +2,7 @@ default
 basic_materials?
 digilines?
 digistuff?
+farming?
 nixie_tubes?
 mesecons_noteblock?
 mesecons_mvps?
