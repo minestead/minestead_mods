@@ -1,10 +1,6 @@
-
-local S = mobs.intllib
-
-mobs:register_mob(":mobs_animal:spider", {
+mobs:register_mob("mobs_spider:spider", {
 	type = "animal",
 	passive = true,
---	docile_by_day = true,
 	attack_type = "dogfight",
 	pathfinding = 1,
 	damage = 2,
@@ -73,7 +69,7 @@ mobs:register_mob(":mobs_animal:spider", {
 })
 
 mobs:spawn({
-	name = "mobs_animal:spider",
+	name = "mobs_spider:spider",
 	nodes = {"default:stone"},
 	interval = 60,
 	chance = 8000,
@@ -82,7 +78,7 @@ mobs:spawn({
 })
 
 
-mobs:register_egg(":mobs_animal:spider", S("Spider"), "mobs_spider_inv.png", 0)
+mobs:register_egg("mobs_spider:spider", "Spider", "mobs_spider_inv.png", 0)
 
 minetest.register_craft({
 	output = "wool:white",

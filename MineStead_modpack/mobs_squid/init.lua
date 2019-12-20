@@ -1,7 +1,4 @@
-
-local S = mobs.intllib
-
-mobs:register_mob(":mobs_animal:squid", {
+mobs:register_mob("mobs_squid:squid", {
 	type = "animal",
 	passive = true,
     stepheight = 0.1,
@@ -31,7 +28,7 @@ mobs:register_mob(":mobs_animal:squid", {
 	},
     drops = {
 		{name = "dye:black", chance = 1, min = 1, max = 3,},
-		{name = "mobs_animal:tentacle", chance = 1,	min = 1, max = 8,},
+		{name = "mobs_squid:tentacle", chance = 1,	min = 1, max = 8,},
 	},
     visual_size = {x=1.75, y=1.75},	
 	makes_footstep_sound = false,
@@ -49,7 +46,7 @@ mobs:register_mob(":mobs_animal:squid", {
 })
 
 mobs:spawn({
-	name = "mobs_animal:squid",
+	name = "mobs_squid:squid",
 	nodes = {"default:water_source"},
 	neighbors = {"default:water_flowing","default:water_source"},
 	min_light = 5,
@@ -59,25 +56,25 @@ mobs:spawn({
 })
 
 -- spawn eggs
-mobs:register_egg(":mobs_animal:squid", S("Squid"), "mobs_mc_spawn_icon_squid.png", 0)
+mobs:register_egg("mobs_squid:squid", "Squid", "mobs_mc_spawn_icon_squid.png", 0)
 
-minetest.register_craftitem(":mobs_animal:tentacle", {
-	description = S("Tentacle"),
+minetest.register_craftitem("mobs_squid:tentacle", {
+	description = "Tentacle",
 	inventory_image = "mobs_tentacle.png",
 	on_use = minetest.item_eat(3),
 	groups = {food_meat_raw = 1},
 })
 
-minetest.register_craftitem(":mobs_animal:squid_salad", {
-	description = S("Squid Salad"),
+minetest.register_craftitem("mobs_squid:squid_salad", {
+	description = "Squid Salad",
 	inventory_image = "mobs_squid_salad.png",
 	on_use = minetest.item_eat(10, "farming:bowl"),
 })
 
 minetest.register_craft({
-	output = "mobs_animal:squid_salad",
+	output = "mobs_squid:squid_salad",
 	recipe = {
-		{"group:food_cucumber","group:food_onion","mobs_animal:tentacle"},
+		{"group:food_cucumber","group:food_onion","mobs_squid:tentacle"},
 		{"group:food_bowl", "", ""},
 		{"", "", ""},
 	}
