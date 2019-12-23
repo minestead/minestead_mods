@@ -36,3 +36,7 @@ end
 if minetest.get_modpath("farming") then
   dofile(MP.."/craft/farming.lua")
 end
+
+if minetest.get_modpath("gravelsieve") then
+  dofile(MP.."/craft/default.lua")
+end
