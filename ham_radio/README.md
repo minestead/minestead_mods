@@ -11,7 +11,7 @@ basic_materials?
 technic?
 digilines?
 ```
-Craft recipes depend of the mods installed. 
+Craft recipes depend of the mods installed.
 
 ## Transmitter
 
@@ -33,14 +33,14 @@ Handheld receiver is a wielded tool.
 - Left click opens configuration dialog to set frequency. Empty string turns receiver off.
 - Shift + left click toggles reception of RDS messages.
 
-When receiver is tuned to a frequency where at least one transmitter is present, HUD signal meter bar shows signal power. The signal power depends on distance and direction to the transmitter. 
+When receiver is tuned to a frequency where at least one transmitter is present, HUD signal meter bar shows signal power. The signal power depends on distance and direction to the transmitter.
 
 If RDS reception is toggled on, the RDS messages from all transmitters on this frequency are enqueued and will be send one by one as a chat messages to the player with 10 seconds interval. When RDS message queue becomes empty, it refills and starts over again.
 
 ## Stationary Receiver
 
 Right click on receiver opens configuration window to set frequency. Receiver displays RDS messages as infotext in the same way as handheld receiver. It does not have signal power meter.
-- You can operate the receiver in the same way as the transmitter.
+- You can operate the receiver via digiline in the same way as the transmitter.
 
 ## Digiline
 
@@ -60,6 +60,21 @@ digiline.send('ham_radio', { command = 'set_frequency', value = '12345' })
 digiline.send('ham_radio', { command = 'set_rds_message', value = 'new RDS message' })
 -- returns { update = 'rds_message', success = true }
 ```
+
+## Config
+
+See `config.lua` to see current parameters. You can edit this file to change them.
+
+Default parameters:
+ - Frequency range: 0 - 9999999
+ - Locked frequency range: 100000 - 9999999 
+    - Only one transmitter is allowed for the frequency in this range.
+ - Beacon frequency range: 1000000 - 99999999 
+   - Beacon frequency is auto-assigned from this range. 
+   - Please note, this range overlaps with locked frequency range to ensure each beacon receives unique frequency.
+ - RDS interval: 10 seconds
+   - This setting affects handheld receivers only. The interval should be high enough to avoid spamming chat with repeated messages.
+   - RDS interval for stationary receiver is 5 seconds and can't be changed.
 
 ## What's next?
 
