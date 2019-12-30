@@ -7,6 +7,7 @@ minetest.register_craft({
     type = "shapeless",
     output = "pizza:pizza_dough",
     recipe = {"group:food_flour", "bucket:bucket_water", "farming:salt"},
+    replacements = {{"bucket:bucket_water", "bucket:bucket_empty"}}
 })
 
 minetest.register_craftitem("pizza:ketchup", {
@@ -33,6 +34,7 @@ minetest.register_craft({
         "caverealms:mycena", "pizza:ketchup", "caverealms:mycena",
         "farming:tomato", "pizza:pizza_dough", "farming:tomato"
     },
+    replacements = {{"pizza:ketchup", "vessels:glass_bottle"}}
 })
 
 minetest.register_craft({
@@ -41,8 +43,9 @@ minetest.register_craft({
     recipe = {
         "flowers:mushroom_brown", "mobs:cheese", "flowers:mushroom_brown",
         "flowers:mushroom_brown", "pizza:ketchup", "flowers:mushroom_brown",
-        "farming:tomato", "pizza:pizza_dough", "farming:tomato"
+        "farming:tomato", "pizza:ketchup", "farming:tomato"
     },
+    replacements = {{"pizza:ketchup", "vessels:glass_bottle"}}
 })
 
 minetest.register_craft({
@@ -53,6 +56,7 @@ minetest.register_craft({
         "mobs:chicken_cooked", "pizza:ketchup", "mobs:chicken_cooked",
         "farming:tomato", "pizza:pizza_dough", "farming:tomato"
     },
+    replacements = {{"pizza:ketchup", "vessels:glass_bottle"}}
 })
 
 minetest.register_craft({
@@ -63,6 +67,7 @@ minetest.register_craft({
         "mobs_squid:tentacle", "pizza:ketchup", "mobs_squid:tentacle",
         "farming:tomato", "pizza:pizza_dough", "farming:tomato"
     },
+    replacements = {{"pizza:ketchup", "vessels:glass_bottle"}}
 })
 
 minetest.register_craft({
@@ -73,6 +78,7 @@ minetest.register_craft({
         "mobs:pork_cooked", "pizza:ketchup", "mobs:pork_cooked",
         "farming:tomato", "pizza:pizza_dough", "farming:tomato"
     },
+    replacements = {{"pizza:ketchup", "vessels:glass_bottle"}}
 })
 
 minetest.register_node("pizza:pizza", {
