@@ -43,7 +43,7 @@ minetest.register_craft({
     recipe = {
         "flowers:mushroom_brown", "mobs:cheese", "flowers:mushroom_brown",
         "flowers:mushroom_brown", "pizza:ketchup", "flowers:mushroom_brown",
-        "farming:tomato", "pizza:ketchup", "farming:tomato"
+        "farming:tomato", "pizza:pizza_dough", "farming:tomato"
     },
     replacements = {{"pizza:ketchup", "vessels:glass_bottle"}}
 })
