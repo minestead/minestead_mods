@@ -308,3 +308,8 @@ if minetest.get_modpath("stairs") then
 		"Palm Wood",
 		stairs.wood)
 end
+
+-- aliases
+minetest.register_alias("palm:trunk", "palm:palm_tree_trunk")
+minetest.register_alias("palm:leaves", "palm:palm_tree_leaves")
+
