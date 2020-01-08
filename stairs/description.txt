@@ -1,0 +1,1 @@
+Adds stairs, slabs, inner and outer corners and slopes for blocks.

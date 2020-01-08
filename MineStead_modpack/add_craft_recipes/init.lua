@@ -40,3 +40,15 @@ end
 if minetest.get_modpath("gravelsieve") then
   dofile(MP.."/craft/default.lua")
 end
+
+if minetest.get_modpath("homedecor_misc") then
+  dofile(MP.."/craft/homedecor.lua")
+end
+
+if minetest.get_modpath("xdecor") then
+  dofile(MP.."/craft/xdecor.lua")
+end
+
+if minetest.get_modpath("stairs") then
+  dofile(MP.."/craft/stairs.lua")
+end

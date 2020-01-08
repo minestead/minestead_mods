@@ -36,16 +36,6 @@ function is_creative_enabled_for(name)
 end
 
 
--- stair rotation
-local rotate_node = function(itemstack, placer, pointed_thing)
-	core.rotate_and_place(itemstack, placer, pointed_thing,
-			is_creative_enabled_for(placer:get_player_name()),
-			{invert_wall = placer:get_player_control().sneak})
-
-	return itemstack
-end
-
-
 -- process textures
 local set_textures = function(images)
 	local stair_images = {}
@@ -66,6 +56,46 @@ local set_textures = function(images)
 		end
 	end
 	return stair_images
+end
+
+
+-- placement helper
+local stair_place = function(itemstack, placer, pointed_thing, stair_node)
+
+	-- if sneak pressed then use param2 in node pointed at when placing
+	if placer:is_player() and placer:get_player_control().sneak then
+
+		local name  = placer:get_player_name()
+		local pos_a = pointed_thing.above
+		local node_a = minetest.get_node(pos_a)
+		local def_a = minetest.registered_nodes[node_a.name]
+
+		if not def_a.buildable_to
+		or minetest.is_protected(pos_a, name) then
+			return itemstack
+		end
+
+		local pos_u = pointed_thing.under
+		local node_u = minetest.get_node(pos_u)
+
+		if minetest.get_item_group(node_u.name, "stair") > 0
+		or minetest.get_item_group(node_u.name, "slab") > 0 then
+
+			minetest.set_node(pos_a, {name = stair_node, param2 = node_u.param2})
+
+			if not is_creative_enabled_for(name) then
+				itemstack:take_item()
+			end
+
+			return itemstack
+		end
+	end
+
+	core.rotate_and_place(itemstack, placer, pointed_thing,
+			is_creative_enabled_for(placer:get_player_name()),
+			{invert_wall = placer:get_player_control().sneak})
+
+	return itemstack
 end
 
 
@@ -92,7 +122,10 @@ function stairs.register_stair(subname, recipeitem, groups, images, description,
 				{-0.5, 0, 0, 0.5, 0.5, 0.5},
 			},
 		},
-		on_place = rotate_node
+		on_place = function(itemstack, placer, pointed_thing)
+			return stair_place(itemstack, placer, pointed_thing,
+					"stairs:stair_" .. subname)
+		end,
 	})
 
 	-- if no recipe item provided then skip craft recipes
@@ -141,7 +174,10 @@ function stairs.register_slab(subname, recipeitem, groups, images, description, 
 			type = "fixed",
 			fixed = {-0.5, -0.5, -0.5, 0.5, 0, 0.5},
 		},
-		on_place = rotate_node
+		on_place = function(itemstack, placer, pointed_thing)
+			return stair_place(itemstack, placer, pointed_thing,
+					"stairs:slab_" .. subname)
+		end,
 	})
 
 	-- if no recipe item provided then skip craft recipes
@@ -191,7 +227,10 @@ function stairs.register_stair_outer(subname, recipeitem, groups, images, descri
 				{-0.5, 0, 0, 0, 0.5, 0.5},
 			},
 		},
-		on_place = rotate_node
+		on_place = function(itemstack, placer, pointed_thing)
+			return stair_place(itemstack, placer, pointed_thing,
+					"stairs:stair_outer_" .. subname)
+		end,
 	})
 
 	-- add alias for old stairs redo name
@@ -253,7 +292,10 @@ function stairs.register_stair_inner(subname, recipeitem, groups, images, descri
 				{-0.5, 0, -0.5, 0, 0.5, 0},
 			},
 		},
-		on_place = rotate_node
+		on_place = function(itemstack, placer, pointed_thing)
+			return stair_place(itemstack, placer, pointed_thing,
+					"stairs:stair_inner_" .. subname)
+		end,
 	})
 
 	-- add alias for old stairs redo name
@@ -321,7 +363,10 @@ function stairs.register_slope(subname, recipeitem, groups, images, description,
 				{-0.5, 0, 0, 0.5, 0.5, 0.5},
 			},
 		},
-		on_place = rotate_node
+		on_place = function(itemstack, placer, pointed_thing)
+			return stair_place(itemstack, placer, pointed_thing,
+					"stairs:slope_" .. subname)
+		end,
 	})
 
 	-- slope recipe
@@ -538,6 +583,8 @@ stairs.register_stair("cloud", "default:cloud",
 
 minetest.override_item("stairs:stair_cloud", {
 	on_blast = function() end,
+	on_drop = function(itemstack, dropper, pos) end,
+	drop = {},
 })
 
 stairs.register_slab("cloud", "default:cloud",
@@ -548,6 +595,8 @@ stairs.register_slab("cloud", "default:cloud",
 
 minetest.override_item("stairs:slab_cloud", {
 	on_blast = function() end,
+	on_drop = function(itemstack, dropper, pos) end,
+	drop = {},
 })
 
 -- Ores
@@ -703,25 +752,6 @@ stairs.register_all("mithril_block", "moreores:mithril_block",
 
 end
 
---[[= Farming Mod
-if minetest.get_modpath("farming") then
-
-stairs.register_all("straw", "farming:straw",
-	{snappy = 3, flammable = 4},
-	{"farming_straw.png"},
-	"Straw",
-	stairs.leaves)
-
-if minetest.registered_nodes["farming:hemp_block"] then
-stairs.register_all("hemp_block", "farming:hemp_block",
-	{snappy = 1, flammable = 2},
-	{"farming_hemp_block.png"},
-	"Hemp Block",
-	stairs.leaves)
-end
-
-end
-]]
 --= Mobs Mod
 
 if minetest.registered_nodes["mobs:cheeseblock"] then
@@ -972,13 +1002,5 @@ stairs.register_all("glow_obsidian_brick_2", "caverealms:glow_obsidian_brick_2",
 	"Glow Obsidian Brick 2",
 	stairs.stone)
 end
-
---= technic
-stairs.register_all("rubber_tree_planks", "moretrees:rubber_tree_planks",
-	{choppy = 2, oddly_breakable_by_hand = 1, flammable = 3},
-	{"moretrees_rubber_tree_wood.png"},
-	"Rubber Tree Wood",
-	stairs.wood)
-
 
 print ("[MOD] Stairs Redo loaded")

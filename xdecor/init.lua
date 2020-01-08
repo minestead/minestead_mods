@@ -20,6 +20,7 @@ local subpart = {
 	"mailbox",
 	"mechanisms",
 	"rope",
+--	"workbench",
 }
 
 for _, name in ipairs(subpart) do
