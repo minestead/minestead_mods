@@ -341,7 +341,7 @@ for i = 4, 6 do
 
 	minetest.register_craftitem("painting:canvas_" .. 2 ^ i, {
 		description = "Canvas " .. 2 ^ i,
-		inventory_image = "default_paper.png",
+		inventory_image = "painting_canvas".. 2 ^ i ..".png",
 		stack_max = 99,
 	})
 end
