@@ -55,7 +55,7 @@ npc.programs.instr.register("advanced_npc:follow:follow_player", function(self, 
         local player_name = args.player_name
         local objs = minetest.get_objects_inside_radius(self.object:getpos(), args.radius)
         -- Check if objects were found
-        minetest.log("Objects found: "..dump(objs))
+        --minetest.log("Objects found: "..dump(objs))
         if #objs > 0 then
             for _,obj in pairs(objs) do
                 if obj then

@@ -17,7 +17,7 @@ npc.programs.register("advanced_npc:use_sittable", function(self, args)
     local node = minetest.get_node(pos)
 
     if action == npc.programs.const.node_ops.sittable.SIT then
-        minetest.log("Sitting...")
+        --minetest.log("Sitting...")
         -- Calculate position depending on bench
         -- Error here due to ignore. Need to come up with better solution
         if node.name == "ignore" then
@@ -54,7 +54,7 @@ npc.programs.register("advanced_npc:use_sittable", function(self, args)
         end
         -- Stand
         npc.programs.instr.execute(self, npc.programs.instr.default.STAND, {pos=pos_out_of_sittable, dir=dir})
-        minetest.log("Setting sittable at "..minetest.pos_to_string(pos).." as not used")
+        --minetest.log("Setting sittable at "..minetest.pos_to_string(pos).." as not used")
         if enable_usage_marking then
             -- Set place as unused
             npc.locations.mark_place_used(pos, npc.locations.USE_STATE.NOT_USED)

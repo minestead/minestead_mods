@@ -387,7 +387,7 @@ function npc.occupations.initialize_occupation_values(self, occupation_name)
 			self.selected_texture = "default_"..self.gender..".png"
 		end
 	end
-	minetest.log("Result: "..dump(self.selected_texture))
+	--minetest.log("Result: "..dump(self.selected_texture))
 
 	-- Set texture and base texture
 	self.textures = {self.selected_texture}
@@ -464,7 +464,7 @@ function npc.occupations.initialize_occupation_values(self, occupation_name)
 	end
 
 	-- Initialize properties
-	minetest.log("def.properties: "..dump(def.properties))
+	--minetest.log("def.properties: "..dump(def.properties))
 	if def.properties then
 		-- Initialize trader status
 		if def.properties.initial_trader_status then

@@ -1217,7 +1217,7 @@ function npc.commands.use_sittable(self, args)
         end
         -- Stand
         npc.enqueue_command(self, npc.commands.cmd.STAND, {pos=pos_out_of_sittable, dir=dir})
-        minetest.log("Setting sittable at "..minetest.pos_to_string(pos).." as not used")
+        --minetest.log("Setting sittable at "..minetest.pos_to_string(pos).." as not used")
         if enable_usage_marking then
             -- Set place as unused
             npc.locations.mark_place_used(pos, npc.locations.USE_STATE.NOT_USED)
@@ -1264,7 +1264,7 @@ end
 -- going to be considered walkable for the algorithm to find a
 -- path.
 npc.commands.register_script("advanced_npc:walk_to_pos", function(self, args)
-    minetest.log("Received arguments: "..dump(args))
+    --minetest.log("Received arguments: "..dump(args))
     -- Get arguments for this task
     local use_access_node = true
     if args.use_access_node ~= nil then
@@ -1332,7 +1332,7 @@ npc.commands.register_script("advanced_npc:walk_to_pos", function(self, args)
                 if use_access_node == true then
                     dir = npc.commands.get_direction(end_pos, node_pos)
                 end
-                minetest.log("Dir: "..dump(dir))
+                --minetest.log("Dir: "..dump(dir))
                 -- Change dir if using access_node
                 npc.enqueue_command(self, npc.commands.cmd.STAND, {dir = dir})
                 break
@@ -1488,7 +1488,7 @@ npc.commands.register_script("advanced_npc:idle", function (self, args)
         else
             -- Set interval
             npc.commands.execute(self, npc.commands.cmd.SET_INTERVAL, {interval=obj_search_interval})
-            minetest.log("No obj found")
+            --minetest.log("No obj found")
         end
     end
 end)
@@ -1546,7 +1546,7 @@ npc.commands.register_script_function("advanced_npc:follow", "follow_player", fu
         local player_name = args.player_name
         local objs = minetest.get_objects_inside_radius(self.object:getpos(), args.radius)
         -- Check if objects were found
-        minetest.log("Objects found: "..dump(objs))
+        --minetest.log("Objects found: "..dump(objs))
         if #objs > 0 then
             for _,obj in pairs(objs) do
                 if obj then

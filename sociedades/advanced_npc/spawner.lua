@@ -299,8 +299,8 @@ function npc.spawner.determine_npc_occupation(building_type, workplace_nodes, np
                     end
                 else
                     -- Try to match building type with the occupation local building types
-                    minetest.log("Building type: "..dump(building_type))
-                    minetest.log("Occupation local building types: "..dump(local_building_types))
+                    --minetest.log("Building type: "..dump(building_type))
+                    --minetest.log("Occupation local building types: "..dump(local_building_types))
                     for i = 1, #occupation_names do
                         for j = 1, #local_building_types do
                             if building_type == local_building_types[j] then
@@ -311,7 +311,7 @@ function npc.spawner.determine_npc_occupation(building_type, workplace_nodes, np
                             end
                         end
                     end
-                    minetest.log("Local building match after: "..dump(result))
+                    --minetest.log("Local building match after: "..dump(result))
                 end
             end
         end
@@ -323,9 +323,9 @@ function npc.spawner.determine_npc_occupation(building_type, workplace_nodes, np
     --      - If count is less than three (only two NPCs), default_basic occupation.
     --      - If count is greater than two, assign any eligible occupation with 50% chance
     --  - If not NPC is working, choose an occupation that is not default_basic
-    minetest.log("Current building occupations: "..dump(current_building_npc_occupations))
-    minetest.log("Result #: "..dump(#result))
-    minetest.log("Result: "..dump(result))
+    --minetest.log("Current building occupations: "..dump(current_building_npc_occupations))
+    --minetest.log("Result #: "..dump(#result))
+    --minetest.log("Result: "..dump(result))
     if next(current_building_npc_occupations) ~= nil then
         for i = 1, #current_building_npc_occupations do
             if current_building_npc_occupations[i] ~= npc.occupations.basic_name then
@@ -839,7 +839,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 
                     -- Scan for usable nodes
                     local area_info = npc.spawner.scan_area_for_spawn(start_pos, end_pos, player:get_player_name(), pos)
-                    minetest.log("Area info: "..dump(area_info))
+                    --minetest.log("Area info: "..dump(area_info))
                     -- Assign occupation
                     local occupation_data = npc.spawner.determine_npc_occupation(
                         fields.building_type or area_info.building_type,
@@ -1094,8 +1094,8 @@ if minetest.get_modpath("mg_villages") ~= nil then
         -- TODO: Change formspec to a more detailed one.
         on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
             local meta = minetest.get_meta(pos)
-            minetest.log("NPCs: "..dump(minetest.deserialize(meta:get_string("npcs"))))
-            minetest.log("Node data: "..dump(minetest.deserialize(meta:get_string("node_data"))))
+            --minetest.log("NPCs: "..dump(minetest.deserialize(meta:get_string("npcs"))))
+            --minetest.log("Node data: "..dump(minetest.deserialize(meta:get_string("node_data"))))
             return mg_villages.plotmarker_formspec( pos, nil, {}, clicker )
         end,
 
@@ -1201,7 +1201,7 @@ minetest.register_chatcommand("restore_area", {
     privs = {server = true},
     func = function(name, param)
         local args = npc.utils.split(param, " ")
-        minetest.log("Params: "..dump(args))
+        --minetest.log("Params: "..dump(args))
         if #args < 2 then
             minetest.chat_send_player("Please specify horizontal and vertical radius.")
             return

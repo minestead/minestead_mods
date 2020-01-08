@@ -48,7 +48,7 @@ npc.programs.register("advanced_npc:wander", function(self, args)
                 })
                 npc.exec.proc.enqueue(self, npc.programs.instr.default.STAND, {})
             else
-                minetest.log("Walking randomly")
+                --minetest.log("Walking randomly")
                 -- Walk in a random direction
                 local npc_pos = self.object:getpos()
                 npc.exec.proc.enqueue(self, npc.programs.instr.default.WALK_STEP, {

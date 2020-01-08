@@ -548,7 +548,7 @@ end
 -- furnaces, storage (e.g. chests) and openable (e.g. doors).
 -- Returns a table with these classifications
 function npc.locations.scan_area_for_usable_nodes(pos1, pos2)
-	minetest.log("Bed Nodes: "..dump(npc.locations.nodes.bed))
+	--minetest.log("Bed Nodes: "..dump(npc.locations.nodes.bed))
 	local result = {
 		bed_type = {},
 		sittable_type = {},

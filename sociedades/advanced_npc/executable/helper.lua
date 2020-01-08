@@ -216,19 +216,19 @@ function npc.programs.helper.get_pos_argument(self, pos, use_access_node)
             local use_access_node = pos.use_access_node or false
             local try_alternative_if_used = pos.try_alternative_if_used or false
             local places = npc.locations.get_by_type(self, pos.place_type)
-            minetest.log("Place type: "..dump(pos.place_type))
-            minetest.log("Places: "..dump(places))
+            --minetest.log("Place type: "..dump(pos.place_type))
+            --minetest.log("Places: "..dump(places))
             -- Check index is valid on the places map
             if #places >= index then
                 local place = places[index]
                 -- Check if place is used, and if it is, find alternative if required
                 if try_alternative_if_used == true then
-                    minetest.log("Self places map: "..dump(self.places_map))
-                    minetest.log("Place category: "..dump(pos.place_category))
-                    minetest.log("Place type: "..dump(pos.place_type))
-                    minetest.log("Original Place: "..dump(place))
+                    --minetest.log("Self places map: "..dump(self.places_map))
+                    --minetest.log("Place category: "..dump(pos.place_category))
+                    --minetest.log("Place type: "..dump(pos.place_type))
+                    --minetest.log("Original Place: "..dump(place))
                     place = npc.locations.find_unused_place(self, pos.place_category, pos.place_type, place)
-                    minetest.log("New place: "..dump(place))
+                    --minetest.log("New place: "..dump(place))
 
                     if next(place) ~= nil then
                         --minetest.log("Mark as used? "..dump(pos.mark_target_as_used))

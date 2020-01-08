@@ -448,7 +448,7 @@ function npc.dialogue.start_dialogue(self, player, show_married_dialogue)
 		dialogue = self.dialogues.normal[math.random(1, #self.dialogues.normal)]
 	elseif chance >= 90 then
 		-- Check if gift items hints are enabled
-		minetest.log("Self gift data enable: "..dump(self.gift_data.enable_gift_items_hints))
+		--minetest.log("Self gift data enable: "..dump(self.gift_data.enable_gift_items_hints))
 		if self.gift_data.enable_gift_items_hints then
 			-- Choose a random dialogue line from the favorite/disliked item hints
 			dialogue = self.dialogues.hints[math.random(1, 4)]
@@ -672,7 +672,7 @@ minetest.register_on_player_receive_fields(function (player, formname, fields)
 						elseif player_response.is_custom_trade_dialogue == true then
 							-- Functions for a custom trade should be available from the same dialogue
 							-- object as they are created on demand
-							minetest.log("Player response: "..dump(player_response.options[i]))
+							--minetest.log("Player response: "..dump(player_response.options[i]))
 							player_response.options[i].action(player_response.npc, player)
 						else
 							-- Get dialogue from registered dialogues

@@ -160,7 +160,7 @@ npc.programs.register("advanced_npc:idle", function(self, args)
             -- Set interval
             npc.programs.instr.execute(self, "advanced_npc:wait", {time=5})
             --npc.programs.instr.execute(self, npc.programs.instr.default.SET_PROCESS_INTERVAL, {interval=obj_search_interval})
-            minetest.log("No obj found")
+            --minetest.log("No obj found")
         end
     end
 end)

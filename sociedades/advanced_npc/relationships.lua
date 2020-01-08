@@ -237,7 +237,7 @@ function npc.relationships.get_response_for_disliked_item(item_name, gender)
     end
 
     for i = 1, #items do
-        minetest.log(dump(items[i]))
+        --minetest.log(dump(items[i]))
         if items[i].item == item_name then
             --minetest.log("Returning: "..dump(items[i].response))
             return items[i].response

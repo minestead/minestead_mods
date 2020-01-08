@@ -451,8 +451,8 @@ function npc.trade.get_dedicated_trade_offers(self)
         -- If it is, create a sell offer, else create a buy offer if possible.
         -- Also, avoid creating sell offers immediately if the item was just bought
         local item = npc.inventory_contains(self, item_name)
-        minetest.log("Searched item: "..dump(item_name))
-        minetest.log("Found: "..dump(item))
+        --minetest.log("Searched item: "..dump(item_name))
+        --minetest.log("Found: "..dump(item))
         if item ~= nil and trade_info.last_offer_type ~= npc.trade.OFFER_BUY then
             -- Check if item can be sold
             if trade_info.item_sold_count == nil

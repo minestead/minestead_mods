@@ -1205,7 +1205,7 @@ end
 function _exec.restore_process(self)
 	local current_process = self.execution.process_queue[1]
 	if current_process then
-		minetest.log("Restoring process: "..dump(current_process.program_name))
+		--minetest.log("Restoring process: "..dump(current_process.program_name))
 		-- Change process state
 		current_process.state = npc.exec.proc.state.RUNNING
 		-- Check if any instruction was interrupted
@@ -1215,7 +1215,7 @@ function _exec.restore_process(self)
 			-- Restore position
 			--self.object:setpos(current_process.current_instruction.pos)
 			-- Execute instruction
-			minetest.log("Re-executing instruction: "..dump(current_process.current_instruction.entry.name))
+			--minetest.log("Re-executing instruction: "..dump(current_process.current_instruction.entry.name))
 			_exec.proc.execute(self, current_process.current_instruction.entry)
 		end
 	end
