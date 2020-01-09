@@ -1,0 +1,3 @@
+name = "Sokomine",
+author = "lovehart",
+comment = "CC BY-SA 3.0",
