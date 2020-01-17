@@ -543,7 +543,7 @@ end
 
 minetest.register_node("gravelsieve:sieved_gravel", {
 	description = "Sieved Gravel",
-	tiles = {"default_gravel.png"},
+	tiles = {"default_gravel.png^[brighten"},
 	groups = {crumbly=2, falling_node=1, not_in_creative_inventory=1},
 	sounds = default.node_sound_gravel_defaults(),
 })
