@@ -112,9 +112,14 @@ minetest.register_globalstep(function(dtime)
 		local pposy = ppos.y
 		local dlight = minetest.get_node_light(ppos, 0.5)
 		if not dlight then return end -- Light is sometimes nil. Why? Don't ask me.
-		local skylit = minetest.get_modpath("minetest_systemd") and
-			minetestd.utils.get_natural_light(pos) or 
-			(minetest.get_node_light(pos, 0.5) - minetest.get_node_light(pos, 0))
+		local skylit = 0
+		local l1 = minetest.get_node_light(pos, 0.5)
+		local l2 = minetest.get_node_light(pos, 0)
+		if l1 ~= nil and l2 ~= nil then
+			skylit = l1 - l2
+		else
+			return
+		end
 		
 		if (pposy < snowdrift.upperLimit) then
 			
