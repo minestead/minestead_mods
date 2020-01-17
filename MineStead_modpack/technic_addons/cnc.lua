@@ -35,6 +35,12 @@ technic_cnc.register_all("technic:carbon_steel_block",
    {"technic_carbon_steel_block.png"},
    "Carbon Steel"
 )
+technic_cnc.register_all("technic:zinc_block",
+   {cracky=1, level=2, not_in_creative_inventory=1},
+   {"technic_zinc_block.png"},
+   "Zinc"
+)
+
 
 -- defaults
 
@@ -42,6 +48,11 @@ technic_cnc.register_all("default:tinblock",
    {cracky = 1, level = 2, not_in_creative_inventory=1},
    {"default_tin_block.png"},
    "Tin"
+)
+technic_cnc.register_all("default:goldblock",
+   {cracky = 1, level = 2, not_in_creative_inventory=1},
+   {"default_gold_block.png"},
+   "Gold"
 )
 technic_cnc.register_all("default:mese",
    {cracky = 1, level = 2, not_in_creative_inventory=1},
