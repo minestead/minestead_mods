@@ -279,11 +279,15 @@ minetest.register_globalstep(function(dtime)
 				end
 			end
 			
-		elseif handles[player_name] then
-			-- Stop sound when player goes above y limit
-			minetest.sound_stop(handles[player_name])
-			handles[player_name] = nil
-			volumes[player_name] = nil
+		else
+			-- Reset sky to normal
+			player:set_sky({}, "regular", {}, true)
+			if handles[player_name] then
+				-- Stop sound when player goes above y limit
+				minetest.sound_stop(handles[player_name])
+				handles[player_name] = nil
+				volumes[player_name] = nil
+			end
 		end
 	end
 end)
