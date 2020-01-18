@@ -52,3 +52,8 @@ end
 if minetest.get_modpath("stairs") then
   dofile(MP.."/craft/stairs.lua")
 end
+
+if minetest.get_modpath("linetrack") then
+  dofile(MP.."/craft/linetrack.lua")
+end
+

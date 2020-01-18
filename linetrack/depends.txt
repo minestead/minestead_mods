@@ -1,0 +1,5 @@
+advtrains
+advtrains_train_track
+advtrains_luaautomation?
+advtrains_line_automation?
+advtrains_interlocking?
