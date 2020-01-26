@@ -124,6 +124,7 @@ minetest.register_tool("fnuclear:uranium_crowbar", {
 		max_drop_level=1,
 		groupcaps={
 			choppy={times={[1]=2.10, [2]=0.90, [3]=0.50}, uses=100, maxlevel=3},
+			cracky={times={[1]=3.20, [2]=1.6, [3]=0.80}, uses=100, maxlevel=3},
 		},
 		damage_groups = {fleshy=10},
 	},
@@ -429,4 +430,65 @@ minetest.register_craft({
 	output = "default:diamond",
 	recipe = {'default:sword_diamond', 'fnuclear:uranium_hammer'},
 	replacements = {{'fnuclear:uranium_hammer', 'fnuclear:uranium_hammer'}},
+})
+
+--hoe
+
+minetest.register_tool("fnuclear:uranium_hoe", {
+	description = "Uranium Hoe",
+	inventory_image = "uranium_hoe.png",
+	max_uses = 500,
+	on_use = function(itemstack, user, pointed_thing)
+	if pointed_thing.type ~= "node" then
+		return
+	end
+
+	local pos = pointed_thing.under
+
+	if minetest.is_protected(pos, user:get_player_name()) then
+		minetest.record_protection_violation(pos, user:get_player_name())
+		return
+	end
+
+	local node = minetest.get_node(pos)
+	local r = 1 -- radius
+	
+	-- remove flora (grass, flowers etc.)
+	local res = minetest.find_nodes_in_area(
+		{x = pos.x - r, y = pos.y - 1, z = pos.z - r},
+		{x = pos.x + r, y = pos.y + 2, z = pos.z + r},
+		{"group:flora"})
+	
+	for n = 1, #res do
+		minetest.swap_node(res[n], {name = "air"})
+	end
+	
+	-- replace dirt with tilled soil
+	res = nil
+	res = minetest.find_nodes_in_area_under_air(
+		{x = pos.x - r, y = pos.y - 1, z = pos.z - r},
+		{x = pos.x + r, y = pos.y + 2, z = pos.z + r},
+		{"group:soil"})
+
+	for n = 1, #res do
+		minetest.swap_node(res[n], {name = "farming:soil"})
+	end
+	
+	minetest.sound_play("default_dig_crumbly", {pos = pointed_thing.under, gain = 0.5})
+
+	itemstack:add_wear(65535 / 500)
+	return itemstack
+	end,	
+	paramtype = "light",
+	light_source = 12,
+	sound = {breaks = "default_tool_breaks"},
+})
+
+minetest.register_craft({
+	output = "fnuclear:uranium_hoe",
+	recipe = {
+	{"technic:uranium0_ingot", "technic:uranium0_ingot", ""},
+	{"", "default:stick", ""},
+	{"", "default:stick", ""}
+  }
 })
