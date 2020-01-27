@@ -3,7 +3,8 @@
 local function get_formspec()
 	local news_file = io.open(minetest.get_worldpath().."/news.txt", "r")
 	local news_fs = 'size[12,8.25]'..
-		"button_exit[-0.05,7.8;2,1;exit;Close]"
+		"button_exit[-0.05,7.8;2,1;exit;Закрыть]"..
+		"label[3,8;Отключить новости при входе: '/news off', включить заново '/news on']"
 	if news_file then
 		local news = news_file:read("*a")
 		news_file:close()
