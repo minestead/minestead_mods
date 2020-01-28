@@ -298,30 +298,12 @@ function minetest.is_protected(pos, digger)
 
 			-- flip player when protection violated
 			if protector_flip then
-
-				-- yaw + 180°
-				local yaw = player:get_look_horizontal() + math.pi
-
-				if yaw > 2 * math.pi then
-					yaw = yaw - 2 * math.pi
-				end
-
-				player:set_look_horizontal(yaw)
-
-				-- invert pitch
-				player:set_look_vertical(-player:get_look_vertical())
-
-				-- if digging below player, move up to avoid falling through hole
-				local pla_pos = player:get_pos()
-
-				if pos.y < pla_pos.y then
-
 					player:set_pos({
-						x = pla_pos.x,
-						y = pla_pos.y + 0.8,
-						z = pla_pos.z
+						x = statspawn.x,
+						y = statspawn.y,
+						z = statspawn.z
 					})
-				end
+				minetest.chat_send_player(digger, "Не трогай защищенные локации!!!")
 			end
 		end
 
