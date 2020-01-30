@@ -109,6 +109,9 @@ local nodes = {
 	{"mahogany:leaves", false},
 	{"palm:trunk", true},
 	{"palm:leaves", false},
+	{"palm:palm_tree_trunk", true},
+	{"palm:palm_tree_leaves", false},
+
 
 	-- Support growing_cactus
 	{"growing_cactus:sprout", true},

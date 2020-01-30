@@ -307,3 +307,6 @@ if minetest.global_exists("moretrees") then
 	fn('moretrees:spruce_cone')
 end
 
+tn('palm:palm_tree_trunk', 'palm:palm_tree_trunk', 'palm:coconut')
+fn('palm:palm_tree_leaves')
+fn('palm:coconut')
