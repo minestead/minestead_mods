@@ -31,3 +31,11 @@ minetest.register_craft({
         {"", "group:wood", ""}
     }
 })
+
+minetest.clear_craft({output = "xdecor:cushion"})
+minetest.register_craft({
+    output = "xdecor:cushion 3",
+    recipe = {
+        {"wool:red", "wool:black", "wool:red"},
+    }
+})
