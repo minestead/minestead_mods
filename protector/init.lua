@@ -298,12 +298,15 @@ function minetest.is_protected(pos, digger)
 
 			-- flip player when protection violated
 			if protector_flip then
+			    -- ugly, ugly hack. we teleport player only if is_protected is called from core.node_dig
+			    if string.match(debug.traceback(), '</usr/local/share/minetest/builtin/game/item.lua:543>') then
 					player:set_pos({
 						x = statspawn.x,
 						y = statspawn.y,
 						z = statspawn.z
 					})
 				minetest.chat_send_player(digger, "Не трогай защищенные локации!!!")
+			    end
 			end
 		end
 
