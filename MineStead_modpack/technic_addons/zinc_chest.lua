@@ -1,0 +1,65 @@
+local ingot = "technic:zinc_ingot"
+
+minetest.register_craft({
+	output = 'technic:zinc_chest 1',
+	recipe = {
+		{ingot,ingot,ingot},
+		{ingot,'default:chest',ingot},
+		{ingot,ingot,ingot},
+	}
+})
+
+minetest.register_craft({
+	output = 'technic:zinc_locked_chest 1',
+	recipe = {
+		{ingot,ingot,ingot},
+		{ingot,'default:chest_locked',ingot},
+		{ingot,ingot,ingot},
+	}
+})
+
+minetest.register_craft({
+	output = 'technic:zinc_locked_chest 1',
+	recipe = {
+		{'basic_materials:padlock'},
+		{'technic:zinc_chest'},
+	}
+})
+
+technic.chests:register("Zinc", {
+	width = 9,
+	height = 5,
+	sort = true,
+	autosort = false,
+	infotext = false,
+	color = false,
+	locked = false,
+})
+
+technic.chests:register("Zinc", {
+	width = 9,
+	height = 5,
+	sort = true,
+	autosort = false,
+	infotext = false,
+	color = false,
+	locked = true,
+})
+
+minetest.register_craft({
+        output = 'technic:copper_chest 1',
+        recipe = {
+                {'default:copper_ingot','default:copper_ingot','default:copper_ingot'},
+                {'default:copper_ingot','technic:zinc_chest','default:copper_ingot'},
+                {'default:copper_ingot','default:copper_ingot','default:copper_ingot'},
+        }
+})
+
+minetest.register_craft({
+        output = 'technic:copper_locked_chest 1',
+        recipe = {
+                {'default:copper_ingot','default:copper_ingot','default:copper_ingot'},
+                {'default:copper_ingot','technic:zinc_locked_chest','default:copper_ingot'},
+                {'default:copper_ingot','default:copper_ingot','default:copper_ingot'},
+        }
+})

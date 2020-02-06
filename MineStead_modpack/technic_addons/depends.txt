@@ -2,3 +2,5 @@ default
 technic
 gravelsieve
 caverealms?
+technic_chests?
+technic_cnc?
