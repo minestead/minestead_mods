@@ -17,3 +17,5 @@ dofile(path.."/quarry.lua")
 dofile(path.."/forcefield.lua")
 dofile(path.."/transmutator.lua")
 
+dofile(path.."/hv_furnace.lua")
+
