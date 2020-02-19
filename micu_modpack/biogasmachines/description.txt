@@ -1,0 +1,2 @@
+Expands Tubelib (and TechPack) with various machines that use Biogas
+either as a product or a power source.

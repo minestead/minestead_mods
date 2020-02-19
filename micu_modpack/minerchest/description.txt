@@ -1,0 +1,1 @@
+High capacity chest that can automatically combine certain materials into blocks.
