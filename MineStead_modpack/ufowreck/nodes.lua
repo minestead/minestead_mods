@@ -38,7 +38,7 @@ minetest.register_node("ufowreck:crate", {
 	description = "Crate",
 	tiles = {"scifi_nodes_crate.png"},
 	paramtype2 = "facedir",
-	groups = {cracky = 1, oddly_breakable_by_hand = 2, fuel = 8},
+	groups = {cracky = 1, oddly_breakable_by_hand = 2},
 	legacy_facedir_simple = true,
 	is_ground_content = false,
 	sounds = default.node_sound_metal_defaults(),
@@ -72,7 +72,7 @@ minetest.register_node("ufowreck:alien_metal", {
 	paramtype = "light",
 	sunlight_propagates = true,
 	is_ground_content = false,
-	groups = {cracky = 2},
+	groups = {cracky = 1},
 	sounds = default.node_sound_metal_defaults(),
 })
 
@@ -114,7 +114,7 @@ minetest.register_node("ufowreck:alien_glass", {
 	},
 	use_texture_alpha = true,
 	paramtype = "light",
-	groups = {cracky=2},
+	groups = {cracky=1},
 	sounds = default.node_sound_glass_defaults()
 })
 
@@ -132,7 +132,7 @@ minetest.register_node("ufowreck:alien_control", {
 		animation={type="vertical_frames", aspect_w=16, aspect_h=16, length=3.50}, --length=0.50
 	}},
 	paramtype = "light",
-	groups = {cracky=3},
+	groups = {cracky=1},
 	sounds = default.node_sound_metal_defaults(),
 })
 
@@ -153,7 +153,7 @@ minetest.register_node("ufowreck:alien_door_closed", {
 	drawtype = "nodebox",
 	paramtype = "light",
 	paramtype2 = "facedir",
-	groups = {cracky = 3, oddly_breakable_by_hand = 1},
+	groups = {cracky = 1, oddly_breakable_by_hand = 1},
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -397,6 +397,7 @@ minetest.register_node("ufowreck:alien_door_opened", {
 			minetest.set_node({x=pos.x-1, y=pos.y+1, z=pos.z+1}, {name="ufowreck:alien_door_closed_top", param2=h.param2})
 		end
 	end,
+	can_dig = nodig,
 })
 
 minetest.register_node("ufowreck:alien_door_opened_top", {
@@ -492,7 +493,7 @@ minetest.register_node("ufowreck:eye_tree", {
 		animation={type="vertical_frames", aspect_w=48, aspect_h=48, length=10}, --length=0.50
 	}},
 	drawtype = "plantlike",
-	groups = {snappy=1, oddly_breakable_by_hand=1, flora=1},
+	groups = {snappy=1, choppy=1, oddly_breakable_by_hand=1, flora=1},
 	paramtype = "light",
 	visual_scale = 2.5,
 	buildable_to = true,
@@ -519,7 +520,7 @@ minetest.register_node("ufowreck:eye_tree_empty", {
 	tiles = {"scifi_nodes_eyetree_2.png"},
 	drawtype = "plantlike",
 	inventory_image = {"scifi_nodes_eyetree_2.png"},
-	groups = {snappy=1, oddly_breakable_by_hand=1, flora=1},
+	groups = {snappy=1, choppy=1, oddly_breakable_by_hand=1, flora=1},
 	paramtype = "light",
 	visual_scale = 2.5,
 	buildable_to = true,
@@ -567,7 +568,7 @@ minetest.register_node("ufowreck:predatory_plant", {
 	tiles = {"scifi_nodes_flower3.png"},
 	drawtype = "plantlike",
 	inventory_image = {"scifi_nodes_flower3.png"},
-	groups = {snappy=1, oddly_breakable_by_hand=1, dig_immediate=3, flora=1},
+	groups = {snappy=1, choppy=1, oddly_breakable_by_hand=1, dig_immediate=3, flora=1},
 	paramtype = "light",
 	visual_scale = 2.5,
 	buildable_to = true,
@@ -587,7 +588,7 @@ minetest.register_node("ufowreck:glow_plant", {
 	tiles = {"scifi_nodes_plant2.png"},
 	drawtype = "plantlike",
 	inventory_image = {"scifi_nodes_plant2.png"},
-	groups = {snappy=1, oddly_breakable_by_hand=1, dig_immediate=3, flora=1},
+	groups = {snappy=1, choppy=1, oddly_breakable_by_hand=1, dig_immediate=3, flora=1},
 	paramtype = "light",
 	visual_scale = 1.5,
 	buildable_to = true,
@@ -611,6 +612,11 @@ minetest.register_node("ufowreck:floob_spawner", {
 	sunlight_propagates = true,
 	is_ground_content = false,
 	groups = {cracky = 2},
+	drop = {
+		items = {
+			{items = {'ufowreck:alien_metal'}},
+		}
+	},
 	sounds = default.node_sound_metal_defaults(),
 })
 
