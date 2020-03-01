@@ -307,7 +307,9 @@ minetest.register_node("ufowreck:alien_door_closed_top", {
 			{0, 0, 0, 0, 0, 0},
 		}
 	},
-	can_dig = nodig,
+	can_dig = function(pos, player)
+		return false
+	end,
 })
 
 minetest.register_node("ufowreck:alien_door_opened", {
@@ -397,7 +399,9 @@ minetest.register_node("ufowreck:alien_door_opened", {
 			minetest.set_node({x=pos.x-1, y=pos.y+1, z=pos.z+1}, {name="ufowreck:alien_door_closed_top", param2=h.param2})
 		end
 	end,
-	can_dig = nodig,
+	can_dig = function(pos, player)
+		return false
+	end,
 })
 
 minetest.register_node("ufowreck:alien_door_opened_top", {
@@ -425,12 +429,10 @@ minetest.register_node("ufowreck:alien_door_opened_top", {
 			{0, 0, 0, 0, 0, 0},
 		}
 	},
-	can_dig = nodig,
+	can_dig = function(pos, player)
+		return false
+	end,
 })
-
-local function nodig(pos, digger)
-	return false
-end
 
 minetest.register_node("ufowreck:bar_light", {
 	description = "Alien Lightbars",
@@ -642,8 +644,9 @@ minetest.register_node("ufowreck:pad", {
 		elseif position2 == nil then
 			position2 = pos
 			meta:set_int("type", 2)
-		else
-			minetest.chat_send_all("There can only be two teleportation pads at a time!")
+--		else
+--			minetest.chat_send_player(placer:get_player_name(), "There can only be two teleportation pads at a time!") 
+-- placer:get_player_name() get nil all time
 		end
 	end,
 	on_rightclick = function(pos, node, clicker)
@@ -719,12 +722,13 @@ minetest.register_node("ufowreck:pad", {
 		elseif position1 == nil and meta:get_int("type") ~= 2 then
 		position1 = pos
 		meta:set_int("type", 1)
-		minetest.chat_send_all("Teleporter 1 connected at "..minetest.pos_to_string(pos))
+		minetest.chat_send_player(clicker:get_player_name(), "Teleporter 1 connected at "..minetest.pos_to_string(pos))
 		elseif position2 == nil and meta:get_int("type") ~= 1 then
 		position2 = pos
 		meta:set_int("type", 2)
-		minetest.chat_send_all("Teleporter 2 connected at "..minetest.pos_to_string(pos))
-		else minetest.chat_send_all("Teleporter error!")
+		minetest.chat_send_player(clicker:get_player_name(), "Teleporter 2 connected at "..minetest.pos_to_string(pos))
+		else
+			minetest.chat_send_player(clicker:get_player_name(), "Teleporter error!")
 		end
 	end,
 	on_destruct = function(pos, oldnode, placer)

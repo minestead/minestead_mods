@@ -39,10 +39,10 @@ mobs:register_mob("ufowreck:floob", {
 	jump = true,
 	floats = 1,
 	view_range = 20,
---	drops = {
---		{name = "ufowreck:raygun",
---		chance = 2, min = 0, max = 1,},
---	},
+	drops = {
+		{name = "ufowreck:broken_raygun",
+		chance = 3, min = 0, max = 1,},
+	},
 	water_damage = 0,
     fear_height = 6,
 	lava_damage = 1,
