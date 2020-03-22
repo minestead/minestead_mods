@@ -135,6 +135,16 @@ minetest.register_tool("ufowreck:heater", {
 			pos=pos,
 			max_hear_distance=20,
 			loop=false})
+	elseif node.name == "default:sand" 
+	then
+		node.name = "default:glass"
+		minetest.swap_node(pos, node)
+		minetest.sound_play({
+			name="blaster_long"},{
+			gain=1,
+			pos=pos,
+			max_hear_distance=20,
+			loop=false})
 	elseif node.name == "default:dirt_with_snow" 
 		or node.name == "default:dirt_with_coniferous_litter"
 		or node.name == "default:dirt_with_dry_grass"

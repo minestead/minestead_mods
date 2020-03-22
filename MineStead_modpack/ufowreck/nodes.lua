@@ -488,6 +488,15 @@ minetest.register_node("ufowreck:alien_egg", {
 	}
 })
 
+if minetest.get_modpath("mobs_spider") then
+mobs:spawn({name = "mobs_spider:spider",
+       nodes = {"ufowreck:alien_egg"},
+       active_object_count = 10,
+       chance = 10,
+       interval = 30,
+})
+end
+
 minetest.register_node("ufowreck:eye_tree", {
 	description = "Alien Eye Tree",
 	tiles = {{
@@ -603,23 +612,6 @@ minetest.register_node("ufowreck:glow_plant", {
 	},
 	is_ground_content = false,
 	light_source = 15,
-})
-
-minetest.register_node("ufowreck:floob_spawner", {
-    description = "Alien Metal Block",
-    tiles = {"scifi_nodes_lighttop.png"},
-	drawtype = "nodebox",
-	paramtype2 = "facedir",
-	paramtype = "light",
-	sunlight_propagates = true,
-	is_ground_content = false,
-	groups = {cracky = 2},
-	drop = {
-		items = {
-			{items = {'ufowreck:alien_metal'}},
-		}
-	},
-	sounds = default.node_sound_metal_defaults(),
 })
 
 minetest.register_node("ufowreck:pad", {

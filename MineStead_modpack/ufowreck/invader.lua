@@ -1,7 +1,7 @@
 mobs:spawn({name = "ufowreck:floob",
        nodes = {"ufowreck:floob_spawner"},
        min_height = 0,
-       active_object_count = 1,
+       active_object_count = 2,
        chance = 1,
        interval = 1,
 })
@@ -81,3 +81,29 @@ mobs:register_arrow("ufowreck:rayray", {
 })
 
 mobs:register_egg("ufowreck:floob", "floob", "amcaw_a_floob_inv.png", 0)
+
+minetest.register_node("ufowreck:floob_spawner", {
+    description = "Alien Metal Block",
+    tiles = {"scifi_nodes_lighttop.png"},
+	drawtype = "nodebox",
+	paramtype2 = "facedir",
+	paramtype = "light",
+	sunlight_propagates = true,
+	is_ground_content = false,
+	groups = {cracky = 2, not_in_creative_inventory = 1},
+	drop = {
+		items = {
+			{items = {'ufowreck:alien_metal'}},
+		}
+	},
+	sounds = default.node_sound_metal_defaults(),
+})
+
+minetest.register_craft({
+	output = "ufowreck:floob_spawner",
+	recipe = {
+	{"ufowreck:alien_metal", "", ""},
+	{"", "", ""},
+	{"", "", "ufowreck:eye"}
+  }
+})

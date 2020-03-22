@@ -4,6 +4,7 @@ dofile(modpath.."/nodes.lua")
 dofile(modpath.."/invader.lua")
 dofile(modpath.."/engine.lua")
 dofile(modpath.."/tools.lua")
+dofile(modpath.."/miniufo.lua")
 
 local _ = {
   name = "air",
