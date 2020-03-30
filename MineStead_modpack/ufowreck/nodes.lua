@@ -324,7 +324,11 @@ minetest.register_node("ufowreck:alien_door_opened", {
 	drawtype = "nodebox",
 	paramtype = "light",
 	paramtype2 = "facedir",
-	drop = closed,
+	drop = {
+		items = {
+			{items = {'ufowreck:alien_door_closed'}},
+		}
+	},
 	groups = {cracky = 1},
 	node_box = {
 		type = "fixed",
@@ -504,7 +508,7 @@ minetest.register_node("ufowreck:eye_tree", {
 		animation={type="vertical_frames", aspect_w=48, aspect_h=48, length=10}, --length=0.50
 	}},
 	drawtype = "plantlike",
-	groups = {snappy=1, choppy=1, oddly_breakable_by_hand=1, flora=1},
+	groups = {snappy=2, choppy=2, oddly_breakable_by_hand=2, dig_immediate=3, flora=1},
 	paramtype = "light",
 	visual_scale = 2.5,
 	buildable_to = true,
@@ -531,7 +535,7 @@ minetest.register_node("ufowreck:eye_tree_empty", {
 	tiles = {"scifi_nodes_eyetree_2.png"},
 	drawtype = "plantlike",
 	inventory_image = {"scifi_nodes_eyetree_2.png"},
-	groups = {snappy=1, choppy=1, oddly_breakable_by_hand=1, flora=1},
+	groups = {snappy=2, choppy=2, oddly_breakable_by_hand=2, flora=1},
 	paramtype = "light",
 	visual_scale = 2.5,
 	buildable_to = true,
@@ -556,6 +560,9 @@ minetest.register_node("ufowreck:eye_tree_empty", {
 	is_ground_content = false,
 })
 
+local buff_speed = 1		--add to physics multiplier
+local buff_jump = 0.5		--add to physics multiplier
+
 minetest.register_node("ufowreck:eye", {
 	description = "Alien Eye",
 	tiles = {"eye.png"},
@@ -563,7 +570,6 @@ minetest.register_node("ufowreck:eye", {
 	inventory_image = "eye.png",
 	wield_image = "eye.png",
 	groups = { food = 2, eatable = 4 },
-	on_use = minetest.item_eat(4),
 	buildable_to = true,
 	walkable = false,
 	on_construct = function(pos)
@@ -572,6 +578,23 @@ minetest.register_node("ufowreck:eye", {
 	on_timer = function(pos)
 		minetest.set_node(pos, {name = "ufowreck:eye_tree"})		
 	end,
+	on_use = function(itemstack, user, pointed_thing)
+		local physics = user:get_physics_override()
+		user:set_physics_override({
+			speed = physics.speed + buff_speed,
+			jump = physics.jump + buff_jump,
+		})
+		minetest.after(10, function(user)
+			if user and user:is_player() then
+				local phys = user:get_physics_override()
+				user:set_physics_override({
+					speed = phys.speed - buff_speed,
+					jump = phys.jump - buff_jump,
+				})
+			end
+		end, user)
+		return minetest.do_item_eat(4, nil, itemstack, user, pointed_thing)
+	end
 })
 
 minetest.register_node("ufowreck:predatory_plant", {
@@ -596,10 +619,14 @@ minetest.register_node("ufowreck:predatory_plant", {
 
 minetest.register_node("ufowreck:glow_plant", {
 	description = "Alien Glow Plant",
-	tiles = {"scifi_nodes_plant2.png"},
+	tiles = {{
+		name="scifi_nodes_plant2_anim.png",
+		animation={type="vertical_frames", aspect_w=32, aspect_h=32, length=5},
+	}},
+	inventory_image = "scifi_nodes_plant2.png",
+	wield_image = "scifi_nodes_plant2.png",
 	drawtype = "plantlike",
-	inventory_image = {"scifi_nodes_plant2.png"},
-	groups = {snappy=1, choppy=1, oddly_breakable_by_hand=1, dig_immediate=3, flora=1},
+	groups = {snappy=2, choppy=2, oddly_breakable_by_hand=2, dig_immediate=3, flora=1},
 	paramtype = "light",
 	visual_scale = 1.5,
 	buildable_to = true,
@@ -611,7 +638,7 @@ minetest.register_node("ufowreck:glow_plant", {
 		}
 	},
 	is_ground_content = false,
-	light_source = 15,
+	light_source = 14,
 })
 
 minetest.register_node("ufowreck:pad", {

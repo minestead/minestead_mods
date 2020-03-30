@@ -5,10 +5,18 @@ dofile(modpath.."/invader.lua")
 dofile(modpath.."/engine.lua")
 dofile(modpath.."/tools.lua")
 dofile(modpath.."/miniufo.lua")
+dofile(modpath.."/lighter.lua")
+dofile(modpath.."/base.lua")
 
 local _ = {
   name = "air",
   prob = 0,
+}
+
+local A = {
+  name = "air",
+  prob = 0,
+  force_place = true,
 }
 
 local M = {
@@ -304,7 +312,7 @@ minetest.register_decoration({
   deco_type = "schematic",
   place_on = {"default:stone", "default:dirt_with_coniferous_litter", "default:dirt_with_rainforest_litter", "default:dirt_with_snow", "default:snow",
 		"default:permafrost_with_stones", "default:sand", "default:dirt_with_grass"},
-  biomes = {"rainforest", "rainforest_swamp", "rainforest_ocean", "floatland_coniferous_forest", "floatland_coniferous_forest_ocean"},
+  biomes = {"rainforest", "rainforest_swamp", "floatland_coniferous_forest", "floatland_coniferous_forest_ocean"},
   sidelen = 5,
   fill_ratio = 0.0000000000000001,
   schematic = ufowreck_schematic_1,
@@ -318,7 +326,7 @@ minetest.register_decoration({
   deco_type = "schematic",
   place_on = {"default:stone", "default:dirt_with_coniferous_litter", "default:dirt_with_rainforest_litter", "default:dirt_with_snow", "default:snow",
 		"default:permafrost_with_stones", "default:sand", "default:dirt_with_grass"},
-  biomes = {"icesheet_ocean", "tundra", "tundra_ocean",	"taiga",
+  biomes = {"icesheet_ocean", "tundra", "tundra_ocean",	"taiga", "rainforest_ocean",
 			--"taiga_ocean", "coniferous_forest", "coniferous_forest_ocean", "cold_desert_ocean",
 			"underground"},
   sidelen = 5,
@@ -345,4 +353,3 @@ minetest.register_decoration({
   y_max = 31000,
   flags = {place_center_z = true, place_center_x = true},
 })
-
