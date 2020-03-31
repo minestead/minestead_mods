@@ -1,6 +1,5 @@
 mobs:spawn({name = "ufowreck:floob",
        nodes = {"ufowreck:floob_spawner"},
-       min_height = 0,
        active_object_count = 2,
        chance = 1,
        interval = 1,
