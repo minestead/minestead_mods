@@ -83,8 +83,8 @@ minetest.register_abm({
 		local xi, yi, zi
 		for xi = 0, 6 do
 			for zi = 0, 6 do
---				if (minetest.get_node(pos)).name == "ufowreck:airlight" then
-				if (minetest.get_node(pos)).name == "default:torch" then
+				if (minetest.get_node(pos)).name == "ufowreck:airlight" then
+--				if (minetest.get_node(pos)).name == "default:torch" then
 					minetest.set_node(pos,{name = "air"})
 				end
 				pos.z = pos.z + 2
@@ -98,8 +98,8 @@ minetest.register_abm({
 		for xi = 0, 6 do
 			for zi = 0, 6 do
 				if (minetest.get_node(pos)).name == "air" then
---					minetest.set_node(pos,{name = "ufowreck:airlight"})
-					minetest.set_node(pos,{name = "default:torch"})
+					minetest.set_node(pos,{name = "ufowreck:airlight"})
+--					minetest.set_node(pos,{name = "default:torch"})
 				end
 				pos.z = pos.z + 2
 			end
