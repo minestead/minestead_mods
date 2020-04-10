@@ -1,6 +1,6 @@
-# powerbanks
+# Powerbanks [powerbanks]
 
-[![Build Status](https://travis-ci.org/OgelGames/powerbanks.svg?branch=master)](https://travis-ci.org/OgelGames/powerbanks)
+[![Build](https://github.com/OgelGames/powerbanks/workflows/Build/badge.svg)](https://github.com/OgelGames/powerbanks/actions)
 [![License](https://img.shields.io/badge/License-MIT%20and%20CC%20BY--SA%204.0-green.svg)](LICENSE.md)
 [![Feedback](https://img.shields.io/badge/Feedback-Minetest%20Forum-lightgrey.svg)](https://forum.minetest.net/viewtopic.php?t=23791)
 [![Download](https://img.shields.io/badge/Download-ContentDB-blue.svg)](https://content.minetest.net/packages/OgelGames/powerbanks)
@@ -76,16 +76,18 @@ Currently there are three different powerbanks:
 
 ## Dependencies
 
-Currently this mod only depends on the default and [technic](https://github.com/minetest-mods/technic) mods.
+**Required**
+
+- `default` (included in [Minetest Game](https://github.com/minetest/minetest_game))
+
+- [`technic`](https://github.com/minetest-mods/technic)
 
 ## Installation
 
-To install this mod, simply download it using one of the methods below, and place it in one of [Minetest's mod folders](https://dev.minetest.net/Installing_Mods).
+Download the [master branch](https://github.com/OgelGames/powerbanks/archive/master.zip) or the [latest release](https://github.com/OgelGames/powerbanks/releases), or clone the repository using Git or the [GitHub Desktop](https://desktop.github.com/) app, and follow [these instructions](https://dev.minetest.net/Installing_Mods).
 
-- Clone the Git repository using `git clone https://github.com/OgelGames/powerbanks.git` or the [GitHub Desktop](https://desktop.github.com/) app.
-- Download the Git repository as a ZIP file: https://github.com/OgelGames/powerbanks/archive/master.zip
-- Download the latest stable release: https://github.com/OgelGames/powerbanks/releases
+Alternatively, you can download and install the mod from [ContentDB](https://content.minetest.net/packages/OgelGames/powerbanks) from the online content tab in Minetest.
 
 ## License
 
-Except for the exceptions stated in [LICENSE.md](LICENSE.md#exceptions), all code is licensed under the [MIT License](LICENSE.md#mit-license), with textures licensed under the [CC BY-SA 4.0 License](LICENSE.md#cc-by-sa-40-license).
+Except for any exceptions stated in [LICENSE.md](LICENSE.md#exceptions), all code is licensed under the [MIT License](LICENSE.md#mit-license), with all textures, models, sounds, and other media licensed under the [CC BY-SA 4.0 License](LICENSE.md#cc-by-sa-40-license). 
