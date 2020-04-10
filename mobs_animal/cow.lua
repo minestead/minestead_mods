@@ -117,6 +117,7 @@ mobs:register_mob("mobs_animal:cow", {
 			return
 		end
 	end,
+
 	on_replace = function(self, pos, oldnode, newnode)
 
 		self.food = (self.food or 0) + 1
