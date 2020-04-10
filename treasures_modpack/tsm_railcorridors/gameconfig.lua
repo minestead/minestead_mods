@@ -39,7 +39,7 @@ if minetest.get_modpath("carts") then
 end
 
 if minetest.get_modpath("mobs_monster") then
-	tsm_railcorridors.nodes.cobweb = "mobs:cobweb"
+	tsm_railcorridors.nodes.cobweb = "xdecor:cobweb"
 
 	-- This is for games to add their spawner node. No spawner is added by default
 	-- because Mobs Redo's mob spawner is still unfinished.
