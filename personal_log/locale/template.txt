@@ -1,0 +1,62 @@
+# textdomain: personal_log
+
+
+### init.lua ###
+
+#book title and author
+"@1" by @2=
+#A list of one item
+@1=
+#A list of two items
+@1 or @2=
+#A list of three items
+@1, @2 or @3=
+#for combining a location or date (@1) with the first few words of the log entry it's associated with (@2)
+@1: @2=
+#button label for returning to the personal log from import/export
+Back=
+#label on the category dropdown
+Category:=
+#button label for deleting a personal log entry
+Delete=
+#a category of log entry
+Event=
+#button label
+Export=
+#label explaining what items a log entry can be exported to
+Export "@1" to @2=
+#a category of log entry
+General=
+#button label
+Import=
+#label explaining what items a log entry can be imported from
+Import an entry from @1=
+#a category of log entry
+Location=
+#tab text. Note: not a piece of wood. This is a log as in a record of items
+Log=
+#button label
+Move Down=
+#button label
+Move Up=
+#button label
+New=
+Open personal log=
+#item name for a physical representation of the personal log
+Personal Log=
+#label on the main log UI
+Personal Log Entries=
+#button label
+Save=
+#button label
+Teleport=
+#tooltip explaining what the button that opens the log is for
+Your personal log for keeping track of what happens where=
+# an item that log data can be imported from or exported to
+a GPS compass map=
+# an item that log data can be imported from or exported to
+a book=
+# an item that log data can be imported from or exported to
+a calibrated compass=
+# an item that log data can be exported to
+a compass=

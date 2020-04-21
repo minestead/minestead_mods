@@ -1,0 +1,2 @@
+personal_log_inventory_button (Access via a button in SFInv/Unified Inventory) bool true
+personal_log_craftable_item (Access via a craftable item) bool false
