@@ -177,10 +177,9 @@ minetest.register_globalstep(function(dtime)
 					sval = math.floor(NISVAL +
 						((time - 0.1875) / 0.0521) * difsval)
 				end
-			-- DISABLED TEMPORARILY - HAS SOME ISSUES WITH Minetest 5.2
-				-- Set sky to overcast bluish-grey 
-			--	player:set_sky({r = sval, g = sval, b = math.floor(sval*1.2), a = 255},
-			--		"plain", {}, false)
+				-- Set sky to overcast bluish-grey
+				player:set_sky({r = sval, g = sval, b = math.floor(sval*1.2), a = 255},
+					"plain", {}, false)
 			else
 				-- Reset sky to normal
 				player:set_sky({}, "regular", {}, true)
