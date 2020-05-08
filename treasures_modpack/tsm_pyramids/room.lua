@@ -1116,6 +1116,7 @@ function tsm_pyramids.make_traps(pos, stype, rotations, layout_room)
 	-- The depth of air between trap stones and lava layer is <depth> - 4
 	local deep_trap = math.random(1,2) == 1
 	local trap_node
+	local depth
 	if deep_trap then
 		trap_node = " "
 		depth = 14
