@@ -84,6 +84,9 @@ minetest.register_node("scaffolding:scaffolding", {
 			end
 		end,
 		on_rightclick = function(pos, node, player, itemstack, pointed_thing)
+			if not itemstack then
+				return
+			end
 			-- if user hits scaffolding with platform Wooden scaffolding then --
 			if itemstack:get_name() == "scaffolding:platform" then
 				node = "scaffolding:platform";
