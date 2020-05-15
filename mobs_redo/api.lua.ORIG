@@ -1007,10 +1007,6 @@ function mob_class:do_jump()
 	local pos = self.object:get_pos()
 	local yaw = self.object:get_yaw()
 
-	if not yaw or not pos then
-	    return
-	end
-
 	-- what is mob standing on?
 	pos.y = pos.y + self.collisionbox[2] - 0.2
 
