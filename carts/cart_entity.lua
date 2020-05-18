@@ -1,3 +1,14 @@
+-- carts/cart_entity.lua
+
+-- support for MT game translation.
+local S = carts.get_translator
+
+-- is mesecons enabled ?
+local HAVE_MESECONS_ENABLED = minetest.get_modpath("mesecons")
+if HAVE_MESECONS_ENABLED then
+	dofile(minetest.get_modpath("carts") .. "/detector.lua")
+end
+
 local cart_entity = {
 	initial_properties = {
 		physical = false, -- otherwise going uphill breaks
@@ -38,6 +49,7 @@ end
 
 function cart_entity:on_activate(staticdata, dtime_s)
 	self.object:set_armor_groups({immortal=1})
+	self.attached_items = {} -- needed to stop itemcount glitch
 	if string.sub(staticdata, 1, string.len("return")) ~= "return" then
 		return
 	end
@@ -62,6 +74,7 @@ end
 function cart_entity:on_detach_child(child)
 	if child and child:get_player_name() == self.driver then
 		self.driver = nil
+		carts:manage_attachment(child, nil)
 	end
 end
 
@@ -162,6 +175,9 @@ local function rail_sound(self, dtime)
 		minetest.after(0.2, minetest.sound_stop, handle)
 	end
 	local vel = self.object:get_velocity()
+
+if not vel then return end -- nil check
+
 	local speed = vector.length(vel)
 	if speed > 0 then
 		self.sound_handle = minetest.sound_play(
@@ -180,6 +196,25 @@ end
 
 local v3_len = vector.length
 local function rail_on_step(self, dtime)
+
+	-- if cart contains nothing then drop as item after 10 seconds
+	if not self.driver and #self.attached_items == 0 then
+		self.count = (self.count or 0) + dtime
+
+		if self.count > 10 then
+			minetest.add_item(self.object:get_pos(), "carts:cart")
+			if self.sound_handle then
+				local handle = self.sound_handle
+				self.sound_handle = nil
+				minetest.after(0.2, minetest.sound_stop, handle)
+			end
+			self.object:remove()
+			return
+		end
+	else
+		self.count = 0
+	end
+
 	local vel = self.object:get_velocity()
 	if self.punched then
 		vel = vector.add(vel, self.velocity)
@@ -302,6 +337,11 @@ local function rail_on_step(self, dtime)
 		new_acc = vector.multiply(dir, acc)
 	end
 
+	-- mesecon detector rail
+	if HAVE_MESECONS_ENABLED then
+		carts:signal_detector_rail(vector.round(pos))
+	end
+
 	-- Limits
 	local max_vel = carts.speed_max
 	for _, v in pairs({"x","y","z"}) do
@@ -324,7 +364,7 @@ local function rail_on_step(self, dtime)
 		for _, obj_ in pairs(minetest.get_objects_inside_radius(pos, 1)) do
 			if not obj_:is_player() and
 					obj_:get_luaentity() and
-					not obj_:get_luaentity().physical_state and
+--					not obj_:get_luaentity().physical_state and
 					obj_:get_luaentity().name == "__builtin:item" then
 
 				obj_:set_attach(self.object, "", {x=0, y=0, z=0}, {x=0, y=0, z=0})
@@ -383,8 +423,9 @@ end
 minetest.register_entity("carts:cart", cart_entity)
 
 minetest.register_craftitem("carts:cart", {
-	description = "Cart (Sneak+Click to pick up)",
-	inventory_image = minetest.inventorycube("carts_cart_top.png", "carts_cart_side.png", "carts_cart_side.png"),
+	description = S("Cart") .. "\n" .. S("(Sneak+Click to pick up)"),
+	inventory_image = minetest.inventorycube(
+			"carts_cart_top.png", "carts_cart_front.png", "carts_cart_side.png"),
 	wield_image = "carts_cart_side.png",
 	on_place = function(itemstack, placer, pointed_thing)
 		local under = pointed_thing.under
@@ -409,7 +450,7 @@ minetest.register_craftitem("carts:cart", {
 		end
 
 		minetest.sound_play({name = "default_place_node_metal", gain = 0.5},
-			{pos = pointed_thing.above})
+			{pos = pointed_thing.above}, true)
 
 		if not (creative and creative.is_enabled_for
 				and creative.is_enabled_for(placer:get_player_name())) then

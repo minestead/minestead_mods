@@ -21,3 +21,9 @@ Features
 - Boost and brake rails
 - Rail junction switching with the 'right-left' walking keys
 - Handbrake with the 'back' key
+
+Additions by TenPlus1
+-----------------------
+- Mesecon detector rail added
+- 10 second cart drop when player or item not inside
+- Alias' set to replace rails from boost_cart mod
