@@ -241,12 +241,7 @@ local function run_nodes(list, run_stage)
 	end
 end
 
-minetest.register_abm({
-	nodenames = {"technic:switching_station"},
-	label = "Switching Station", -- allows the mtt profiler to profile this abm individually
-	interval   = 1,
-	chance     = 1,
-	action = function(pos, node, active_object_count, active_object_count_wider)
+technic.switching_station_run = function(pos)
 		if not technic.powerctrl_state then return end
 		local meta             = minetest.get_meta(pos)
 		local meta1            = nil
@@ -267,9 +262,6 @@ minetest.register_abm({
 
 		--Disable if necessary
 		if meta:get_int("active") ~= 1 then
-			minetest.forceload_free_block(pos)
-			minetest.forceload_free_block(pos1)
-			meta:set_int('is_forceloaded', 0)
 			meta:set_string("infotext",S("%s Already Present"):format(machine_name))
 
 			local poshash = minetest.hash_node_position(pos)
@@ -284,19 +276,10 @@ minetest.register_abm({
 		local name = minetest.get_node(pos1).name
 		local tier = technic.get_cable_tier(name)
 		if tier then
-			-- Forceload switching station
-			if meta:get_int('is_forceloaded') ~= 1 then
-			    minetest.forceload_block(pos)
-			    minetest.forceload_block(pos1)
-			    meta:set_int('is_forceloaded', 1)
-			end
 			PR_nodes, BA_nodes, RE_nodes = get_network(pos, pos1, tier)
 		else
 			--dprint("Not connected to a network")
 			meta:set_string("infotext", S("%s Has No Network"):format(machine_name))
-			minetest.forceload_free_block(pos)
-			minetest.forceload_free_block(pos1)
-			meta:set_int('is_forceloaded', 0)
 			return
 		end
 
@@ -448,8 +431,8 @@ minetest.register_abm({
 			meta1:set_int(eu_input_str, 0)
 		end
 
-	end,
-})
+end
+
 
 -- Timeout ABM
 -- Timeout for a node in case it was disconnected from the network

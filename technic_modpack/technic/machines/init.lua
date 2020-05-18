@@ -8,6 +8,8 @@ dofile(path.."/MV/init.lua")
 dofile(path.."/HV/init.lua")
 
 dofile(path.."/switching_station.lua")
+dofile(path.."/switching_station_globalstep.lua")
+
 dofile(path.."/power_monitor.lua")
 dofile(path.."/supply_converter.lua")
 
