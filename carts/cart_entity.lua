@@ -198,6 +198,7 @@ local v3_len = vector.length
 local function rail_on_step(self, dtime)
 
 	-- if cart contains nothing then drop as item after 10 seconds
+--[[
 	if not self.driver and #self.attached_items == 0 then
 		self.count = (self.count or 0) + dtime
 
@@ -214,6 +215,7 @@ local function rail_on_step(self, dtime)
 	else
 		self.count = 0
 	end
+]]--
 
 	local vel = self.object:get_velocity()
 	if self.punched then
