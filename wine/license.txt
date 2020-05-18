@@ -19,3 +19,20 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+
+Textures by TenPlus1 unless listed below (CC-By-3.0)
+
+Mikhail Miroscnichenko @ dreamstime.com (royalty free license)
+  wine_bourbon_bottle.png
+
+RiverKpocc @ deviantart.com
+  wine_beer_glass.png
+  wine_wheat_beer_glass.png
+
+Textures by Darkstalker (cc-by-3.0 license)
+  wine_beer_bottle.png
+  wine_wheat_beer_bottle.png
+  wine_sake_bottle.png
+  wine_cider.bottle.png
+  wine_mead_bottle.png
+
