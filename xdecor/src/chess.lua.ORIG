@@ -635,7 +635,7 @@ local function get_moves_list(meta, pieceFrom, pieceTo, pieceTo_s, from_idx, to_
 	local to_x, to_y      = index_to_xy(to_idx)
 	local moves           = meta:get_string("moves")
 	local pieceFrom_s     = pieceFrom:match(":(%w+_%w+)")
-	local pieceFrom_si_id = pieceFrom_s ~= "" and pieces_str:match("(%d+)=" .. pieceFrom_s) or ""
+	local pieceFrom_si_id = pieces_str:match("(%d+)=" .. pieceFrom_s)
 	local pieceTo_si_id   = pieceTo_s ~= "" and pieces_str:match("(%d+)=" .. pieceTo_s) or ""
 
 	local coordFrom = letters[from_x + 1] .. math.abs(from_y - 8)
