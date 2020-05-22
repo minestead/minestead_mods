@@ -1,6 +1,7 @@
 -- contains the node definition for a general travelnet that can be used by anyone
 --   further travelnets can only be installed by the owner or by people with the travelnet_attach priv
---   digging of such a travelnet is limited to the owner and to people with the travelnet_remove priv (useful for admins to clean up)
+--   digging of such a travelnet is limited to the owner and to people with the
+--   travelnet_remove priv (useful for admins to clean up)
 -- (this can be overrided in config.lua)
 -- Author: Sokomine
 local S = travelnet.S;
@@ -25,13 +26,13 @@ minetest.register_node("travelnet:travelnet", {
 		fixed = {
 
 			{ 0.45, -0.5,-0.5,  0.5,  1.45, 0.5},
-			{-0.5 , -0.5, 0.45, 0.45, 1.45, 0.5}, 
+			{-0.5 , -0.5, 0.45, 0.45, 1.45, 0.5},
 			{-0.5,  -0.5,-0.5 ,-0.45, 1.45, 0.5},
 
 			--groundplate to stand on
-			{ -0.5,-0.5,-0.5,0.5,-0.45, 0.5}, 
+			{ -0.5,-0.5,-0.5,0.5,-0.45, 0.5},
 			--roof
-			{ -0.5, 1.45,-0.5,0.5, 1.5, 0.5}, 
+			{ -0.5, 1.45,-0.5,0.5, 1.5, 0.5},
 
 			-- control panel
 			--                { -0.2, 0.6,  0.3, 0.2, 1.1,  0.5},
@@ -48,11 +49,14 @@ minetest.register_node("travelnet:travelnet", {
     light_source = 10,
 
     after_place_node  = function(pos, placer, itemstack)
-	local meta = minetest.get_meta(pos);
-	travelnet.reset_formspec( meta );
-        meta:set_string("owner",          placer:get_player_name() );
+		local meta = minetest.get_meta(pos);
+		travelnet.reset_formspec( meta );
+        meta:set_string("owner", placer:get_player_name() );
+
+		local top_pos = {x=pos.x, y=pos.y+1, z=pos.z}
+		minetest.set_node(top_pos, {name="travelnet:hidden_top"})
     end,
-    
+
     on_receive_fields = travelnet.on_receive_fields,
     on_punch          = function(pos, node, puncher)
                              travelnet.update_formspec(pos, puncher:get_player_name(), nil)
@@ -74,16 +78,24 @@ minetest.register_node("travelnet:travelnet", {
     on_place = function(itemstack, placer, pointed_thing)
 
        local pos = pointed_thing.above;
-       local def = minetest.registered_nodes[
-             minetest.get_node({x=pos.x, y=pos.y+1, z=pos.z}).name]
-       if not def or not def.buildable_to then
+       local node = minetest.get_node({x=pos.x, y=pos.y+1, z=pos.z})
+       local def = minetest.registered_nodes[node.name]
+	   -- leftover top nodes can be removed by placing a new travelnet underneath
+       if (not def or not def.buildable_to) and node.name ~= "travelnet:hidden_top" then
 
-          minetest.chat_send_player( placer:get_player_name(), S('Not enough vertical space to place the travelnet box!'))
+          minetest.chat_send_player(
+						placer:get_player_name(),
+						S('Not enough vertical space to place the travelnet box!')
+					)
           return;
        end
        return minetest.item_place(itemstack, placer, pointed_thing);
     end,
 
+	on_destruct = function(pos)
+        pos = {x=pos.x, y=pos.y+1, z=pos.z}
+	    minetest.remove_node(pos)
+    end
 })
 
 --[
