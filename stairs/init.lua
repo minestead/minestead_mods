@@ -1,1006 +1,1112 @@
+-- stairs/init.lua
+
+-- Minetest 0.4 mod: stairs
+-- See README.txt for licensing and other information.
+
+
+-- Global namespace for functions
+
 stairs = {}
-stairs.mod = "redo"
+
+-- Load support for MT game translation.
+local S = minetest.get_translator("stairs")
 
 
-function default.node_sound_wool_defaults(table)
-	table = table or {}
-	table.footstep = table.footstep or
-			{name = "wool_coat_movement", gain = 1.0}
-	table.dug = table.dug or
-			{name = "wool_coat_movement", gain = 0.25}
-	table.place = table.place or
-			{name = "default_place_node", gain = 1.0}
-	return table
-end
+-- Register aliases for new pine node names
+
+minetest.register_alias("stairs:stair_pinewood", "stairs:stair_pine_wood")
+minetest.register_alias("stairs:slab_pinewood", "stairs:slab_pine_wood")
 
 
-stairs.wood = default.node_sound_wood_defaults()
-stairs.dirt = default.node_sound_dirt_defaults()
-stairs.stone = default.node_sound_stone_defaults()
-stairs.glass = default.node_sound_glass_defaults()
-stairs.leaves = default.node_sound_leaves_defaults()
-stairs.metal = default.node_sound_metal_defaults()
-stairs.wool = stairs.leaves
-if minetest.get_modpath("xanadu") then
-	stairs.wool = default.node_sound_wool_defaults()
-end
+-- Get setting for replace ABM
 
+local replace = minetest.settings:get_bool("enable_stairs_replace_abm")
 
--- cache creative
-local creative = minetest.settings:get_bool("creative_mode")
-function is_creative_enabled_for(name)
-	if creative or minetest.check_player_privs(name, {creative = true}) then
-		return true
+local function rotate_and_place(itemstack, placer, pointed_thing)
+	local p0 = pointed_thing.under
+	local p1 = pointed_thing.above
+	local param2 = 0
+
+	if placer then
+		local placer_pos = placer:get_pos()
+		if placer_pos then
+			param2 = minetest.dir_to_facedir(vector.subtract(p1, placer_pos))
+		end
+
+		local finepos = minetest.pointed_thing_to_face_pos(placer, pointed_thing)
+		local fpos = finepos.y % 1
+
+		if p0.y - 1 == p1.y or (fpos > 0 and fpos < 0.5)
+				or (fpos < -0.5 and fpos > -0.999999999) then
+			param2 = param2 + 20
+			if param2 == 21 then
+				param2 = 23
+			elseif param2 == 23 then
+				param2 = 21
+			end
+		end
 	end
-	return false
+	return minetest.item_place(itemstack, placer, pointed_thing, param2)
+end
+
+local function warn_if_exists(nodename)
+	if minetest.registered_nodes[nodename] then
+		minetest.log("warning", "Overwriting stairs node: " .. nodename)
+	end
 end
 
 
--- process textures
-local set_textures = function(images)
+-- Register stair
+-- Node will be called stairs:stair_<subname>
+
+function stairs.register_stair(subname, recipeitem, groups, images, description,
+		sounds, worldaligntex)
+	-- Set backface culling and world-aligned textures
 	local stair_images = {}
 	for i, image in ipairs(images) do
 		if type(image) == "string" then
 			stair_images[i] = {
 				name = image,
 				backface_culling = true,
-				align_style = "world",
 			}
-		elseif image.backface_culling == nil then -- override using any other value
+			if worldaligntex then
+				stair_images[i].align_style = "world"
+			end
+		else
+			stair_images[i] = table.copy(image)
 			if stair_images[i].backface_culling == nil then
 				stair_images[i].backface_culling = true
 			end
-			if stair_images[i].align_style == nil then
+			if worldaligntex and stair_images[i].align_style == nil then
 				stair_images[i].align_style = "world"
 			end
 		end
 	end
-	return stair_images
-end
-
-
--- placement helper
-local stair_place = function(itemstack, placer, pointed_thing, stair_node)
-
-	-- if sneak pressed then use param2 in node pointed at when placing
-	if placer:is_player() and placer:get_player_control().sneak then
-
-		local name  = placer:get_player_name()
-		local pos_a = pointed_thing.above
-		local node_a = minetest.get_node(pos_a)
-		local def_a = minetest.registered_nodes[node_a.name]
-
-		if not def_a.buildable_to
-		or minetest.is_protected(pos_a, name) then
-			return itemstack
-		end
-
-		local pos_u = pointed_thing.under
-		local node_u = minetest.get_node(pos_u)
-
-		if minetest.get_item_group(node_u.name, "stair") > 0
-		or minetest.get_item_group(node_u.name, "slab") > 0 then
-
-			minetest.set_node(pos_a, {name = stair_node, param2 = node_u.param2})
-
-			if not is_creative_enabled_for(name) then
-				itemstack:take_item()
-			end
-
-			return itemstack
-		end
-	end
-
-	core.rotate_and_place(itemstack, placer, pointed_thing,
-			is_creative_enabled_for(placer:get_player_name()),
-			{invert_wall = placer:get_player_control().sneak})
-
-	return itemstack
-end
-
-
--- Node will be called stairs:stair_<subname>
-function stairs.register_stair(subname, recipeitem, groups, images, description, snds, alpha)
-	local stair_images = set_textures(images)
 	local new_groups = table.copy(groups)
 	new_groups.stair = 1
-
+	warn_if_exists("stairs:stair_" .. subname)
 	minetest.register_node(":stairs:stair_" .. subname, {
-		description = description .. " Stair",
+		description = description,
 		drawtype = "nodebox",
 		tiles = stair_images,
 		paramtype = "light",
 		paramtype2 = "facedir",
 		is_ground_content = false,
-		use_texture_alpha = alpha,
 		groups = new_groups,
-		sounds = snds,
+		sounds = sounds,
 		node_box = {
 			type = "fixed",
 			fixed = {
-				{-0.5, -0.5, -0.5, 0.5, 0, 0.5},
-				{-0.5, 0, 0, 0.5, 0.5, 0.5},
+				{-0.5, -0.5, -0.5, 0.5, 0.0, 0.5},
+				{-0.5, 0.0, 0.0, 0.5, 0.5, 0.5},
 			},
 		},
 		on_place = function(itemstack, placer, pointed_thing)
-			return stair_place(itemstack, placer, pointed_thing,
-					"stairs:stair_" .. subname)
+			if pointed_thing.type ~= "node" then
+				return itemstack
+			end
+
+			return rotate_and_place(itemstack, placer, pointed_thing)
 		end,
 	})
 
-	-- if no recipe item provided then skip craft recipes
-	if not recipeitem then
-		return
+	-- for replace ABM
+	if replace then
+		minetest.register_node(":stairs:stair_" .. subname .. "upside_down", {
+			replace_name = "stairs:stair_" .. subname,
+			groups = {slabs_replace = 1},
+		})
 	end
 
-	-- stair recipes
-	minetest.register_craft({
-		output = "stairs:stair_" .. subname .. " 8",
-		recipe = {
-			{recipeitem, "", ""},
-			{recipeitem, recipeitem, ""},
-			{recipeitem, recipeitem, recipeitem},
-		},
-	})
+	if recipeitem then
+		-- Recipe matches appearence in inventory
+		minetest.register_craft({
+			output = "stairs:stair_" .. subname .. " 8",
+			recipe = {
+				{"", "", recipeitem},
+				{"", recipeitem, recipeitem},
+				{recipeitem, recipeitem, recipeitem},
+			},
+		})
 
-	-- stair to original material recipe
-	minetest.register_craft({
-		output = recipeitem .. " 3",
-		recipe = {
-			{"stairs:stair_" .. subname, "stairs:stair_" .. subname},
-			{"stairs:stair_" .. subname, "stairs:stair_" .. subname},
-		},
-	})
+		-- Use stairs to craft full blocks again (1:1)
+		minetest.register_craft({
+			output = recipeitem .. " 3",
+			recipe = {
+				{"stairs:stair_" .. subname, "stairs:stair_" .. subname},
+				{"stairs:stair_" .. subname, "stairs:stair_" .. subname},
+			},
+		})
+
+		-- Fuel
+		local baseburntime = minetest.get_craft_result({
+			method = "fuel",
+			width = 1,
+			items = {recipeitem}
+		}).time
+		if baseburntime > 0 then
+			minetest.register_craft({
+				type = "fuel",
+				recipe = "stairs:stair_" .. subname,
+				burntime = math.floor(baseburntime * 0.75),
+			})
+		end
+	end
 end
 
 
+-- Register slab
 -- Node will be called stairs:slab_<subname>
-function stairs.register_slab(subname, recipeitem, groups, images, description, snds, alpha)
-	local slab_images = set_textures(images)
+
+function stairs.register_slab(subname, recipeitem, groups, images, description,
+		sounds, worldaligntex)
+	-- Set world-aligned textures
+	local slab_images = {}
+	for i, image in ipairs(images) do
+		if type(image) == "string" then
+			slab_images[i] = {
+				name = image,
+			}
+			if worldaligntex then
+				slab_images[i].align_style = "world"
+			end
+		else
+			slab_images[i] = table.copy(image)
+			if worldaligntex and image.align_style == nil then
+				slab_images[i].align_style = "world"
+			end
+		end
+	end
 	local new_groups = table.copy(groups)
 	new_groups.slab = 1
-
+	warn_if_exists("stairs:slab_" .. subname)
 	minetest.register_node(":stairs:slab_" .. subname, {
-		description = description .. " Slab",
+		description = description,
 		drawtype = "nodebox",
 		tiles = slab_images,
 		paramtype = "light",
 		paramtype2 = "facedir",
 		is_ground_content = false,
-		use_texture_alpha = alpha,
 		groups = new_groups,
-		sounds = snds,
+		sounds = sounds,
 		node_box = {
 			type = "fixed",
 			fixed = {-0.5, -0.5, -0.5, 0.5, 0, 0.5},
 		},
 		on_place = function(itemstack, placer, pointed_thing)
-			return stair_place(itemstack, placer, pointed_thing,
-					"stairs:slab_" .. subname)
+			local under = minetest.get_node(pointed_thing.under)
+			local wield_item = itemstack:get_name()
+			local player_name = placer and placer:get_player_name() or ""
+			local creative_enabled = (creative and creative.is_enabled_for
+					and creative.is_enabled_for(player_name))
+
+			if under and under.name:find("^stairs:slab_") then
+				-- place slab using under node orientation
+				local dir = minetest.dir_to_facedir(vector.subtract(
+					pointed_thing.above, pointed_thing.under), true)
+
+				local p2 = under.param2
+
+				-- Placing a slab on an upside down slab should make it right-side up.
+				if p2 >= 20 and dir == 8 then
+					p2 = p2 - 20
+				-- same for the opposite case: slab below normal slab
+				elseif p2 <= 3 and dir == 4 then
+					p2 = p2 + 20
+				end
+
+				-- else attempt to place node with proper param2
+				minetest.item_place_node(ItemStack(wield_item), placer, pointed_thing, p2)
+				if not creative_enabled then
+					itemstack:take_item()
+				end
+				return itemstack
+			else
+				return rotate_and_place(itemstack, placer, pointed_thing)
+			end
 		end,
 	})
 
-	-- if no recipe item provided then skip craft recipes
-	if not recipeitem then
-		return
+	-- for replace ABM
+	if replace then
+		minetest.register_node(":stairs:slab_" .. subname .. "upside_down", {
+			replace_name = "stairs:slab_".. subname,
+			groups = {slabs_replace = 1},
+		})
 	end
 
-	-- slab recipe
-	minetest.register_craft({
-		output = "stairs:slab_" .. subname .. " 6",
-		recipe = {
-			{recipeitem, recipeitem, recipeitem},
-		},
-	})
-
-	-- slab to original material recipe
-	minetest.register_craft({
-		output = recipeitem,
-		recipe = {
-			{"stairs:slab_" .. subname},
-			{"stairs:slab_" .. subname},
-		},
-	})
-end
-
-
--- Node will be called stairs:stair_outer_<subname>
-function stairs.register_stair_outer(subname, recipeitem, groups, images, description, snds, alpha)
-	local stair_images = set_textures(images)
-	local new_groups = table.copy(groups)
-	new_groups.stair = 1
-
-	minetest.register_node(":stairs:stair_outer_" .. subname, {
-		description = "Outer " .. description .. " Stair",
-		drawtype = "nodebox",
-		tiles = stair_images,
-		paramtype = "light",
-		paramtype2 = "facedir",
-		is_ground_content = false,
-		use_texture_alpha = alpha,
-		groups = new_groups,
-		sounds = snds,
-		node_box = {
-			type = "fixed",
-			fixed = {
-				{-0.5, -0.5, -0.5, 0.5, 0, 0.5},
-				{-0.5, 0, 0, 0, 0.5, 0.5},
+	if recipeitem then
+		minetest.register_craft({
+			output = "stairs:slab_" .. subname .. " 6",
+			recipe = {
+				{recipeitem, recipeitem, recipeitem},
 			},
-		},
-		on_place = function(itemstack, placer, pointed_thing)
-			return stair_place(itemstack, placer, pointed_thing,
-					"stairs:stair_outer_" .. subname)
+		})
+
+		-- Use 2 slabs to craft a full block again (1:1)
+		minetest.register_craft({
+			output = recipeitem,
+			recipe = {
+				{"stairs:slab_" .. subname},
+				{"stairs:slab_" .. subname},
+			},
+		})
+
+		-- Fuel
+		local baseburntime = minetest.get_craft_result({
+			method = "fuel",
+			width = 1,
+			items = {recipeitem}
+		}).time
+		if baseburntime > 0 then
+			minetest.register_craft({
+				type = "fuel",
+				recipe = "stairs:slab_" .. subname,
+				burntime = math.floor(baseburntime * 0.5),
+			})
+		end
+	end
+end
+
+
+-- Optionally replace old "upside_down" nodes with new param2 versions.
+-- Disabled by default.
+
+if replace then
+	minetest.register_abm({
+		label = "Slab replace",
+		nodenames = {"group:slabs_replace"},
+		interval = 16,
+		chance = 1,
+		action = function(pos, node)
+			node.name = minetest.registered_nodes[node.name].replace_name
+			node.param2 = node.param2 + 20
+			if node.param2 == 21 then
+				node.param2 = 23
+			elseif node.param2 == 23 then
+				node.param2 = 21
+			end
+			minetest.set_node(pos, node)
 		end,
 	})
-
-	-- add alias for old stairs redo name
-	minetest.register_alias("stairs:corner_" .. subname, "stairs:stair_outer_" .. subname)
-
-	-- if no recipe item provided then skip craft recipes
-	if not recipeitem then
-		return
-	end
-
-	-- corner stair recipe
-	minetest.register_craft({
-		output = "stairs:stair_outer_" .. subname .. " 6",
-		recipe = {
-			{"", "", ""},
-			{"", recipeitem, ""},
-			{recipeitem, recipeitem, recipeitem},
-		},
-	})
-
-	-- corner stair to original material recipe
-	minetest.register_craft({
-		output = recipeitem .. " 2",
-		recipe = {
-			{"stairs:stair_outer_" .. subname, "stairs:stair_outer_" .. subname},
-			{"stairs:stair_outer_" .. subname, "stairs:stair_outer_" .. subname},
-		},
-	})
-end
-
--- compatibility function for previous stairs:corner_<subname>
-function stairs.register_corner(subname, recipeitem, groups, images, description, snds, alpha)
-	stairs.register_stair_outer(subname, recipeitem, groups, images, description, snds, alpha)
 end
 
 
+-- Register inner stair
 -- Node will be called stairs:stair_inner_<subname>
-function stairs.register_stair_inner(subname, recipeitem, groups, images, description, snds, alpha)
 
-	local stair_images = set_textures(images)
+function stairs.register_stair_inner(subname, recipeitem, groups, images,
+		description, sounds, worldaligntex, full_description)
+	-- Set backface culling and world-aligned textures
+	local stair_images = {}
+	for i, image in ipairs(images) do
+		if type(image) == "string" then
+			stair_images[i] = {
+				name = image,
+				backface_culling = true,
+			}
+			if worldaligntex then
+				stair_images[i].align_style = "world"
+			end
+		else
+			stair_images[i] = table.copy(image)
+			if stair_images[i].backface_culling == nil then
+				stair_images[i].backface_culling = true
+			end
+			if worldaligntex and stair_images[i].align_style == nil then
+				stair_images[i].align_style = "world"
+			end
+		end
+	end
 	local new_groups = table.copy(groups)
 	new_groups.stair = 1
-
+	if full_description then
+		description = full_description
+	else
+		description = "Inner " .. description
+	end
+	warn_if_exists("stairs:stair_inner_" .. subname)
 	minetest.register_node(":stairs:stair_inner_" .. subname, {
-		description = "Inner " .. description .. " Stair",
+		description = description,
 		drawtype = "nodebox",
 		tiles = stair_images,
 		paramtype = "light",
 		paramtype2 = "facedir",
 		is_ground_content = false,
-		use_texture_alpha = alpha,
 		groups = new_groups,
-		sounds = snds,
+		sounds = sounds,
 		node_box = {
 			type = "fixed",
 			fixed = {
-				{-0.5, -0.5, -0.5, 0.5, 0, 0.5},
-				{-0.5, 0, 0, 0.5, 0.5, 0.5},
-				{-0.5, 0, -0.5, 0, 0.5, 0},
+				{-0.5, -0.5, -0.5, 0.5, 0.0, 0.5},
+				{-0.5, 0.0, 0.0, 0.5, 0.5, 0.5},
+				{-0.5, 0.0, -0.5, 0.0, 0.5, 0.0},
 			},
 		},
 		on_place = function(itemstack, placer, pointed_thing)
-			return stair_place(itemstack, placer, pointed_thing,
-					"stairs:stair_inner_" .. subname)
+			if pointed_thing.type ~= "node" then
+				return itemstack
+			end
+
+			return rotate_and_place(itemstack, placer, pointed_thing)
 		end,
 	})
 
-	-- add alias for old stairs redo name
-	minetest.register_alias("stairs:invcorner_" .. subname, "stairs:stair_inner_" .. subname)
+	if recipeitem then
+		minetest.register_craft({
+			output = "stairs:stair_inner_" .. subname .. " 7",
+			recipe = {
+				{"", recipeitem, ""},
+				{recipeitem, "", recipeitem},
+				{recipeitem, recipeitem, recipeitem},
+			},
+		})
 
-	-- if no recipe item provided then skip craft recipes
-	if not recipeitem then
-		return
+		-- Fuel
+		local baseburntime = minetest.get_craft_result({
+			method = "fuel",
+			width = 1,
+			items = {recipeitem}
+		}).time
+		if baseburntime > 0 then
+			minetest.register_craft({
+				type = "fuel",
+				recipe = "stairs:stair_inner_" .. subname,
+				burntime = math.floor(baseburntime * 0.875),
+			})
+		end
 	end
-
-	-- inside corner stair recipe
-	minetest.register_craft({
-		output = "stairs:stair_inner_" .. subname .. " 9",
-		recipe = {
-			{recipeitem, recipeitem, ""},
-			{recipeitem, recipeitem, recipeitem},
-			{recipeitem, recipeitem, recipeitem},
-		},
-	})
-
-	-- inside corner stair to original material recipe
-	minetest.register_craft({
-		output = recipeitem .. " 3",
-		recipe = {
-			{"stairs:stair_inner_" .. subname, "stairs:stair_inner_" .. subname},
-			{"stairs:stair_inner_" .. subname, "stairs:stair_inner_" .. subname},
-		},
-	})
-end
-
--- compatibility function for previous stairs:invcorner_<subname>
-function stairs.register_invcorner(subname, recipeitem, groups, images, description, snds, alpha)
-	stairs.register_stair_inner(subname, recipeitem, groups, images, description, snds, alpha)
 end
 
 
--- Node will be called stairs:slope_<subname>
-function stairs.register_slope(subname, recipeitem, groups, images, description, snds, alpha)
-	local stair_images = set_textures(images)
+-- Register outer stair
+-- Node will be called stairs:stair_outer_<subname>
+
+function stairs.register_stair_outer(subname, recipeitem, groups, images,
+		description, sounds, worldaligntex, full_description)
+	-- Set backface culling and world-aligned textures
+	local stair_images = {}
+	for i, image in ipairs(images) do
+		if type(image) == "string" then
+			stair_images[i] = {
+				name = image,
+				backface_culling = true,
+			}
+			if worldaligntex then
+				stair_images[i].align_style = "world"
+			end
+		else
+			stair_images[i] = table.copy(image)
+			if stair_images[i].backface_culling == nil then
+				stair_images[i].backface_culling = true
+			end
+			if worldaligntex and stair_images[i].align_style == nil then
+				stair_images[i].align_style = "world"
+			end
+		end
+	end
 	local new_groups = table.copy(groups)
 	new_groups.stair = 1
-
-	minetest.register_node(":stairs:slope_" .. subname, {
-		description = description .. " Slope",
-		drawtype = "mesh",
-		mesh = "stairs_slope.obj",
+	if full_description then
+		description = full_description
+	else
+		description = "Outer " .. description
+	end
+	warn_if_exists("stairs:stair_outer_" .. subname)
+	minetest.register_node(":stairs:stair_outer_" .. subname, {
+		description = description,
+		drawtype = "nodebox",
 		tiles = stair_images,
 		paramtype = "light",
 		paramtype2 = "facedir",
 		is_ground_content = false,
-		use_texture_alpha = alpha,
 		groups = new_groups,
-		sounds = snds,
-		selection_box = {
+		sounds = sounds,
+		node_box = {
 			type = "fixed",
 			fixed = {
-				{-0.5, -0.5, -0.5, 0.5, 0, 0.5},
-				{-0.5, 0, 0, 0.5, 0.5, 0.5},
-			},
-		},
-		collision_box = {
-			type = "fixed",
-			fixed = {
-				{-0.5, -0.5, -0.5, 0.5, 0, 0.5},
-				{-0.5, 0, 0, 0.5, 0.5, 0.5},
+				{-0.5, -0.5, -0.5, 0.5, 0.0, 0.5},
+				{-0.5, 0.0, 0.0, 0.0, 0.5, 0.5},
 			},
 		},
 		on_place = function(itemstack, placer, pointed_thing)
-			return stair_place(itemstack, placer, pointed_thing,
-					"stairs:slope_" .. subname)
+			if pointed_thing.type ~= "node" then
+				return itemstack
+			end
+
+			return rotate_and_place(itemstack, placer, pointed_thing)
 		end,
 	})
 
-	-- slope recipe
-	minetest.register_craft({
-		output = "stairs:slope_" .. subname .. " 6",
-		recipe = {
-			{recipeitem, "", ""},
-			{recipeitem, recipeitem, ""},
-		},
-	})
+	if recipeitem then
+		minetest.register_craft({
+			output = "stairs:stair_outer_" .. subname .. " 6",
+			recipe = {
+				{"", recipeitem, ""},
+				{recipeitem, recipeitem, recipeitem},
+			},
+		})
 
-	-- slope to original material recipe
-	minetest.register_craft({
-		output = recipeitem,
-		recipe = {
-			{"stairs:slope_" .. subname, "stairs:slope_" .. subname},
-		},
-	})
+		-- Fuel
+		local baseburntime = minetest.get_craft_result({
+			method = "fuel",
+			width = 1,
+			items = {recipeitem}
+		}).time
+		if baseburntime > 0 then
+			minetest.register_craft({
+				type = "fuel",
+				recipe = "stairs:stair_outer_" .. subname,
+				burntime = math.floor(baseburntime * 0.625),
+			})
+		end
+	end
 end
 
 
+-- Stair/slab registration function.
 -- Nodes will be called stairs:{stair,slab}_<subname>
+
 function stairs.register_stair_and_slab(subname, recipeitem, groups, images,
-		desc_stair, desc_slab, sounds, alpha)
-	stairs.register_stair(subname, recipeitem, groups, images, desc_stair, sounds, alpha)
-	stairs.register_slab(subname, recipeitem, groups, images, desc_slab, sounds, alpha)
+		desc_stair, desc_slab, sounds, worldaligntex)
+	stairs.register_stair(subname, recipeitem, groups, images, desc_stair,
+		sounds, worldaligntex)
+	stairs.register_stair_inner(subname, recipeitem, groups, images, desc_stair,
+		sounds, worldaligntex)
+	stairs.register_stair_outer(subname, recipeitem, groups, images, desc_stair,
+		sounds, worldaligntex)
+	stairs.register_slab(subname, recipeitem, groups, images, desc_slab,
+		sounds, worldaligntex)
 end
 
--- Nodes will be called stairs:{stair,slab,corner,invcorner,slope}_<subname>
-function stairs.register_all(subname, recipeitem, groups, images, desc, snds, alpha)
-	stairs.register_stair(subname, recipeitem, groups, images, desc, snds, alpha)
-	stairs.register_slab(subname, recipeitem, groups, images, desc, snds, alpha)
-	stairs.register_corner(subname, recipeitem, groups, images, desc, snds, alpha)
-	stairs.register_invcorner(subname, recipeitem, groups, images, desc, snds, alpha)
-	stairs.register_slope(subname, recipeitem, groups, images, desc, snds, alpha)
+-- Local function so we can apply translations
+local function my_register_stair_and_slab(subname, recipeitem, groups, images,
+		desc_stair, desc_slab, sounds, worldaligntex)
+	stairs.register_stair(subname, recipeitem, groups, images, S(desc_stair),
+		sounds, worldaligntex)
+	stairs.register_stair_inner(subname, recipeitem, groups, images, "",
+		sounds, worldaligntex, S("Inner " .. desc_stair))
+	stairs.register_stair_outer(subname, recipeitem, groups, images, "",
+		sounds, worldaligntex, S("Outer " .. desc_stair))
+	stairs.register_slab(subname, recipeitem, groups, images, S(desc_slab),
+		sounds, worldaligntex)
 end
 
 
-local grp = {} -- Helper
+-- Register default stairs and slabs
 
---= Default Minetest
-
--- Wood types
-
-stairs.register_all("wood", "default:wood",
-	{choppy = 2, oddly_breakable_by_hand = 2, flammable = 3},
+my_register_stair_and_slab(
+	"wood",
+	"default:wood",
+	{choppy = 2, oddly_breakable_by_hand = 2, flammable = 2},
 	{"default_wood.png"},
-	"Wooden",
-	stairs.wood)
+	"Wooden Stair",
+	"Wooden Slab",
+	default.node_sound_wood_defaults(),
+	false
+)
 
-stairs.register_all("junglewood", "default:junglewood",
-	{choppy = 2, oddly_breakable_by_hand = 2, flammable = 3},
+my_register_stair_and_slab(
+	"junglewood",
+	"default:junglewood",
+	{choppy = 2, oddly_breakable_by_hand = 2, flammable = 2},
 	{"default_junglewood.png"},
-	"Jungle Wood",
-	stairs.wood)
+	"Jungle Wood Stair",
+	"Jungle Wood Slab",
+	default.node_sound_wood_defaults(),
+	false
+)
 
-stairs.register_all("pine_wood", "default:pinewood",
-	{choppy = 2, oddly_breakable_by_hand = 1, flammable = 3},
+my_register_stair_and_slab(
+	"pine_wood",
+	"default:pine_wood",
+	{choppy = 3, oddly_breakable_by_hand = 2, flammable = 3},
 	{"default_pine_wood.png"},
-	"Pine Wood",
-	stairs.wood)
+	"Pine Wood Stair",
+	"Pine Wood Slab",
+	default.node_sound_wood_defaults(),
+	false
+)
 
-stairs.register_all("acacia_wood", "default:acacia_wood",
-	{choppy = 2, oddly_breakable_by_hand = 1, flammable = 3},
+my_register_stair_and_slab(
+	"acacia_wood",
+	"default:acacia_wood",
+	{choppy = 2, oddly_breakable_by_hand = 2, flammable = 2},
 	{"default_acacia_wood.png"},
-	"Acacia Wood",
-	stairs.wood)
+	"Acacia Wood Stair",
+	"Acacia Wood Slab",
+	default.node_sound_wood_defaults(),
+	false
+)
 
-stairs.register_all("aspen_wood", "default:aspen_wood",
-	{choppy = 2, oddly_breakable_by_hand = 2, flammable = 3},
+my_register_stair_and_slab(
+	"aspen_wood",
+	"default:aspen_wood",
+	{choppy = 3, oddly_breakable_by_hand = 2, flammable = 3},
 	{"default_aspen_wood.png"},
-	"Aspen Wood",
-	stairs.wood)
+	"Aspen Wood Stair",
+	"Aspen Wood Slab",
+	default.node_sound_wood_defaults(),
+	false
+)
 
--- Stone types
-
-stairs.register_all("stone", "default:stone",
-	{cracky=3,stone=1, },
+my_register_stair_and_slab(
+	"stone",
+	"default:stone",
+	{cracky = 3},
 	{"default_stone.png"},
-	"Stone",
-	stairs.stone)
+	"Stone Stair",
+	"Stone Slab",
+	default.node_sound_stone_defaults(),
+	true
+)
 
-stairs.register_all("stonebrick", "default:stonebrick",
-	{cracky = 2},
-	{"default_stone_brick.png"},
-	"Stone Brick",
-	stairs.stone)
-
-stairs.register_all("stone_block", "default:stone_block",
-	{cracky = 2},
-	{"default_stone_block.png"},
-	"Stone Block",
-	stairs.stone)
-
-stairs.register_all("cobble", "default:cobble",
+my_register_stair_and_slab(
+	"cobble",
+	"default:cobble",
 	{cracky = 3},
 	{"default_cobble.png"},
-	"Cobble",
-	stairs.stone)
+	"Cobblestone Stair",
+	"Cobblestone Slab",
+	default.node_sound_stone_defaults(),
+	true
+)
 
-stairs.register_all("mossycobble", "default:mossycobble",
+my_register_stair_and_slab(
+	"mossycobble",
+	"default:mossycobble",
 	{cracky = 3},
 	{"default_mossycobble.png"},
-	"Mossy Cobble",
-	stairs.stone)
+	"Mossy Cobblestone Stair",
+	"Mossy Cobblestone Slab",
+	default.node_sound_stone_defaults(),
+	true
+)
 
-stairs.register_all("desert_stone", "default:desert_stone",
+my_register_stair_and_slab(
+	"stonebrick",
+	"default:stonebrick",
+	{cracky = 2},
+	{"default_stone_brick.png"},
+	"Stone Brick Stair",
+	"Stone Brick Slab",
+	default.node_sound_stone_defaults(),
+	false
+)
+
+my_register_stair_and_slab(
+	"stone_block",
+	"default:stone_block",
+	{cracky = 2},
+	{"default_stone_block.png"},
+	"Stone Block Stair",
+	"Stone Block Slab",
+	default.node_sound_stone_defaults(),
+	true
+)
+
+my_register_stair_and_slab(
+	"desert_stone",
+	"default:desert_stone",
 	{cracky = 3},
 	{"default_desert_stone.png"},
-	"Desert Stone",
-	stairs.stone)
+	"Desert Stone Stair",
+	"Desert Stone Slab",
+	default.node_sound_stone_defaults(),
+	true
+)
 
-stairs.register_all("desert_stonebrick", "default:desert_stonebrick",
-	{cracky = 3},
-	{"default_desert_stone_brick.png"},
-	"Desert Stone Brick",
-	stairs.stone)
-
-stairs.register_all("desert_stone_block", "default:desert_stone_block",
-	{cracky = 2},
-	{"default_desert_stone_block.png"},
-	"Desert Stone Block",
-	stairs.stone)
-
-stairs.register_all("desert_cobble", "default:desert_cobble",
+my_register_stair_and_slab(
+	"desert_cobble",
+	"default:desert_cobble",
 	{cracky = 3},
 	{"default_desert_cobble.png"},
-	"Desert Cobble", 
-	stairs.stone)
+	"Desert Cobblestone Stair",
+	"Desert Cobblestone Slab",
+	default.node_sound_stone_defaults(),
+	true
+)
 
--- Sandstone types
+my_register_stair_and_slab(
+	"desert_stonebrick",
+	"default:desert_stonebrick",
+	{cracky = 2},
+	{"default_desert_stone_brick.png"},
+	"Desert Stone Brick Stair",
+	"Desert Stone Brick Slab",
+	default.node_sound_stone_defaults(),
+	false
+)
 
-stairs.register_all("sandstone", "default:sandstone",
+my_register_stair_and_slab(
+	"desert_stone_block",
+	"default:desert_stone_block",
+	{cracky = 2},
+	{"default_desert_stone_block.png"},
+	"Desert Stone Block Stair",
+	"Desert Stone Block Slab",
+	default.node_sound_stone_defaults(),
+	true
+)
+
+my_register_stair_and_slab(
+	"sandstone",
+	"default:sandstone",
 	{crumbly = 1, cracky = 3},
 	{"default_sandstone.png"},
-	"Sandstone",
-	stairs.stone)
+	"Sandstone Stair",
+	"Sandstone Slab",
+	default.node_sound_stone_defaults(),
+	true
+)
 
-stairs.register_all("sandstonebrick", "default:sandstonebrick",
+my_register_stair_and_slab(
+	"sandstonebrick",
+	"default:sandstonebrick",
 	{cracky = 2},
 	{"default_sandstone_brick.png"},
-	"Sandstone Brick",
-	stairs.stone)
+	"Sandstone Brick Stair",
+	"Sandstone Brick Slab",
+	default.node_sound_stone_defaults(),
+	false
+)
 
-stairs.register_all("sandstone_block", "default:sandstone_block",
+my_register_stair_and_slab(
+	"sandstone_block",
+	"default:sandstone_block",
 	{cracky = 2},
 	{"default_sandstone_block.png"},
-	"Sandstone Block",
-	stairs.stone)
+	"Sandstone Block Stair",
+	"Sandstone Block Slab",
+	default.node_sound_stone_defaults(),
+	true
+)
 
-stairs.register_all("desert_sandstone", "default:desert_sandstone",
+my_register_stair_and_slab(
+	"desert_sandstone",
+	"default:desert_sandstone",
 	{crumbly = 1, cracky = 3},
 	{"default_desert_sandstone.png"},
-	"Desert Sandstone",
-	stairs.stone)
+	"Desert Sandstone Stair",
+	"Desert Sandstone Slab",
+	default.node_sound_stone_defaults(),
+	true
+)
 
-stairs.register_all("desert_sandstone_brick", "default:desert_sandstone_brick",
+my_register_stair_and_slab(
+	"desert_sandstone_brick",
+	"default:desert_sandstone_brick",
 	{cracky = 2},
 	{"default_desert_sandstone_brick.png"},
-	"Desert Sandstone Brick",
-	stairs.stone)
+	"Desert Sandstone Brick Stair",
+	"Desert Sandstone Brick Slab",
+	default.node_sound_stone_defaults(),
+	false
+)
 
-stairs.register_all("desert_sandstone_block", "default:desert_sandstone_block",
+my_register_stair_and_slab(
+	"desert_sandstone_block",
+	"default:desert_sandstone_block",
 	{cracky = 2},
 	{"default_desert_sandstone_block.png"},
-	"Desert Sandstone Block",
-	stairs.stone)
+	"Desert Sandstone Block Stair",
+	"Desert Sandstone Block Slab",
+	default.node_sound_stone_defaults(),
+	true
+)
 
-stairs.register_all("silver_sandstone", "default:silver_sandstone",
+my_register_stair_and_slab(
+	"silver_sandstone",
+	"default:silver_sandstone",
 	{crumbly = 1, cracky = 3},
 	{"default_silver_sandstone.png"},
-	"Silver Sandstone",
-	stairs.stone)
+	"Silver Sandstone Stair",
+	"Silver Sandstone Slab",
+	default.node_sound_stone_defaults(),
+	true
+)
 
-stairs.register_all("silver_sandstone_brick", "default:silver_sandstone_brick",
+my_register_stair_and_slab(
+	"silver_sandstone_brick",
+	"default:silver_sandstone_brick",
 	{cracky = 2},
 	{"default_silver_sandstone_brick.png"},
-	"Silver Sandstone Brick",
-	stairs.stone)
+	"Silver Sandstone Brick Stair",
+	"Silver Sandstone Brick Slab",
+	default.node_sound_stone_defaults(),
+	false
+)
 
-stairs.register_all("silver_sandstone_block", "default:silver_sandstone_block",
+my_register_stair_and_slab(
+	"silver_sandstone_block",
+	"default:silver_sandstone_block",
 	{cracky = 2},
 	{"default_silver_sandstone_block.png"},
-	"Silver Sandstone Block",
-	stairs.stone)
+	"Silver Sandstone Block Stair",
+	"Silver Sandstone Block Slab",
+	default.node_sound_stone_defaults(),
+	true
+)
 
--- Obsidian
-
-stairs.register_all("obsidian", "default:obsidian",
+my_register_stair_and_slab(
+	"obsidian",
+	"default:obsidian",
 	{cracky = 1, level = 2},
 	{"default_obsidian.png"},
-	"Obsidian",
-	stairs.stone)
+	"Obsidian Stair",
+	"Obsidian Slab",
+	default.node_sound_stone_defaults(),
+	true
+)
 
-stairs.register_all("obsidianbrick", "default:obsidianbrick",
-	{cracky = 1, level = 3},
+my_register_stair_and_slab(
+	"obsidianbrick",
+	"default:obsidianbrick",
+	{cracky = 1, level = 2},
 	{"default_obsidian_brick.png"},
-	"Obsidian Brick",
-	stairs.stone)
+	"Obsidian Brick Stair",
+	"Obsidian Brick Slab",
+	default.node_sound_stone_defaults(),
+	false
+)
 
-stairs.register_all("obsidian_block", "default:obsidian_block",
-	{cracky = 1, level = 3},
+my_register_stair_and_slab(
+	"obsidian_block",
+	"default:obsidian_block",
+	{cracky = 1, level = 2},
 	{"default_obsidian_block.png"},
-	"Obsidian block",
-	stairs.stone)
+	"Obsidian Block Stair",
+	"Obsidian Block Slab",
+	default.node_sound_stone_defaults(),
+	true
+)
 
--- Cloud (with overrides)
-
-stairs.register_stair("cloud", "default:cloud",
-	{unbreakable = 1, not_in_creative_inventory = 1},
-	{"default_cloud.png"},
-	"Cloud Stair",
-	stairs.wool)
-
-minetest.override_item("stairs:stair_cloud", {
-	on_blast = function() end,
-	on_drop = function(itemstack, dropper, pos) end,
-	drop = {},
-})
-
-stairs.register_slab("cloud", "default:cloud",
-	{unbreakable = 1, not_in_creative_inventory = 1},
-	{"default_cloud.png"},
-	"Cloud Slab",
-	stairs.wool)
-
-minetest.override_item("stairs:slab_cloud", {
-	on_blast = function() end,
-	on_drop = function(itemstack, dropper, pos) end,
-	drop = {},
-})
-
--- Ores
-
-stairs.register_all("coal", "default:coalblock",
-	{cracky = 3},
-	{"default_coal_block.png"},
-	"Coal",
-	stairs.stone)
-
-stairs.register_all("steelblock", "default:steelblock",
-	{cracky = 1, level = 2},
-	{"default_steel_block.png"},
-	"Steel",
-	stairs.metal)
-
-stairs.register_all("copperblock", "default:copperblock",
-	{cracky = 1, level = 2},
-	{"default_copper_block.png"},
-	"Copper",
-	stairs.metal)
-
-stairs.register_all("bronzeblock", "default:bronzeblock",
-	{cracky = 1, level = 2},
-	{"default_bronze_block.png"},
-	"Bronze",
-	stairs.metal)
-
-stairs.register_all("tinblock", "default:tinblock",
-	{cracky = 1, level = 2},
-	{"default_tin_block.png"},
-	"Tin",
-	stairs.metal)
-
-stairs.register_all("mese", "default:mese",
-	{cracky = 1, level = 2},
-	{"default_mese_block.png"},
-	"Mese",
-	stairs.stone)
-
-stairs.register_all("goldblock", "default:goldblock",
-	{cracky = 1},
-	{"default_gold_block.png"},
-	"Gold",
-	stairs.metal)
-
-stairs.register_all("diamondblock", "default:diamondblock",
-	{cracky = 1, level = 3},
-	{"default_diamond_block.png"},
-	"Diamond",
-	stairs.stone)
-
--- Glass types
-
-stairs.register_all("glass", "default:glass",
-	{cracky = 3, oddly_breakable_by_hand = 3},
-	{"default_glass.png"},
-	"Glass",
-	stairs.glass)
-
-stairs.register_all("obsidian_glass", "default:obsidian_glass",
-	{cracky = 2},
-	{"default_obsidian_glass.png"},
-	"Obsidian Glass",
-	stairs.glass)
-
--- Brick, Snow and Ice
-
-stairs.register_all("brick", "default:brick",
+my_register_stair_and_slab(
+	"brick",
+	"default:brick",
 	{cracky = 3},
 	{"default_brick.png"},
-	"Brick",
-	stairs.stone)
+	"Brick Stair",
+	"Brick Slab",
+	default.node_sound_stone_defaults(),
+	false
+)
 
-stairs.register_all("snowblock", "default:snowblock",
-	{crumbly = 3, puts_out_fire = 1, cools_lava = 1, snowy = 1},
-	{"default_snow.png"},
-	"Snow Block",
-	default.node_sound_dirt_defaults({
-		footstep = {name = "default_snow_footstep", gain = 0.15},
-		dug = {name = "default_snow_footstep", gain = 0.2},
-		dig = {name = "default_snow_footstep", gain = 0.2}
-	}))
+my_register_stair_and_slab(
+	"steelblock",
+	"default:steelblock",
+	{cracky = 1, level = 2},
+	{"default_steel_block.png"},
+	"Steel Block Stair",
+	"Steel Block Slab",
+	default.node_sound_metal_defaults(),
+	true
+)
 
-stairs.register_all("ice", "default:ice",
-	{cracky = 3, puts_out_fire = 1, cools_lava = 1},
+my_register_stair_and_slab(
+	"tinblock",
+	"default:tinblock",
+	{cracky = 1, level = 2},
+	{"default_tin_block.png"},
+	"Tin Block Stair",
+	"Tin Block Slab",
+	default.node_sound_metal_defaults(),
+	true
+)
+
+my_register_stair_and_slab(
+	"copperblock",
+	"default:copperblock",
+	{cracky = 1, level = 2},
+	{"default_copper_block.png"},
+	"Copper Block Stair",
+	"Copper Block Slab",
+	default.node_sound_metal_defaults(),
+	true
+)
+
+my_register_stair_and_slab(
+	"bronzeblock",
+	"default:bronzeblock",
+	{cracky = 1, level = 2},
+	{"default_bronze_block.png"},
+	"Bronze Block Stair",
+	"Bronze Block Slab",
+	default.node_sound_metal_defaults(),
+	true
+)
+
+my_register_stair_and_slab(
+	"goldblock",
+	"default:goldblock",
+	{cracky = 1},
+	{"default_gold_block.png"},
+	"Gold Block Stair",
+	"Gold Block Slab",
+	default.node_sound_metal_defaults(),
+	true
+)
+
+my_register_stair_and_slab(
+	"ice",
+	"default:ice",
+	{cracky = 3, cools_lava = 1, slippery = 3},
 	{"default_ice.png"},
-	"Ice",
-	default.node_sound_glass_defaults())
+	"Ice Stair",
+	"Ice Slab",
+	default.node_sound_glass_defaults(),
+	true
+)
 
+my_register_stair_and_slab(
+	"snowblock",
+	"default:snowblock",
+	{crumbly = 3, cools_lava = 1, snowy = 1},
+	{"default_snow.png"},
+	"Snow Block Stair",
+	"Snow Block Slab",
+	default.node_sound_snow_defaults(),
+	true
+)
 
-local colours = {
-	{"black",      "Black",      "#000000b0"},
-	{"blue",       "Blue",       "#015dbb70"},
-	{"brown",      "Brown",      "#a78c4570"},
-	{"cyan",       "Cyan",       "#01ffd870"},
-	{"dark_green", "Dark Green", "#005b0770"},
-	{"dark_grey",  "Dark Grey",  "#303030b0"},
-	{"green",      "Green",      "#61ff0170"},
-	{"grey",       "Grey",       "#5b5b5bb0"},
-	{"magenta",    "Magenta",    "#ff05bb70"},
-	{"orange",     "Orange",     "#ff840170"},
-	{"pink",       "Pink",       "#ff65b570"},
-	{"red",        "Red",        "#ff000070"},
-	{"violet",     "Violet",     "#2000c970"},
-	{"white",      "White",      "#abababc0"},
-	{"yellow",     "Yellow",     "#e3ff0070"},
-}
+-- Glass stair nodes need to be registered individually to utilize specialized textures.
 
---= Coloured Blocks Mod
-if minetest.get_modpath("cblocks") then
-
-local col
-
-for i = 1, #colours, 1 do
-
-col = colours[i][1]
-
-stairs.register_all(colours[i][1] .. "_glass", "cblocks:glass_" .. colours[i][1],
+stairs.register_stair(
+	"glass",
+	"default:glass",
 	{cracky = 3, oddly_breakable_by_hand = 3},
-	{"cblocks.png^[colorize:" .. colours[i][3]},
-	colours[i][2] .. " Glass",
-	stairs.glass, true)
-
-if col == "yellow" then col = "yellow2" end -- fixes ethereal yellow wood and cblocks yellow wood mixup
-
-stairs.register_all(col .. "_wood", "cblocks:wood_" .. colours[i][1],
-	{choppy = 2, oddly_breakable_by_hand = 2, flammable = 3},
-	{"default_wood.png^[colorize:" .. colours[i][3]},
-	colours[i][2] .. " Wooden",
-	stairs.wood)
-
-end --for
-
-end
-
---= More Ores Mod
-if minetest.get_modpath("moreores") then
-
-grp = {cracky = 1, level = 2}
-
-stairs.register_all("silver_block", "moreores:silver_block",
-	grp,
-	{"moreores_silver_block.png"},
-	"Silver",
-	stairs.metal)
-
-stairs.register_all("mithril_block", "moreores:mithril_block",
-	grp,
-	{"moreores_mithril_block.png"},
-	"Mithril",
-	stairs.metal)
-
-end
-
---= Mobs Mod
-
-if minetest.registered_nodes["mobs:cheeseblock"] then
-
-grp = {crumbly = 3, flammable = 2}
-
-stairs.register_all("cheeseblock", "mobs:cheeseblock",
-	grp,
-	{"mobs_cheeseblock.png"},
-	"Cheese Block",
-	stairs.dirt)
-
-stairs.register_all("honey_block", "mobs:honey_block",
-	grp,
-	{"mobs_honey_block.png"},
-	"Honey Block",
-	stairs.dirt)
-
-end
-
---= Lapis Mod
-
-if minetest.get_modpath("lapis") then
-
-grp = {cracky = 3}
-
-stairs.register_all("lapis_block", "lapis:lapis_block",
-	grp,
-	{"lapis_block_side.png"},
-	"Lapis",
-	stairs.stone)
-
-stairs.register_all("lapis_brick", "lapis:lapis_brick",
-	grp,
-	{"lapis_brick.png"},
-	"Lapis Brick",
-	stairs.stone)
-
-stairs.register_all("lapis_cobble", "lapis:lapis_cobble",
-	grp,
-	{"lapis_cobble.png"},
-	"Lapis Cobble",
-	stairs.stone)
-
-end
-
---= Homedecor Mod
-
-if minetest.get_modpath("homedecor") then
-
-local grp = {snappy = 3}
-
-stairs.register_all("shingles_asphalt", "homedecor:shingles_asphalt",
-	grp,
-	{"homedecor_shingles_asphalt.png"},
-	"Asphalt Shingle",
-	stairs.leaves)
-
-stairs.register_all("shingles_terracotta", "homedecor:roof_tile_terracotta",
-	grp,
-	{"homedecor_shingles_terracotta.png"},
-	"Terracotta Shingle",
-	stairs.leaves)
-
-stairs.register_all("shingles_wood", "homedecor:shingles_wood",
-	grp,
-	{"homedecor_shingles_wood.png"},
-	"Wooden Shingle",
-	stairs.leaves)
-
-end
-
---= Xanadu Mod
-
-if minetest.get_modpath("xanadu") then
-
-grp = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 3}
-
-stairs.register_all("stained_wood_white", "xanadu:stained_wood_white",
-	grp,
-	{"stained_wood_white.png"},
-	"White Wooden",
-	stairs.wood)
-
-stairs.register_all("stained_wood_red", "xanadu:stained_wood_red",
-	grp,
-	{"stained_wood_red.png"},
-	"Red Wooden",
-	stairs.wood)
-
--- Decorative blocks
-
-grp = {cracky = 3}
-
-stairs.register_all("stone1", "xanadu:stone1",
-	grp,
-	{"stone1.png"},
-	"Decorative Stone 1",
-	stairs.stone)
-
-stairs.register_all("stone2", "xanadu:stone2",
-	grp,
-	{"stone2.png"},
-	"Decorative Stone 2",
-	stairs.stone)
-
-stairs.register_all("stone3", "xanadu:stone3",
-	grp,
-	{"stone3.png"},
-	"Decorative Stone 3",
-	stairs.stone)
-
-stairs.register_all("stone4", "xanadu:stone4",
-	grp,
-	{"stone4.png"},
-	"Decorative Stone 4",
-	stairs.stone)
-
-stairs.register_all("stone5", "xanadu:stone5",
-	grp,
-	{"stone5.png"},
-	"Decorative Stone 5",
-	stairs.stone)
-
-stairs.register_all("stone6", "xanadu:stone6",
-	grp,
-	{"stone6.png"},
-	"Decorative Stone 6",
-	stairs.stone)
-
-stairs.register_all("sandstonebrick4", "xanadu:sandstonebrick4",
-	grp,
-	{"sandstonebrick4.png"},
-	"Decorative Sandstone 4",
-	stairs.stone)
-
-stairs.register_slab("desert_cobble1", "xanadu:desert_cobble1",
-	grp,
-	{"desert_cobble1.png"},
-	"Decorative desert cobble 1 slab",
-	stairs.stone)
-
-stairs.register_slab("desert_cobble5", "xanadu:desert_cobble5",
-	grp,
-	{"desert_cobble5.png"},
-	"Decorative desert cobble 5 slab",
-	stairs.stone)
-
-stairs.register_slab("desert_stone1", "xanadu:desert_stone1",
-	grp,
-	{"desert_stone1.png"},
-	"Decorative desert stone 1 slab",
-	stairs.stone)
-
-stairs.register_slab("desert_stone3", "xanadu:desert_stone3",
-	grp,
-	{"desert_stone3.png"},
-	"Decorative desert stone 3 slab",
-	stairs.stone)
-
-stairs.register_slab("desert_stone4", "xanadu:desert_stone4",
-	grp,
-	{"desert_stone4.png"},
-	"Decorative desert stone 4 slab",
-	stairs.stone)
-
-stairs.register_stair("desert_stone4", "xanadu:desert_stone4",
-	grp,
-	{"desert_stone4.png"},
-	"Decorative desert stone 4 stair",
-	stairs.stone)
-
-stairs.register_slab("desert_stone5", "xanadu:desert_stone5",
-	grp,
-	{"desert_stone5.png"},
-	"Decorative desert stone 5 slab",
-	stairs.stone)
-
-stairs.register_slab("red1", "xanadu:red1",
-	grp,
-	{"baked_clay_red1.png"},
-	"Decorative baked red clay 1 slab",
-	stairs.stone)
-
-stairs.register_all("bred2", "xanadu:red2",
-	grp,
-	{"baked_clay_red2.png"},
-	"Decorative baked red clay 2",
-	stairs.stone)
-
-end
-
---= Castle Mod
-
-if minetest.get_modpath("castle") then
-
-grp = {cracky = 2}
-
-stairs.register_all("dungeon_stone", "castle:dungeon_stone",
-	grp,
-	{"castle_dungeon_stone.png"},
-	"Dungeon",
-	stairs.stone)
-
-stairs.register_all("stonewall", "castle:stonewall",
-	grp,
-	{"castle_stonewall.png"},
-	"Castle Wall",
-	stairs.stone)
-
-end
-
---= Wool Mod
-
-if minetest.get_modpath("wool") then
-
-for i = 1, #colours, 1 do
-
-stairs.register_all("wool_" .. colours[i][1], "wool:" .. colours[i][1],
-	{snappy = 2, choppy = 2, oddly_breakable_by_hand = 3, flammable = 3},
-	{"wool_" .. colours[i][1] .. ".png"},
-	colours[i][2] .. " Wool",
-	stairs.wool)
-
-end -- END for
-
-end
-
---= Caverealms lite mod
-if minetest.get_modpath("caverealms")
-and minetest.registered_nodes["caverealms:glow_obsidian_brick"] then
-
-stairs.register_all("hot_cobble", "caverealms:hot_cobble",
+	{"stairs_glass_split.png", "default_glass.png",
+	"stairs_glass_stairside.png^[transformFX", "stairs_glass_stairside.png",
+	"default_glass.png", "stairs_glass_split.png"},
+	S("Glass Stair"),
+	default.node_sound_glass_defaults(),
+	false
+)
+
+stairs.register_slab(
+	"glass",
+	"default:glass",
+	{cracky = 3, oddly_breakable_by_hand = 3},
+	{"default_glass.png", "default_glass.png", "stairs_glass_split.png"},
+	S("Glass Slab"),
+	default.node_sound_glass_defaults(),
+	false
+)
+
+stairs.register_stair_inner(
+	"glass",
+	"default:glass",
+	{cracky = 3, oddly_breakable_by_hand = 3},
+	{"stairs_glass_stairside.png^[transformR270", "default_glass.png",
+	"stairs_glass_stairside.png^[transformFX", "default_glass.png",
+	"default_glass.png", "stairs_glass_stairside.png"},
+	"",
+	default.node_sound_glass_defaults(),
+	false,
+	S("Inner Glass Stair")
+)
+
+stairs.register_stair_outer(
+	"glass",
+	"default:glass",
+	{cracky = 3, oddly_breakable_by_hand = 3},
+	{"stairs_glass_stairside.png^[transformR90", "default_glass.png",
+	"stairs_glass_outer_stairside.png", "stairs_glass_stairside.png",
+	"stairs_glass_stairside.png^[transformR90","stairs_glass_outer_stairside.png"},
+	"",
+	default.node_sound_glass_defaults(),
+	false,
+	S("Outer Glass Stair")
+)
+
+stairs.register_stair(
+	"obsidian_glass",
+	"default:obsidian_glass",
 	{cracky = 3},
-	{"caverealms_hot_cobble.png"},
-	"Hot Cobble",
-	stairs.stone)
+	{"stairs_obsidian_glass_split.png", "default_obsidian_glass.png",
+	"stairs_obsidian_glass_stairside.png^[transformFX", "stairs_obsidian_glass_stairside.png",
+	"default_obsidian_glass.png", "stairs_obsidian_glass_split.png"},
+	S("Obsidian Glass Stair"),
+	default.node_sound_glass_defaults(),
+	false
+)
 
-stairs.register_all("glow_obsidian_brick", "caverealms:glow_obsidian_brick",
-	{cracky = 1, level = 3},
-	{"caverealms_glow_obsidian_brick.png"},
-	"Glow Obsidian Brick",
-	stairs.stone)
+stairs.register_slab(
+	"obsidian_glass",
+	"default:obsidian_glass",
+	{cracky = 3},
+	{"default_obsidian_glass.png", "default_obsidian_glass.png", "stairs_obsidian_glass_split.png"},
+	S("Obsidian Glass Slab"),
+	default.node_sound_glass_defaults(),
+	false
+)
 
-stairs.register_all("glow_obsidian_brick_2", "caverealms:glow_obsidian_brick_2",
-	{cracky = 1, level = 3},
-	{"caverealms_glow_obsidian_brick_2.png"},
-	"Glow Obsidian Brick 2",
-	stairs.stone)
-end
+stairs.register_stair_inner(
+	"obsidian_glass",
+	"default:obsidian_glass",
+	{cracky = 3},
+	{"stairs_obsidian_glass_stairside.png^[transformR270", "default_obsidian_glass.png",
+	"stairs_obsidian_glass_stairside.png^[transformFX", "default_obsidian_glass.png",
+	"default_obsidian_glass.png", "stairs_obsidian_glass_stairside.png"},
+	"",
+	default.node_sound_glass_defaults(),
+	false,
+	S("Inner Obsidian Glass Stair")
+)
 
-print ("[MOD] Stairs Redo loaded")
+stairs.register_stair_outer(
+	"obsidian_glass",
+	"default:obsidian_glass",
+	{cracky = 3},
+	{"stairs_obsidian_glass_stairside.png^[transformR90", "default_obsidian_glass.png",
+	"stairs_obsidian_glass_outer_stairside.png", "stairs_obsidian_glass_stairside.png",
+	"stairs_obsidian_glass_stairside.png^[transformR90","stairs_obsidian_glass_outer_stairside.png"},
+	"",
+	default.node_sound_glass_defaults(),
+	false,
+	S("Outer Obsidian Glass Stair")
+)
+
+-- Dummy calls to S() to allow translation scripts to detect the strings.
+-- To update this add this code to my_register_stair_and_slab:
+-- for _,x in ipairs({"","Inner ","Outer "}) do print(("S(%q)"):format(x..desc_stair)) end
+-- print(("S(%q)"):format(desc_slab))
+
+--[[
+S("Wooden Stair")
+S("Inner Wooden Stair")
+S("Outer Wooden Stair")
+S("Wooden Slab")
+S("Jungle Wood Stair")
+S("Inner Jungle Wood Stair")
+S("Outer Jungle Wood Stair")
+S("Jungle Wood Slab")
+S("Pine Wood Stair")
+S("Inner Pine Wood Stair")
+S("Outer Pine Wood Stair")
+S("Pine Wood Slab")
+S("Acacia Wood Stair")
+S("Inner Acacia Wood Stair")
+S("Outer Acacia Wood Stair")
+S("Acacia Wood Slab")
+S("Aspen Wood Stair")
+S("Inner Aspen Wood Stair")
+S("Outer Aspen Wood Stair")
+S("Aspen Wood Slab")
+S("Stone Stair")
+S("Inner Stone Stair")
+S("Outer Stone Stair")
+S("Stone Slab")
+S("Cobblestone Stair")
+S("Inner Cobblestone Stair")
+S("Outer Cobblestone Stair")
+S("Cobblestone Slab")
+S("Mossy Cobblestone Stair")
+S("Inner Mossy Cobblestone Stair")
+S("Outer Mossy Cobblestone Stair")
+S("Mossy Cobblestone Slab")
+S("Stone Brick Stair")
+S("Inner Stone Brick Stair")
+S("Outer Stone Brick Stair")
+S("Stone Brick Slab")
+S("Stone Block Stair")
+S("Inner Stone Block Stair")
+S("Outer Stone Block Stair")
+S("Stone Block Slab")
+S("Desert Stone Stair")
+S("Inner Desert Stone Stair")
+S("Outer Desert Stone Stair")
+S("Desert Stone Slab")
+S("Desert Cobblestone Stair")
+S("Inner Desert Cobblestone Stair")
+S("Outer Desert Cobblestone Stair")
+S("Desert Cobblestone Slab")
+S("Desert Stone Brick Stair")
+S("Inner Desert Stone Brick Stair")
+S("Outer Desert Stone Brick Stair")
+S("Desert Stone Brick Slab")
+S("Desert Stone Block Stair")
+S("Inner Desert Stone Block Stair")
+S("Outer Desert Stone Block Stair")
+S("Desert Stone Block Slab")
+S("Sandstone Stair")
+S("Inner Sandstone Stair")
+S("Outer Sandstone Stair")
+S("Sandstone Slab")
+S("Sandstone Brick Stair")
+S("Inner Sandstone Brick Stair")
+S("Outer Sandstone Brick Stair")
+S("Sandstone Brick Slab")
+S("Sandstone Block Stair")
+S("Inner Sandstone Block Stair")
+S("Outer Sandstone Block Stair")
+S("Sandstone Block Slab")
+S("Desert Sandstone Stair")
+S("Inner Desert Sandstone Stair")
+S("Outer Desert Sandstone Stair")
+S("Desert Sandstone Slab")
+S("Desert Sandstone Brick Stair")
+S("Inner Desert Sandstone Brick Stair")
+S("Outer Desert Sandstone Brick Stair")
+S("Desert Sandstone Brick Slab")
+S("Desert Sandstone Block Stair")
+S("Inner Desert Sandstone Block Stair")
+S("Outer Desert Sandstone Block Stair")
+S("Desert Sandstone Block Slab")
+S("Silver Sandstone Stair")
+S("Inner Silver Sandstone Stair")
+S("Outer Silver Sandstone Stair")
+S("Silver Sandstone Slab")
+S("Silver Sandstone Brick Stair")
+S("Inner Silver Sandstone Brick Stair")
+S("Outer Silver Sandstone Brick Stair")
+S("Silver Sandstone Brick Slab")
+S("Silver Sandstone Block Stair")
+S("Inner Silver Sandstone Block Stair")
+S("Outer Silver Sandstone Block Stair")
+S("Silver Sandstone Block Slab")
+S("Obsidian Stair")
+S("Inner Obsidian Stair")
+S("Outer Obsidian Stair")
+S("Obsidian Slab")
+S("Obsidian Brick Stair")
+S("Inner Obsidian Brick Stair")
+S("Outer Obsidian Brick Stair")
+S("Obsidian Brick Slab")
+S("Obsidian Block Stair")
+S("Inner Obsidian Block Stair")
+S("Outer Obsidian Block Stair")
+S("Obsidian Block Slab")
+S("Brick Stair")
+S("Inner Brick Stair")
+S("Outer Brick Stair")
+S("Brick Slab")
+S("Steel Block Stair")
+S("Inner Steel Block Stair")
+S("Outer Steel Block Stair")
+S("Steel Block Slab")
+S("Tin Block Stair")
+S("Inner Tin Block Stair")
+S("Outer Tin Block Stair")
+S("Tin Block Slab")
+S("Copper Block Stair")
+S("Inner Copper Block Stair")
+S("Outer Copper Block Stair")
+S("Copper Block Slab")
+S("Bronze Block Stair")
+S("Inner Bronze Block Stair")
+S("Outer Bronze Block Stair")
+S("Bronze Block Slab")
+S("Gold Block Stair")
+S("Inner Gold Block Stair")
+S("Outer Gold Block Stair")
+S("Gold Block Slab")
+S("Ice Stair")
+S("Inner Ice Stair")
+S("Outer Ice Stair")
+S("Ice Slab")
+S("Snow Block Stair")
+S("Inner Snow Block Stair")
+S("Outer Snow Block Stair")
+S("Snow Block Slab")
+--]]
