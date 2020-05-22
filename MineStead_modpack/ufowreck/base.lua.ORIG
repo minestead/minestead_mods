@@ -344,7 +344,8 @@ _, _, _, _, _, _, _, _, _, _, _, G, G, G, G, _, _, _, _, _, _, _, _, _, _, _,
 
 minetest.register_decoration({
   deco_type = "schematic",
-  place_on = {"default:sand", "default:clay", "default:desert_sand", "default:silver_sand"},
+  place_on = {"default:stone", "default:dirt_with_coniferous_litter", "default:dirt_with_rainforest_litter", "default:dirt_with_snow", "default:snow",
+		"default:permafrost_with_stones", "default:sand", "default:dirt_with_grass"},
   biomes = {"sandstone_desert_ocean", "desert_ocean",
 			"icesheet_ocean", "tundra_ocean", "taiga_ocean", "snowy_grassland_ocean", "grassland_ocean", "coniferous_forest_ocean", "deciduous_forest_ocean", "cold_desert_ocean", "savanna_ocean",
 			"rainforest_ocean", "underground", "floatland_coniferous_forest", "floatland_coniferous_forest_ocean"},
@@ -352,7 +353,7 @@ minetest.register_decoration({
   fill_ratio = 0.0000000000000000001,
   schematic = ufowreck_base,
   rotation = rotx,
-  y_min = -30,
+  y_min = -31000,
   y_max = -10,
   flags = {place_center_z = true, place_center_x = true},
 })
