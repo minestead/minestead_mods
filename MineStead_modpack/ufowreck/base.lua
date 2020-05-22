@@ -347,7 +347,7 @@ minetest.register_decoration({
   place_on = {"default:sand", "default:clay", "default:desert_sand", "default:silver_sand"},
   biomes = {"sandstone_desert_ocean", "desert_ocean",
 			"icesheet_ocean", "tundra_ocean", "taiga_ocean", "snowy_grassland_ocean", "grassland_ocean", "coniferous_forest_ocean", "deciduous_forest_ocean", "cold_desert_ocean", "savanna_ocean",
-			"rainforest_ocean", "underground", "floatland_coniferous_forest", "floatland_coniferous_forest_ocean"},
+			"rainforest_ocean", "floatland_coniferous_forest", "floatland_coniferous_forest_ocean"},
   sidelen = 5,
   fill_ratio = 0.0000000000000000001,
   schematic = ufowreck_base,
