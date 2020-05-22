@@ -1,7 +1,11 @@
+-- firefly/init.lua
 
--- firefly 
+-- Load support for MT game translation.
+local S = minetest.get_translator("fireflies")
+
+
 minetest.register_node("fireflies:firefly", {
-	description = "Firefly",
+	description = S("Firefly"),
 	drawtype = "plantlike",
 	tiles = {{
 		name = "fireflies_firefly_animated.png",
@@ -26,18 +30,69 @@ minetest.register_node("fireflies:firefly", {
 	},
 	light_source = 6,
 	floodable = true,
-	on_flood = function(pos, oldnode, newnode)
-		minetest.add_item(pos, "fireflies:firefly 1")
+	on_place = function(itemstack, placer, pointed_thing)
+		local player_name = placer:get_player_name()
+		local pos = pointed_thing.above
+
+		if not minetest.is_protected(pos, player_name) and
+				not minetest.is_protected(pointed_thing.under, player_name) and
+				minetest.get_node(pos).name == "air" then
+			minetest.set_node(pos, {name = "fireflies:firefly"})
+			minetest.get_node_timer(pos):start(1)
+			itemstack:take_item()
+		end
+		return itemstack
+	end,
+	on_timer = function(pos, elapsed)
+		if minetest.get_node_light(pos) > 11 then
+			minetest.set_node(pos, {name = "fireflies:hidden_firefly"})
+		end
+		minetest.get_node_timer(pos):start(30)
+	end
+})
+
+minetest.register_node("fireflies:hidden_firefly", {
+	description = S("Hidden Firefly"),
+	drawtype = "airlike",
+	inventory_image = "fireflies_firefly.png",
+	wield_image =  "fireflies_firefly.png",
+	paramtype = "light",
+	sunlight_propagates = true,
+	walkable = false,
+	pointable = false,
+	diggable = false,
+	buildable_to = true,
+	drop = "",
+	groups = {not_in_creative_inventory = 1},
+	floodable = true,
+	on_place = function(itemstack, placer, pointed_thing)
+		local player_name = placer:get_player_name()
+		local pos = pointed_thing.above
+
+		if not minetest.is_protected(pos, player_name) and
+				not minetest.is_protected(pointed_thing.under, player_name) and
+				minetest.get_node(pos).name == "air" then
+			minetest.set_node(pos, {name = "fireflies:hidden_firefly"})
+			minetest.get_node_timer(pos):start(1)
+			itemstack:take_item()
+		end
+		return itemstack
+	end,
+	on_timer = function(pos, elapsed)
+		if minetest.get_node_light(pos) <= 11 then
+			minetest.set_node(pos, {name = "fireflies:firefly"})
+		end
+		minetest.get_node_timer(pos):start(30)
 	end
 })
 
 
 -- bug net
 minetest.register_tool("fireflies:bug_net", {
-	description = "Bug Net",
+	description = S("Bug Net"),
 	inventory_image = "fireflies_bugnet.png",
 	on_use = function(itemstack, player, pointed_thing)
-		if not pointed_thing or pointed_thing.type ~= "node" or 
+		if not pointed_thing or pointed_thing.type ~= "node" or
 				minetest.is_protected(pointed_thing.under, player:get_player_name()) then
 			return
 		end
@@ -49,9 +104,9 @@ minetest.register_tool("fireflies:bug_net", {
 			local leftover = inv:add_item("main", stack)
 			if leftover:get_count() > 0 then
 				minetest.add_item(pointed_thing.under, node_name.." 1")
-			end	
+			end
 		end
-		if not minetest.setting_getbool("creative_mode") then
+		if not (creative and creative.is_enabled_for(player:get_player_name())) then
 			itemstack:add_wear(256)
 			return itemstack
 		end
@@ -61,16 +116,16 @@ minetest.register_tool("fireflies:bug_net", {
 minetest.register_craft( {
 	output = "fireflies:bug_net",
 	recipe = {
-		{"farming:string", "farming:string", ""},
-		{"farming:string", "farming:string", ""},
-		{"default:stick", "", ""}
+		{"farming:string", "farming:string"},
+		{"farming:string", "farming:string"},
+		{"group:stick", ""}
 	}
 })
 
 
 -- firefly in a bottle
 minetest.register_node("fireflies:firefly_bottle", {
-	description = "Firefly in a Bottle",
+	description = S("Firefly in a Bottle"),
 	inventory_image = "fireflies_bottle.png",
 	wield_image = "fireflies_bottle.png",
 	tiles = {{
@@ -87,7 +142,7 @@ minetest.register_node("fireflies:firefly_bottle", {
 	sunlight_propagates = true,
 	light_source = 9,
 	walkable = false,
-	groups = {snappy = 3, attached_node = 1},
+	groups = {vessel = 1, dig_immediate = 3, attached_node = 1},
 	selection_box = {
 		type = "fixed",
 		fixed = {-0.25, -0.5, -0.25, 0.25, 0.3, 0.25}
@@ -113,6 +168,7 @@ minetest.register_node("fireflies:firefly_bottle", {
 		if firefly_pos then
 			minetest.set_node(pos, {name = "vessels:glass_bottle"})
 			minetest.set_node(firefly_pos, {name = "fireflies:firefly"})
+			minetest.get_node_timer(firefly_pos):start(1)
 		end
 	end
 })
@@ -120,54 +176,115 @@ minetest.register_node("fireflies:firefly_bottle", {
 minetest.register_craft( {
 	output = "fireflies:firefly_bottle",
 	recipe = {
-		{"", "", ""},
-		{"", "fireflies:firefly", ""},
-		{"", "vessels:glass_bottle", ""}
+		{"fireflies:firefly"},
+		{"vessels:glass_bottle"}
 	}
 })
 
 
 -- register fireflies as decorations
-minetest.register_decoration({
-	deco_type = "simple",
-	place_on = {
-		"default:dirt_with_grass",
-		"default:dirt_with_coniferous_litter",
-		"default:dirt_with_rainforest_litter",
-		"default:dirt"
-	},
-	place_offset_y = 2,
-	sidelen = 80,
-	fill_ratio = 0.002,
-	biomes = {
-		"deciduous_forest",
-		"coniferous_forest",
-		"rainforest",
-		"rainforest_swamp"
-	},
-	y_min = -1,
-	y_max = 31000,
-	decoration = "fireflies:firefly",
-})
 
-minetest.register_decoration({
-	deco_type = "simple",
-	place_on = {
-		"default:dirt_with_grass",
-		"default:dirt_with_coniferous_litter",
-		"default:dirt_with_rainforest_litter",
-		"default:dirt"
-	},
-	place_offset_y = 3,
-	sidelen = 80,
-	fill_ratio = 0.002,
-	biomes = {
-		"deciduous_forest",
-		"coniferous_forest",
-		"rainforest",
-		"rainforest_swamp"
-	},
-	y_min = -1,
-	y_max = 31000,
-	decoration = "fireflies:firefly",
-})
+if minetest.get_mapgen_setting("mg_name") == "v6" then
+
+	minetest.register_decoration({
+		name = "fireflies:firefly_low",
+		deco_type = "simple",
+		place_on = "default:dirt_with_grass",
+		place_offset_y = 2,
+		sidelen = 80,
+		fill_ratio = 0.0002,
+		y_max = 31000,
+		y_min = 1,
+		decoration = "fireflies:hidden_firefly",
+	})
+
+	minetest.register_decoration({
+		name = "fireflies:firefly_high",
+		deco_type = "simple",
+		place_on = "default:dirt_with_grass",
+		place_offset_y = 3,
+		sidelen = 80,
+		fill_ratio = 0.0002,
+		y_max = 31000,
+		y_min = 1,
+		decoration = "fireflies:hidden_firefly",
+	})
+
+else
+
+	minetest.register_decoration({
+		name = "fireflies:firefly_low",
+		deco_type = "simple",
+		place_on = {
+			"default:dirt_with_grass",
+			"default:dirt_with_coniferous_litter",
+			"default:dirt_with_rainforest_litter",
+			"default:dirt"
+		},
+		place_offset_y = 2,
+		sidelen = 80,
+		fill_ratio = 0.0005,
+		biomes = {
+			"deciduous_forest",
+			"coniferous_forest",
+			"rainforest",
+			"rainforest_swamp"
+		},
+		y_max = 31000,
+		y_min = -1,
+		decoration = "fireflies:hidden_firefly",
+	})
+
+	minetest.register_decoration({
+		name = "fireflies:firefly_high",
+		deco_type = "simple",
+		place_on = {
+			"default:dirt_with_grass",
+			"default:dirt_with_coniferous_litter",
+			"default:dirt_with_rainforest_litter",
+			"default:dirt"
+		},
+		place_offset_y = 3,
+		sidelen = 80,
+		fill_ratio = 0.0005,
+		biomes = {
+			"deciduous_forest",
+			"coniferous_forest",
+			"rainforest",
+			"rainforest_swamp"
+		},
+		y_max = 31000,
+		y_min = -1,
+		decoration = "fireflies:hidden_firefly",
+	})
+
+end
+
+
+-- get decoration IDs
+local firefly_low = minetest.get_decoration_id("fireflies:firefly_low")
+local firefly_high = minetest.get_decoration_id("fireflies:firefly_high")
+
+minetest.set_gen_notify({decoration = true}, {firefly_low, firefly_high})
+
+-- start nodetimers
+minetest.register_on_generated(function(minp, maxp, blockseed)
+	local gennotify = minetest.get_mapgen_object("gennotify")
+	local poslist = {}
+
+	for _, pos in ipairs(gennotify["decoration#"..firefly_low] or {}) do
+		local firefly_low_pos = {x = pos.x, y = pos.y + 3, z = pos.z}
+		table.insert(poslist, firefly_low_pos)
+	end
+	for _, pos in ipairs(gennotify["decoration#"..firefly_high] or {}) do
+		local firefly_high_pos = {x = pos.x, y = pos.y + 4, z = pos.z}
+		table.insert(poslist, firefly_high_pos)
+	end
+
+	if #poslist ~= 0 then
+		for i = 1, #poslist do
+			local pos = poslist[i]
+			minetest.get_node_timer(pos):start(1)
+		end
+	end
+end)
