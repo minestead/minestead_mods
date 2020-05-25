@@ -172,12 +172,6 @@ function orienteering.update_hud_displays(player)
 	end
 end
 
-if mod_map then
-	-- Disable all HUD flag handling in map mod because we already handle it
-	-- ourselves.
-	map.update_hud_flags = function() end
-end
-
 minetest.register_on_newplayer(orienteering.init_hud)
 minetest.register_on_joinplayer(orienteering.init_hud)
 
