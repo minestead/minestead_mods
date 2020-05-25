@@ -1,17 +1,33 @@
 -- This is inspired by the landrush mod by Bremaweb
-
+local S = minetest.get_translator("areas")
 areas.hud = {}
+areas.hud.refresh = 0
 
 minetest.register_globalstep(function(dtime)
+
+	areas.hud.refresh = areas.hud.refresh + dtime
+	if areas.hud.refresh > areas.config["tick"] then
+		areas.hud.refresh = 0
+	else
+		return
+	end
+
 	for _, player in pairs(minetest.get_connected_players()) do
 		local name = player:get_player_name()
-		local pos = vector.round(player:getpos())
+		local pos = vector.round(player:get_pos())
+		pos = vector.apply(pos, function(p)
+			return math.max(math.min(p, 2147483), -2147483)
+		end)
 		local areaStrings = {}
 
 		for id, area in pairs(areas:getAreasAtPos(pos)) do
-			table.insert(areaStrings, ("%s [%u] (%s%s)")
+			local faction_info = area.faction_open and areas.factions_available and
+					factions.get_player_faction(area.owner)
+			area.faction_open = faction_info
+			table.insert(areaStrings, ("%s [%u] (%s%s%s)")
 					:format(area.name, id, area.owner,
-					area.open and ":open" or ""))
+					area.open and S(":open") or "",
+					faction_info and ":"..faction_info or ""))
 		end
 
 		for i, area in pairs(areas:getExternalHudEntries(pos)) do
@@ -22,7 +38,7 @@ minetest.register_globalstep(function(dtime)
 			table.insert(areaStrings, str)
 		end
 
-		local areaString = "Areas:"
+		local areaString = S("Areas:")
 		if #areaStrings > 0 then
 			areaString = areaString.."\n"..
 				table.concat(areaStrings, "\n")

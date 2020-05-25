@@ -1,5 +1,23 @@
 local hudHandlers = {}
 
+
+areas.registered_on_adds = {}
+areas.registered_on_removes = {}
+areas.registered_on_moves = {}
+
+function areas:registerOnAdd(func)
+	table.insert(areas.registered_on_adds, func)
+end
+
+function areas:registerOnRemove(func)
+	table.insert(areas.registered_on_removes, func)
+end
+
+function areas:registerOnMove(func)
+	table.insert(areas.registered_on_moves, func)
+end
+
+
 --- Adds a function as a HUD handler, it will be able to add items to the Areas HUD element.
 function areas:registerHudHandler(handler)
 	table.insert(hudHandlers, handler)
@@ -76,9 +94,13 @@ function areas:canInteract(pos, name)
 	for _, area in pairs(self:getAreasAtPos(pos)) do
 		if area.owner == name or area.open then
 			return true
-		else
-			owned = true
+		elseif areas.factions_available and area.faction_open then
+			local faction_name = factions.get_player_faction(area.owner)
+			if faction_name ~= nil and faction_name == factions.get_player_faction(name) then
+				return true
+			end
 		end
+		owned = true
 	end
 	return not owned
 end
@@ -141,4 +163,3 @@ function areas:canInteractInArea(pos1, pos2, name, allow_open)
 	-- intersecting areas and they are all owned by the player.
 	return true
 end
-
