@@ -217,22 +217,6 @@ local function rail_on_step(self, dtime)
 	end
 ]]--
 
-	if not self.driver and #self.attached_items == 0 then
-		self.count = (self.count or 0) + dtime
-		if self.count > 2 then
-			self.object:set_velocity({x = 0, y = 0, z = 0})
-			if self.sound_handle then
-				local handle = self.sound_handle
-				self.sound_handle = nil
-				minetest.after(0.2, minetest.sound_stop, handle)
-			end
-			return
-		end
-	else
-		self.count = 0
-	end
-
-
 	local vel = self.object:get_velocity()
 	if self.punched then
 		vel = vector.add(vel, self.velocity)
