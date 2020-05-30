@@ -275,9 +275,9 @@ local xdecor_doors = {
 		{"group:wood", "default:paper"}
 	},
 	prison = {
-		{"xpanes:bar_flat", "", "xpanes:bar_flat",},
-		{"xpanes:bar_flat", "", "xpanes:bar_flat",},
-		{"xpanes:bar_flat", "", "xpanes:bar_flat"}
+		{"xpanes:bar_flat", "xpanes:bar_flat",},
+		{"xpanes:bar_flat", "xpanes:bar_flat",},
+		{"xpanes:bar_flat", "xpanes:bar_flat"}
 	},
 	rusty_prison = {
 		{"xpanes:rusty_bar_flat", "xpanes:rusty_bar_flat",},
