@@ -414,7 +414,6 @@ register_board("bulletin_boards:bulletin_board_basic", {
 	cost = "default:paper",
 	icons = base_icons,
 })
---[[
 minetest.register_craft({
 	output = "bulletin_boards:bulletin_board_basic",
 	recipe = {
@@ -423,5 +422,4 @@ minetest.register_craft({
 		{'group:wood', 'group:wood', 'group:wood'},
 	},
 })
-]]--
 end
