@@ -675,10 +675,7 @@ npc.programs.instr.register("advanced_npc:use_openable_node", function(self, arg
     clicker.is_player = function() return true end
     clicker.get_player_name = function(self) return self.npc_id end
     if command ~= state then
-        local target_node = minetest.registered_nodes[node.name]
-        if (target_node.on_rightclick) then
-          target_node.on_rightclick(pos, node, clicker, nil, nil)
-        end
+        minetest.registered_nodes[node.name].on_rightclick(pos, node, clicker, nil, nil)
     end
 end)
 
