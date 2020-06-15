@@ -29,6 +29,7 @@ local wallmounted_rotations = {
 	[0]={x=1, y=0, z=0}, [1]={x=3, y=0, z=0},
 	[2]={x=0, y=3, z=0}, [3]={x=0, y=1, z=0},
 	[4]={x=0, y=0, z=0}, [5]={x=0, y=2, z=0},
+	[6]={x=1, y=0, z=0}, [7]={x=1, y=1, z=1},
 }
 
 local facedir_rotations = {
@@ -162,6 +163,9 @@ function display_api.update_entities(pos)
 	local node = minetest.get_node(pos)
 	local ndef = minetest.registered_nodes[node.name]
 	local ov = get_orientation_values(node)
+	if not ndef or not ov then
+		return
+	end
 
 	for _, objref in pairs(get_display_objrefs(pos, true)) do
 		local edef = ndef.display_entities[objref:get_luaentity().name]
@@ -283,6 +287,9 @@ end
 function display_api.on_rotate(pos, node, user, _, new_param2)
 	node.param2 = new_param2
 	local ov = get_orientation_values(node)
+	if not ov then
+		return
+	end
 
 	if ov.restricted or not display_api.is_rotation_restricted() then
 		minetest.swap_node(pos, node)

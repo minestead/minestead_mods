@@ -40,6 +40,7 @@ local function display_poster(pos, node, player)
 		size[7,9]bgcolor[#0000]
 		background[0,0;7,9;signs_poster_formspec.png]
 		image[0,-0.2;8.4,2;%s]
+		style_type[textarea;textcolor=#111]
 		textarea[0.3,1.5;7,8;;%s;]]=],
 		titletexture,
 		minetest.colorize("#111",
@@ -210,6 +211,9 @@ local models = {
 			on_construct = display_api.on_construct,
 			on_rightclick = display_poster,
 			on_receive_fields = on_receive_fields_poster,
+			on_punch = function(pos, node, player, pointed_thing)
+				display_api.update_entities(pos)
+			end,
 		},
 	},
 	label_small = {
