@@ -15,32 +15,32 @@ advtrains.register_wagon("engine_electric", {
 	seats = {	
 		{
 			name=S("Driver Stand (left)"),
-			attach_offset={x=-1, y=5, z=2},
+			attach_offset={x=-1, y=-1, z=2},
 			view_offset={x=0, y=-4, z=2},
 			driving_ctrl_access=true,
 			group = "dstand",
 		},
 		{
 			name="1",
-			attach_offset={x=-4, y=8, z=0},
+			attach_offset={x=-4, y=-1, z=0},
 			view_offset={x=0, y=-4, z=0},
 			group="pass",
 		},
 		{
 			name="2",
-			attach_offset={x=4, y=8, z=0},
+			attach_offset={x=4, y=-1, z=0},
 			view_offset={x=0, y=-4, z=0},
 			group="pass",
 		},
 		{
 			name="3",
-			attach_offset={x=-4, y=8, z=-8},
+			attach_offset={x=-4, y=-1, z=-8},
 			view_offset={x=0, y=-4, z=0},
 			group="pass",
 		},
 		{
 			name="4",
-			attach_offset={x=4, y=8, z=-8},
+			attach_offset={x=4, y=-1, z=-8},
 			view_offset={x=0, y=-4, z=0},
 			group="pass",
 		},
