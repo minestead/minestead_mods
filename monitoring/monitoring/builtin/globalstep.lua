@@ -33,7 +33,7 @@ minetest.register_on_mods_loaded(function()
       metric_time.inc(diff)
       metric_time_max.setmax(diff)
 
-      if diff > 75000 then
+      if diff > 100000 then
         minetest.log("warning", "[monitoring] globalstep took " .. diff .. " us in mod " .. (info.mod or "<unknown>"))
       end
 
