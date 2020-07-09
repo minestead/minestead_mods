@@ -23,6 +23,12 @@ if minetest.settings:get_bool("monitoring.advtrains.verbose") then
 	monitoring.wrap_global({"advtrains", "path_get"}, "advtrains_path_get")
 	monitoring.wrap_global({"advtrains", "get_rail_info_at"}, "advtrains_get_rail_info_at")
 	monitoring.wrap_global({"advtrains", "path_get_adjacent"}, "advtrains_path_get_adjacent")
+
+
+	monitoring.wrap_global({"advtrains", "path_get_forwards"}, "advtrains_path_get_forwards")
+	monitoring.wrap_global({"advtrains", "path_get_backwards"}, "advtrains_path_get_backwards")
+
+
 	-- monitoring.wrap_global({"advtrains", ""}, "advtrains_")
 
 end
