@@ -286,26 +286,23 @@ end
 -- This function determines the index resulting from moving along the path by 'offset' meters
 -- starting from 'index'. See also the comment on the top of the file.
 function advtrains.path_get_index_by_offset(train, index, offset)
-	local advtrains_path_get = advtrains.path_get
 	-- Step 1: determine my current absolute pos on the path
 	local start_index_f = atfloor(index)
 
 	-- ===
 	-- local _, _, frac = advtrains.path_get_adjacent(train, index)
-	local i_floor = atfloor(index)
-	local i_ceil = i_floor + 1
-	local frac = index - i_floor
-	advtrains_path_get(train, i_floor)
-	advtrains_path_get(train, i_ceil)
+	-- get path for all required length
+	local c_idx = atfloor(index + offset)
+	advtrains.path_get(train, start_index_f)
+	advtrains.path_get(train, c_idx + 1)
 	-- ===
-
+	
+	local frac = index - start_index_f
 	local dist1, dist2 = train.path_dist[start_index_f], train.path_dist[start_index_f+1]
-	local start_dist = n_interpolate(dist1, dist2, frac)
+	local start_dist = dist1 + (dist2-dist1)*frac
 	
 	-- Step 2: determine the total end distance and estimate the index we'd come out
 	local end_dist = start_dist + offset
-	
-	local c_idx = atfloor(index + offset)
 	
 	-- Step 3: move forward/backward to find real index
 	-- We assume here that the distance between 2 path items is never smaller than 1.
@@ -316,12 +313,6 @@ function advtrains.path_get_index_by_offset(train, index, offset)
 	--  Desired position:  -------#------
 	--  Path items      :  --|--|--|--|--
 	--  c_idx           :       ^
-
-	-- ===
-	-- advtrains.path_get_adjacent(train, c_idx)
-	advtrains_path_get(train, c_idx)
-	advtrains_path_get(train, c_idx + 1)
-	-- ===
 
 	while train.path_dist[c_idx] < end_dist do
 		c_idx = c_idx + 1
