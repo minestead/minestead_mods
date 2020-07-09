@@ -293,8 +293,9 @@ function advtrains.path_get_index_by_offset(train, index, offset)
 	-- local _, _, frac = advtrains.path_get_adjacent(train, index)
 	-- get path for all required length
 	local c_idx = atfloor(index + offset)
-	advtrains.path_get(train, start_index_f)
-	advtrains.path_get(train, c_idx + 1)
+	local end_index_f = c_idx + 1
+	advtrains.path_get(train, math.min(start_index_f, end_index_f))
+	advtrains.path_get(train, math.max(start_index_f + 1, end_index_f))
 	-- ===
 	
 	local frac = index - start_index_f
