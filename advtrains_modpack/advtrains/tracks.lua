@@ -383,21 +383,31 @@ function advtrains.is_track_and_drives_on(nodename, drives_on_p)
 	return false
 end
 
+
+local CACHE_get_track_connections = {}
 function advtrains.get_track_connections(name, param2)
-	local nodedef=minetest.registered_nodes[name]
-	if not nodedef then atprint(" get_track_connections couldn't find nodedef for nodename "..(name or "nil")) return nil end
-	local noderot=param2
-	if not param2 then noderot=0 end
-	if noderot > 3 then atprint(" get_track_connections: rail has invaild param2 of "..noderot) noderot=0 end
-	
-	local tracktype
-	for k,_ in pairs(nodedef.groups) do
-		local tt=string.match(k, "^advtrains_track_(.+)$")
-		if tt then
-			tracktype=tt
+	local CACHE_key = name .. '-' .. param2
+	if not CACHE_get_track_connections[CACHE_key] then
+		local nodedef=minetest.registered_nodes[name]
+		if not nodedef then atprint(" get_track_connections couldn't find nodedef for nodename "..(name or "nil")) return nil end
+		local noderot=param2
+		if not param2 then noderot=0 end
+		if noderot > 3 then atprint(" get_track_connections: rail has invaild param2 of "..noderot) noderot=0 end
+		
+		local tracktype
+		for k,_ in pairs(nodedef.groups) do
+			local tt=string.match(k, "^advtrains_track_(.+)$")
+			if tt then
+				tracktype=tt
+			end
 		end
+		CACHE_get_track_connections[CACHE_key] = {
+			advtrains.rotate_conn_by(nodedef.at_conns, noderot*AT_CMAX/4),
+			(nodedef.at_rail_y or 0),
+			tracktype
+		}
 	end
-	return advtrains.rotate_conn_by(nodedef.at_conns, noderot*AT_CMAX/4), (nodedef.at_rail_y or 0), tracktype
+	return CACHE_get_track_connections[CACHE_key][1], CACHE_get_track_connections[CACHE_key][2], CACHE_get_track_connections[CACHE_key][3]
 end
 
 -- slope placer. Defined in register_tracks.
