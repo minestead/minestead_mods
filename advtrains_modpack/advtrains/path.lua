@@ -163,6 +163,26 @@ function advtrains.path_get(train, index)
 		error("For train "..train.id..": Called path_get() but index="..index.." is not a round number")
 	end
 	
+	if index > train.path_ext_f then
+		advtrains.path_get_forwards(train, index)
+	end
+	
+	if index < train.path_ext_b then
+		advtrains.path_get_backwards(train, index)
+	end
+
+	if index < train.path_req_b then
+		train.path_req_b = index
+	end
+	if index > train.path_req_f then
+		train.path_req_f = index
+	end
+	
+	return train.path[index], (index<=train.path_trk_f and index>=train.path_trk_b)
+	
+end
+
+function advtrains.path_get_forwards(train, index)
 	local pef = train.path_ext_f
 	-- generate forward (front of train, positive)
 	while index > pef do
@@ -194,8 +214,9 @@ function advtrains.path_get(train, index)
 		train.path_dist[pef] = train.path_dist[pef-1] + vector.distance(pos, adj_pos)
 	end
 	train.path_ext_f = pef
-	
-	
+end
+
+function advtrains.path_get_backwards(train, index) {
 	local peb = train.path_ext_b
 	-- generate backward (back of train, negative)
 	while index < peb do
@@ -227,17 +248,8 @@ function advtrains.path_get(train, index)
 		train.path_dist[peb] = train.path_dist[peb+1] - vector.distance(pos, adj_pos)
 	end
 	train.path_ext_b = peb
-	
-	if index < train.path_req_b then
-		train.path_req_b = index
-	end
-	if index > train.path_req_f then
-		train.path_req_f = index
-	end
-	
-	return train.path[index], (index<=train.path_trk_f and index>=train.path_trk_b)
-	
-end
+}
+
 
 -- interpolated position to fractional index given, and angle based on path_dir
 -- returns: pos, angle(yaw), p_floor, p_ceil
