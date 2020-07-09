@@ -216,7 +216,7 @@ function advtrains.path_get_forwards(train, index)
 	train.path_ext_f = pef
 end
 
-function advtrains.path_get_backwards(train, index) {
+function advtrains.path_get_backwards(train, index)
 	local peb = train.path_ext_b
 	-- generate backward (back of train, negative)
 	while index < peb do
@@ -248,7 +248,7 @@ function advtrains.path_get_backwards(train, index) {
 		train.path_dist[peb] = train.path_dist[peb+1] - vector.distance(pos, adj_pos)
 	end
 	train.path_ext_b = peb
-}
+end
 
 
 -- interpolated position to fractional index given, and angle based on path_dir
