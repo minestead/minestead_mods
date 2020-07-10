@@ -83,3 +83,42 @@ minetest.register_craft({
 	},
 })
 
+advtrains.register_wagon("moretrains_diesel_german", {
+	mesh="moretrains_diesel_german.b3d",
+	textures = {"moretrains_diesel_german.png"},
+	drives_on={default=true},
+	max_speed=20,
+	seats = {
+		{
+			name=S("Driver Stand (right)"),
+			attach_offset={x=0, y=-1.4, z=-7.2},
+			view_offset={x=2, y=0.2, z=-8},
+			driving_ctrl_access=true,
+			group = "dstand",
+		},
+		
+	},
+	seat_groups = {
+		dstand={
+			name = "Driver Stand",
+			access_to = {},
+			driving_ctrl_access = true,
+		},
+	},
+	assign_to_seat_group = {"dstand"},
+	visual_size = {x=1, y=1},
+	wagon_span=2.8,
+	is_locomotive=true,
+	collisionbox = {-1.0,-0.5,-1.0, 1.0,2.5,1.0},
+	drops={"advtrains:moretrains_diesel_german"},
+	horn_sound = "advtrains_industrial_horn",
+}, S("Old German Diesel"), "moretrains_diesel_german_inv.png")
+
+minetest.register_craft({
+	output = 'advtrains:moretrains_diesel_german',
+	recipe = {
+		{'default:glass', 'dye:red', ''},
+		{'default:steelblock', 'advtrains:driver_cab', 'default:steelblock'},
+		{'advtrains:wheel', 'advtrains:wheel', 'advtrains:wheel'},
+	},
+})
