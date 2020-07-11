@@ -89,6 +89,10 @@ if minetest.get_modpath("real_trees") then
 	dofile(mod_path .. "/real_trees.lua")
 end
 
+if minetest.get_modpath("oak_steampunk") then
+	dofile(mod_path .. "/oak_steampunk.lua")
+end
+
 
 --
 -- Minetest engine debug logging
