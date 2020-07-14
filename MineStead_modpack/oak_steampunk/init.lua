@@ -38,7 +38,7 @@ minetest.register_node("oak_steampunk:oak_acorn", {
   on_timer = function(pos)
     if minetest.get_item_group(name_under, "soil") then
       minetest.set_node(pos, {name="air"})
-      minetest.place_schematic({x = pos.x - 6, y = pos.y, z = pos.z - 6 }, oak_tree_schematic, "random", nil, false)
+      minetest.place_schematic({x = pos.x - 4, y = pos.y, z = pos.z - 4 }, oak_tree_schematic, "random", nil, false)
     end
   end
 })
@@ -60,8 +60,6 @@ minetest.register_node("oak_steampunk:oak_tree_leaves", {
 	description = "Oak Tree Leaves",
 	drawtype = "allfaces_optional",
 	tiles = {"oak_leaves.png"},
---	inventory_image = "moretrees_palm_leaves.png",
---	wield_image = "moretrees_palm_leaves.png",
 	paramtype = "light",
 	walkable = true,
 	waving = 1,
