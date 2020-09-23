@@ -28,8 +28,6 @@ mobs:register_mob("ufowreck:floob", {
 	visual_size = {x=4, y=4},
 	makes_footstep_sound = true,
 	sounds = {
---		random = "amcaw_floob",
---		damage = "amcaw_floobhurt",
 		shoot_attack = "blaster_long",
 		death = "amcaw_floobdeath",
 	},

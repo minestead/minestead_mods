@@ -7,6 +7,8 @@ dofile(modpath.."/tools.lua")
 dofile(modpath.."/miniufo.lua")
 dofile(modpath.."/lighter.lua")
 dofile(modpath.."/base.lua")
+dofile(modpath.."/antigrav.lua")
+dofile(modpath.."/teleport.lua")
 
 local _ = {
   name = "air",
