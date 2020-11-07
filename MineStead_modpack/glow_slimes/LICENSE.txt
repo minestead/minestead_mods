@@ -1,0 +1,2 @@
+License for code GNU GPL
+License for media (Sounds, textures, models) Creative Commons Attribution-ShareAlike 4.0 <https://creativecommons.org/licenses/by-sa/4.0/legalcode>
