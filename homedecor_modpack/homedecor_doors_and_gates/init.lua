@@ -620,8 +620,8 @@ minetest.register_craft( {
 	type = "shapeless",
         output = "doors:homedecor_closet_mahogany 2",
         recipe = {
-			"doors:homedecor_closet_oak_a",
-			"doors:homedecor_closet_oak_a",
+			"doors:homedecor_closet_oak",
+			"doors:homedecor_closet_oak",
 			"dye:brown"
         },
 })
