@@ -681,14 +681,16 @@ minetest.register_node("more_metal_stuff:copper_square", {
 })
 
 minetest.register_craft({
-	output = "more_metal_stuff:copper_square",
+	output = "more_metal_stuff:copper_square 8",
 	recipe = {
-		{"default:copperblock"},
+		{"default:copperblock", "default:copperblock", "default:copperblock"},
+		{"default:copperblock", "", "default:copperblock"},
+		{"default:copperblock", "default:copperblock", "default:copperblock"},
 	},
 })
 
 minetest.register_craft({
-	output = "default:copperblock",
+	output = "default:copper_ingot 9",
 	recipe = {
 		{"more_metal_stuff:copper_square"},
 	},
@@ -705,14 +707,16 @@ minetest.register_node("more_metal_stuff:chromium_square", {
 })
 
 minetest.register_craft({
-	output = "more_metal_stuff:chromium_square",
+	output = "more_metal_stuff:chromium_square 8",
 	recipe = {
-		{"technic:chromium_block"},
+		{"technic:chromium_block", "technic:chromium_block", "technic:chromium_block"},
+		{"technic:chromium_block", "", "technic:chromium_block"},
+		{"technic:chromium_block", "technic:chromium_block", "technic:chromium_block"},
 	},
 })
 
 minetest.register_craft({
-	output = "technic:chromium_block",
+	output = "technic:chromium_ingot 9",
 	recipe = {
 		{"more_metal_stuff:chromium_square"},
 	},
@@ -729,14 +733,16 @@ minetest.register_node("more_metal_stuff:uranium_square", {
 })
 
 minetest.register_craft({
-	output = "more_metal_stuff:uranium_square",
+	output = "more_metal_stuff:uranium_square 8",
 	recipe = {
-		{"technic:uranium0_block"},
+		{"technic:uranium0_block", "technic:uranium0_block", "technic:uranium0_block"},
+		{"technic:uranium0_block", "", "technic:uranium0_block"},
+		{"technic:uranium0_block", "technic:uranium0_block", "technic:uranium0_block"},
 	},
 })
 
 minetest.register_craft({
-	output = "technic:uranium0_block",
+	output = "technic:uranium0_ingot 9",
 	recipe = {
 		{"more_metal_stuff:uranium_square"},
 	},
@@ -753,14 +759,16 @@ minetest.register_node("more_metal_stuff:zinc_square", {
 })
 
 minetest.register_craft({
-	output = "more_metal_stuff:zinc_square",
+	output = "more_metal_stuff:zinc_square 8",
 	recipe = {
-		{"technic:zinc_block"},
+		{"technic:zinc_block", "technic:zinc_block", "technic:zinc_block"},
+		{"technic:zinc_block", "", "technic:zinc_block"},
+		{"technic:zinc_block", "technic:zinc_block", "technic:zinc_block"},
 	},
 })
 
 minetest.register_craft({
-	output = "technic:zinc_block",
+	output = "technic:zinc_ingot 9",
 	recipe = {
 		{"more_metal_stuff:zinc_square"},
 	},
