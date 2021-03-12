@@ -11,6 +11,7 @@ areas.startTime = os.clock()
 
 areas.modpath = minetest.get_modpath("areas")
 dofile(areas.modpath.."/settings.lua")
+dofile(areas.modpath.."/sandbox.lua") -- patch: sandbox
 dofile(areas.modpath.."/api.lua")
 dofile(areas.modpath.."/internal.lua")
 dofile(areas.modpath.."/chatcommands.lua")

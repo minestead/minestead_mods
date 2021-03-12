@@ -90,6 +90,11 @@ function areas:canInteract(pos, name)
 	if minetest.check_player_privs(name, self.adminPrivs) then
 		return true
 	end
+	-- patch: disallow interaction out of sandbox area
+	if minetest.get_player_privs(name).sandboxed and not self:is_in_sandbox_area(pos) then
+        return false
+    end
+	-- end of patch
 	local owned = false
 	for _, area in pairs(self:getAreasAtPos(pos)) do
 		if area.owner == name or area.open then
