@@ -7,6 +7,7 @@ local mg_name = minetest.get_mapgen_setting("mg_name")
 if mg_name == "v6" or mg_name == "singlenode" or
 		minetest.settings:get("static_spawnpoint") or
 		minetest.settings:get_bool("engine_spawn") then
+			print ("[MOD] SPAWN mod disabled")
 	return
 end
 
@@ -20,7 +21,7 @@ local res = 64
 local checks = 128 * 128
 -- Starting point for biome checks. This also sets the y co-ordinate for all
 -- points checked, so the suitable biomes must be active at this y.
-local pos = {x = 0, y = 8, z = 0}
+local pos = {x = 0, y = 8, z = -20000}
 
 
 -- Table of suitable biomes
@@ -96,6 +97,10 @@ end
 
 local function search()
 	for iter = 1, checks do
+		minetest.emerge_area(
+			{x = pos.x - chunksize, y = pos.y - chunksize, z = pos.z - chunksize},
+			{x = pos.x + chunksize, y = pos.y + chunksize, z = pos.z + chunksize}
+		)
 		local biome_data = minetest.get_biome_data(pos)
 		-- Sometimes biome_data is nil
 		local biome = biome_data and biome_data.biome
@@ -133,6 +138,7 @@ local function on_spawn(player)
 		searched = true
 	end
 	if success then
+		print ("[MOD] SPAWN - teleport to position")
 		player:set_pos(spawn_pos)
 	end
 	return success

@@ -43,6 +43,9 @@ minetest.register_globalstep(function(dtime)
 			areaString = areaString.."\n"..
 				table.concat(areaStrings, "\n")
 		end
+		if minetest.get_player_privs(name).sandboxed and not areas:is_in_sandbox_area(pos) then
+			areaString = areaString .. " [PROTECTED]"
+		end
 		local hud = areas.hud[name]
 		if not hud then
 			hud = {}
