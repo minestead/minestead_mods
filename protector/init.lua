@@ -276,6 +276,28 @@ protector.can_dig = function(r, pos, digger, onlyowner, infolevel)
 	return true
 end
 
+local player_freeze = function(player, digger)
+	local playerMeta = player:get_meta()
+	if playerMeta:get_string("protector_freeze") == 'frozen' then
+	  return
+	end
+	playerMeta:set_string('protector_freeze', 'frozen')
+	local playerPos = player:get_pos()
+	local op = player:get_physics_override()
+	player:set_physics_override({speed = 0, gravity = 0, jump = 0})
+	minetest.after(3, function(o, ps, pn)
+		local pl = minetest.get_player_by_name(pn)
+		pl:set_physics_override({gravity = o.gravity, jump = o.jump, speed = o.speed})
+		pl:set_pos( ps );
+		minetest.chat_send_player(pn, "...and don't do this again.")
+		local pmeta = pl:get_meta()
+		pmeta:set_string('protector_freeze', '')
+	end, op, playerPos, digger)
+	minetest.chat_send_player(digger, "Freeze!!!")
+end
+
+
+
 
 local old_is_protected = minetest.is_protected
 
@@ -298,17 +320,8 @@ function minetest.is_protected(pos, digger)
 					if protector_hurt > 0 and player:get_hp() > 0 then
 						player:set_hp(player:get_hp() - protector_hurt)
 					end
-
-					local playerPos = player:get_pos()
-					local op = player:get_physics_override()
-					player:set_physics_override({speed = 0, gravity = 0, jump = 0})
-					minetest.after(3, function(o, ps, pn)
-						local pl = minetest.get_player_by_name(pn)
-						pl:set_physics_override({gravity = o.gravity, jump = o.jump, speed = o.speed})
-						pl:set_pos( ps );
-						minetest.chat_send_player(pn, "...and don't do this again.")
-					end, op, playerPos, digger)
-					minetest.chat_send_player(digger, "Freeze!!!")
+					-- freeze player
+					player_freeze(player, digger)
 			    end
 			end
 		end
