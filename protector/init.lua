@@ -296,19 +296,26 @@ function minetest.is_protected(pos, digger)
 				player:set_hp(player:get_hp() - protector_hurt)
 			end
 
-			--[[ flip player when protection violated
 			if protector_flip then
-			    -- ugly, ugly hack. we teleport player only if is_protected is called from core.node_dig
+			    -- ugly, ugly hack. we freeze player only if is_protected is called from core.node_dig
 			    if string.match(debug.traceback(), '</usr/local/share/minetest/builtin/game/item.lua:550>') then
-					player:set_pos({
-						x = statspawn.x,
-						y = statspawn.y,
-						z = statspawn.z
-					})
-				minetest.chat_send_player(digger, "Не трогай защищенные локации!!!")
+                              local playerPos = player:get_pos()
+                              local op = player:get_physics_override()
+                              player:set_physics_override({speed = 0, gravity = 0, jump = 0})
+                              minetest.after(3, function(o, ps, pn)
+                                local pl = minetest.get_player_by_name(pn)
+                                pl:set_physics_override({gravity = o.gravity, jump = o.jump, speed = o.speed})
+                                pl:set_pos( ps );
+                                minetest.chat_send_player(pn, "...and don't do this again.")
+                              end, op, playerPos, digger)
+					-- player:set_pos({
+					-- 	x = statspawn.x,
+					-- 	y = statspawn.y,
+					-- 	z = statspawn.z
+					-- })
+				minetest.chat_send_player(digger, "Freeze!!!")
 			    end
 			end
-			]]--
 		end
 
 		return true
