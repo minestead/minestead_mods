@@ -291,14 +291,15 @@ function minetest.is_protected(pos, digger)
 
 		if player and player:is_player() then
 
+
+			if protector_flip then
+			    -- ugly, ugly hack. we freeze player only if is_protected is called from core.node_dig
+			    if string.match(debug.traceback(), '</usr/local/share/minetest/builtin/game/item.lua:550>') then
 			-- hurt player if protection violated
 			if protector_hurt > 0 and player:get_hp() > 0 then
 				player:set_hp(player:get_hp() - protector_hurt)
 			end
 
-			if protector_flip then
-			    -- ugly, ugly hack. we freeze player only if is_protected is called from core.node_dig
-			    if string.match(debug.traceback(), '</usr/local/share/minetest/builtin/game/item.lua:550>') then
                               local playerPos = player:get_pos()
                               local op = player:get_physics_override()
                               player:set_physics_override({speed = 0, gravity = 0, jump = 0})
