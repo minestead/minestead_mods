@@ -11,4 +11,5 @@ advtrains_luaautomation?
 gravelsieve?
 homedecor_misc?
 stairs?
+protector?
 
