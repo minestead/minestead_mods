@@ -8,3 +8,9 @@ minetest.register_craft({
 		{"default:stone", "default:tin_ingot", "default:stone"},
 	}
 })
+
+minetest.register_craft({
+	type = "shapeless",
+	output = "protector:protect",
+	recipe = {"protector:protect2"}
+})
