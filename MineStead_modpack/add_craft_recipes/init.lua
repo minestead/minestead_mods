@@ -56,3 +56,7 @@ end
 if minetest.get_modpath("protector") then
   dofile(MP.."/craft/protector.lua")
 end
+
+if minetest.get_modpath("towercrane") then
+  dofile(MP.."/craft/towercrane.lua")
+end
