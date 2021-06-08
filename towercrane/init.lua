@@ -340,6 +340,7 @@ minetest.register_node("towercrane:balance", {
 	light_source = 12,
 	sunlight_propagates = true,
 	is_ground_content = false,
+	diggable = false,
 	groups = {crumbly=0, not_in_creative_inventory=1},
 })
 
@@ -357,6 +358,7 @@ minetest.register_node("towercrane:mast", {
 	paramtype2 = "facedir",
 	sunlight_propagates = true,
 	is_ground_content = false,
+	diggable = false,
 	groups = {crumbly=0, not_in_creative_inventory=1},
 })
 
@@ -374,6 +376,7 @@ minetest.register_node("towercrane:arm", {
 	paramtype2 = "facedir",
 	sunlight_propagates = true,
 	is_ground_content = false,
+	diggable = false,
 	groups = {crumbly=0, not_in_creative_inventory=1},
 })
 
@@ -391,6 +394,7 @@ minetest.register_node("towercrane:arm2", {
 	paramtype2 = "facedir",
 	sunlight_propagates = true,
 	is_ground_content = false,
+	diggable = false,
 	groups = {crumbly=0, not_in_creative_inventory=1},
 })
 
