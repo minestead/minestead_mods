@@ -1,0 +1,2 @@
+default
+cursed_world?

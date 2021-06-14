@@ -1,0 +1,1 @@
+Adds a /spawn command that telepors you to the server spawn command.
