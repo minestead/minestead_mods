@@ -1,3 +1,0 @@
-
-# Use alpha color level to hide nametag instead of clearing text.
-hidename.use_alpha (Use nametag alpha level) bool false
