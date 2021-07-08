@@ -1,147 +1,190 @@
+local modpath = minetest.get_modpath(minetest.get_current_modname())
 
-local S = mobs.intllib
+dofile(modpath .. "/mammoth.lua")
+dofile(modpath .. "/moose.lua")
+dofile(modpath .. "/reindeer.lua")
 
-local animation_awake = {
-		speed_normal = 10,
-		speed_sprint = 30,
-		stand_start = 50,
-		stand_end = 150,
-		walk_start = 1,
-		walk_end = 40,
-		punch_start = 160,
-		punch_end = 200,
-		punch_loop = false,
-		}
-local animation_sleep = {
-		speed_stand = 5,
-		speed_normal = 10,
-		speed_sprint = 30,
-		stand_start = 205,
-		stand_end = 230,
-		walk_start = 205,
-		walk_end = 230,
-		}
 
--- Mammoth by ElCeejo
 
-mobs:register_mob("mobs_mammoth:mammoth", {
-	type = "animal",
-	hp_min = 54,
-	hp_max = 54,
-	armor = 115,
-	passive = false,
-	walk_velocity = 0.8,
-	run_velocity = 3,
-        walk_chance = 40,
-        jump = true,
-        jump_height = 1.0,
-        stepheight = 1.1,
-        runaway = false,
-        pushable = false,
-        view_range = 8,
-        knock_back = 0,
-        damage = 13,
-	fear_height = 6,
-	fall_speed = -8,
-	fall_damage = 20,
-	water_damage = 0,
-	lava_damage = 3,
-	light_damage = 0,
-        suffocation = false,
-        floats = 1,
-	follow = {"default:leaves"},
-        reach = 10,
-        owner_loyal = true,
-	attack_type = "dogfight",
-	pathfinding = 0,
-	makes_footstep_sound = true,
-	sounds = {
---		random = "paleotest_mammoth",
-	},
-	drops = {
-		{name = "mobs:meat_raw", chance = 1, min = 6, max = 9},
-	},
-	visual = "mesh",
-	visual_size = {x=18, y=18},
-	collisionbox = {-1.2, -1.7, -1.2, 1.2, 0.8, 1.2},
-	textures = {
-		{"paleotest_mammoth1.png"},
-		{"paleotest_mammoth2.png"},
-	},
-	child_texture = {
-		{"paleotest_mammoth3.png"},
-	},
-	mesh = "paleotest_mammoth.b3d",
-	animation = {
-		speed_normal = 10,
-		speed_sprint = 30,
-		stand_start = 50,
-		stand_end = 150,
-		walk_start = 1,
-		walk_end = 40,
-		punch_start = 160,
-		punch_end = 200,
-		punch_loop = false,
-	},
-
-	on_rightclick = function(self, clicker)
-
-		-- feed or tame
-		if mobs:feed_tame(self, clicker, 8, true, true) then return end
-		if mobs:protect(self, clicker) then return end
-
-		if self.owner == "" then
-			self.owner = clicker:get_player_name()
-		else
-			if self.order == "follow" then
-				self.order = "stand"
-			else
-				self.order = "follow"
-
-			end
-
-		end
-
-	end,
-
-	replace_rate = 10,
-	replace_what = {
-		{"group:grass", "air", 0},
-	},
-
-	do_custom = function(self, dtime)
-
--- Diurnal mobs sleep at night and awake at day
-
-	if self.time_of_day > 0.2
-	and self.time_of_day < 0.8 then
-
-        self.passive = false    
-        self.view_range = 8
-        self.walk_chance = 40
-        self.jump = false
-        self.animation = animation_awake
-	mobs:set_animation(self, self.animation.current)
-	elseif self.time_of_day > 0.0
-	and self.time_of_day < 1.0 then
-
-        self.passive = true     
-        self.view_range = 0
-        self.walk_chance = 0
-        self.jump = false
-        self.animation = animation_sleep
-	mobs:set_animation(self, self.animation.current)
-	end
-	end,
+minetest.register_craftitem("mobs_mammoth:leather_sheet", {
+    description = "Leather Sheet",
+    inventory_image = "leather_block.png",
+    groups = {leather = 1, flammable = 2},
 })
 
-mobs:spawn({
-	name = "mobs_mammoth:mammoth",
-	nodes = {"default:snow","default:dirt_with_snow", "default:snowblock", "default:permafrost_with_moss"},
-	interval = 60,
-	chance = 8000,
-	min_height = 0,
-	max_height = 200,
+minetest.register_node("mobs_mammoth:leather_block", {
+    description = "Leather Block",
+    tiles = {"leather_block.png"},
+	drawtype = "nodebox",
+	paramtype2 = "facedir",
+	paramtype = "light",
+	sunlight_propagates = true,
+	is_ground_content = false,
+	groups = {cracky = 1},
+	sounds = default.node_sound_wood_defaults(),
 })
 
-mobs:register_egg("mobs_mammoth:mammoth", S("Mammoth"), "default_dirt.png", 1)
+minetest.register_craft({
+	output = "mobs_mammoth:leather_block",
+	recipe = {
+		{"mobs_mammoth:leather_sheet", "mobs_mammoth:leather_sheet", "mobs_mammoth:leather_sheet"},
+		{"mobs_mammoth:leather_sheet", "mobs_mammoth:leather_sheet", "mobs_mammoth:leather_sheet"},
+		{"mobs_mammoth:leather_sheet", "mobs_mammoth:leather_sheet", "mobs_mammoth:leather_sheet"},
+	},
+})
+
+minetest.register_craft({
+	output = "mobs_mammoth:leather_sheet 9",
+	recipe = {
+		{"mobs_mammoth:leather_block"},
+	},
+})
+
+minetest.register_craft({
+	output = "mobs_mammoth:leather_sheet",
+	recipe = {
+		{"water_life:beaver_fur", "water_life:beaver_fur"},
+		{"water_life:beaver_fur", "water_life:beaver_fur"},
+	},
+})
+
+minetest.register_craft({
+	output = "mobs_mammoth:leather_sheet",
+	recipe = {
+		{"water_life:crocleather", "water_life:crocleather"},
+	},
+})
+
+minetest.register_craft({
+	output = "mobs_mammoth:leather_sheet",
+	recipe = {
+		{"mobs:leather", "mobs:leather"},
+		{"mobs:leather", "mobs:leather"},
+	},
+})
+
+minetest.register_craft({
+	output = "mobs_mammoth:leather_sheet",
+	recipe = {
+		{"mobs:rabbit_hide", "mobs:rabbit_hide", "mobs:rabbit_hide"},
+		{"mobs:rabbit_hide", "mobs:rabbit_hide", "mobs:rabbit_hide"},
+	},
+})
+
+armor:register_armor("mobs_mammoth:leather_jacket", {
+	description = "Leather Jacket",
+	inventory_image = "leather_jacket_inv.png",
+	groups = {armor_torso=1, armor_heal=1, armor_use=400,
+		physics_speed=0.2, physics_gravity=0.0},
+	armor_groups = {fleshy=15},
+	damage_groups = {cracky=3, snappy=2, choppy=2, crumbly=1, level=2},
+})
+
+minetest.register_craft({
+	output = "mobs_mammoth:leather_jacket",
+	recipe = {
+		{"mobs_mammoth:leather_sheet", "", "mobs_mammoth:leather_sheet"},
+		{"mobs_mammoth:leather_sheet", "dye:black", "mobs_mammoth:leather_sheet"},
+		{"mobs_mammoth:leather_sheet", "dye:black", "mobs_mammoth:leather_sheet"},
+	},
+})
+
+minetest.register_craft({
+	type = "shapeless",
+	output = "default:paper 9",
+	recipe = {"mobs_mammoth:leather_sheet"},
+})
+
+armor:register_armor("mobs_mammoth:brown_jacket", {
+	description = "Brown Jacket",
+	inventory_image = "brown_jacket_inv.png",
+	groups = {armor_torso=1, armor_heal=1, armor_use=400, physics_speed=0.2, physics_gravity=0.0},
+	armor_groups = {fleshy=15},
+	damage_groups = {cracky=3, snappy=2, choppy=2, crumbly=1, level=2},
+})
+
+minetest.register_craft({
+	output = "mobs_mammoth:brown_jacket",
+	recipe = {
+		{"mobs_mammoth:leather_sheet", "wool:white", "mobs_mammoth:leather_sheet"},
+		{"mobs_mammoth:leather_sheet", "", "mobs_mammoth:leather_sheet"},
+		{"mobs_mammoth:leather_sheet", "", "mobs_mammoth:leather_sheet"},
+	},
+})
+
+minetest.register_node("mobs_mammoth:snow_brick", {
+	description = "Snow Brick",
+	tiles = {"snow_brick.png"},
+	groups = {crumbly = 2, cools_lava = 1, snowy = 1},
+	is_ground_content = false,
+	sounds = default.node_sound_stone_defaults(),
+})
+
+minetest.register_craft({
+	output = "mobs_mammoth:snow_brick 4",
+	recipe = {
+	{ "default:snowblock", "default:snowblock" },
+	{ "default:snowblock", "default:snowblock", }
+	},
+})
+
+minetest.register_craft({
+	output = "default:snowblock 4",
+	recipe = { { "mobs_mammoth:snow_brick" } },
+})
+
+minetest.register_node("mobs_mammoth:ice_brick", {
+	description = "Ice Brick",
+	tiles = {"ice_brick.png"},
+	groups = {crumbly = 2, cools_lava = 1, snowy = 1},
+	is_ground_content = false,
+	sounds = default.node_sound_glass_defaults(),
+})
+
+minetest.register_craft({
+	output = "mobs_mammoth:ice_brick 4",
+	recipe = {
+	{ "default:ice", "default:ice" },
+	{ "default:ice", "default:ice" },
+	},
+})
+
+minetest.register_craft({
+	output = "default:ice 4",
+	recipe = { { "mobs_mammoth:ice_brick" } },
+})
+
+default.chest.register_chest("mobs_mammoth:leather_chest", {
+	description = "Leather Chest",
+	tiles = {
+		"leather_block_top.png",
+		"leather_block_top.png",
+		"leather_block_side.png",
+		"leather_block_side.png",
+		"leather_block_front.png",
+		"default_chest_inside.png"
+	},
+	sounds = default.node_sound_wood_defaults(),
+	sound_open = "default_chest_open",
+	sound_close = "default_chest_close",
+	groups = {choppy = 2, oddly_breakable_by_hand = 2},
+})
+
+minetest.register_craft({
+	type = "shapeless",
+	output = "mobs_mammoth:leather_chest",
+	recipe = {"default:chest", "mobs_mammoth:leather_block"},
+})
+
+if minetest.get_modpath("stairs") then
+	stairs.register_all("ice_brick", "mobs_mammoth:ice_brick",
+		{choppy = 2, oddly_breakable_by_hand = 2, flammable = 3},
+		{"ice_brick.png"},
+		"Ice Brick",
+		stairs.glass)
+	stairs.register_all("snow_brick", "mobs_mammoth:snow_brick",
+		{choppy = 2, oddly_breakable_by_hand = 2, flammable = 3},
+		{"snow_brick.png"},
+		"Snow Brick",
+		default.node_sound_stone_defaults())
+end

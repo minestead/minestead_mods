@@ -1,2 +1,7 @@
+3d_armor
 default
+dye
 mobs
+wool
+water_life?
+stairs?
