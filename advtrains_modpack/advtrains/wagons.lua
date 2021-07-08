@@ -658,7 +658,7 @@ function wagon:get_on(clicker, seatno)
 	self.seatpc[seatno] = clicker:get_player_control_bits()
 	advtrains.player_to_train_mapping[clicker:get_player_name()]=data.train_id
 	clicker:set_attach(self.object, "", self.seats[seatno].attach_offset, {x=0,y=0,z=0})
-	clicker:set_eye_offset(self.seats[seatno].view_offset, self.seats[seatno].view_offset)
+	clicker:set_eye_offset(self.seats[seatno].view_offset, { x = 0, y = 0, z = 0}) -- always centered 3d view
 end
 function wagon:get_off_plr(pname)
 	local no=self:get_seatno(pname)
