@@ -3,7 +3,7 @@
 	Tube Library 2
 	==============
 
-	Copyright (C) 2018 Joachim Stolberg
+	Copyright (C) 2018-2021 Joachim Stolberg
 
 	LGPLv2.1+
 	See LICENSE.txt for more information
@@ -63,22 +63,11 @@ local Dir6dToVector = {[0] =
 	{x=0,  y=1,  z=0},
 }
 
-local VectorToDir6d = {
-	[{x=0,  y=0,  z=1}] = 1,
-	[{x=1,  y=0,  z=0}] = 2,
-	[{x=0,  y=0, z=-1}] = 3,
-	[{x=-1, y=0,  z=0}] = 4,
-	[{x=0,  y=-1, z=0}] = 5,
-	[{x=0,  y=1,  z=0}] = 6,
-}
-
-
 tubelib2.Tube = Tube
 tubelib2.Turn180Deg = Turn180Deg
 tubelib2.DirToParam2 = DirToParam2
 tubelib2.Param2ToDir = Param2ToDir
 tubelib2.Dir6dToVector = Dir6dToVector
-tubelib2.VectorToDir6d = VectorToDir6d
 
 
 --
@@ -108,9 +97,9 @@ end
 -- Function returns param2, new_pos or nil
 function Tube:get_primary_node_param2(pos, dir)
 	local npos = vector.add(pos, Dir6dToVector[dir or 0])
-	local node = self:get_node_lvm(npos)
-	if self.primary_node_names[node.name] then
-		return node.param2, npos
+	self.node = self:get_node_lvm(npos)
+	if self.primary_node_names[self.node.name] then
+		return self.node.param2, npos
 	end
 end
 
@@ -123,44 +112,78 @@ function Tube:is_primary_node(pos, dir)
 	return self.primary_node_names[node.name]
 end
 
--- Check if node at given position is a secondary node
+-- Get secondary node at given position
 -- If dir == nil then node_pos = pos 
--- Function returns the new pos or nil
-function Tube:secondary_node(pos, dir)
+-- Function returns node and new_pos or nil
+function Tube:get_secondary_node(pos, dir)
 	local npos = vector.add(pos, Dir6dToVector[dir or 0])
 	local node = self:get_node_lvm(npos)
 	if self.secondary_node_names[node.name] then
-		return npos
+		return node, npos
 	end
+end
+
+-- Get special registered nodes at given position
+-- If dir == nil then node_pos = pos 
+-- Function returns node and new_pos or nil
+function Tube:get_special_node(pos, dir)
+	local npos = vector.add(pos, Dir6dToVector[dir or 0])
+	local node = self:get_node_lvm(npos)
+	if self.special_node_names[node.name] then
+		return node, npos
+	end
+end
+
+-- Check if node at given position is a secondary node
+-- If dir == nil then node_pos = pos 
+-- Function returns true/false
+function Tube:is_secondary_node(pos, dir)
+	local npos = vector.add(pos, Dir6dToVector[dir or 0])
+	local node = self:get_node_lvm(npos)
+	return self.secondary_node_names[node.name]
+end
+
+-- Check if node at given position is a special node
+-- If dir == nil then node_pos = pos 
+-- Function returns true/false
+function Tube:is_special_node(pos, dir)
+	local npos = vector.add(pos, Dir6dToVector[dir or 0])
+	local node = self:get_node_lvm(npos)
+	return self.special_node_names[node.name]
 end
 
 -- Check if node has a connection on the given dir
 function Tube:connected(pos, dir)
-	return self:is_primary_node(pos, dir) or self:secondary_node(pos, dir)
+	return self:is_primary_node(pos, dir) or self:is_secondary_node(pos, dir)
 end
 
 function Tube:get_next_tube(pos, dir)
 	local param2, npos = self:get_primary_node_param2(pos, dir)
 	if param2 then
-		local val = Param2ToDir[param2 % 32]
+		local val = Param2ToDir[param2 % 32] or 0
 		local dir1, dir2 = math.floor(val / 10), val % 10
-		local num_conn = math.floor(param2 / 32)
-		if Turn180Deg[dir] == dir1 then
+		local num_conn = math.floor(param2 / 32) or 0
+		local odir = Turn180Deg[dir]
+		if odir == dir1 then
 			return npos, dir2, num_conn
-		else
+		elseif odir == dir2 then
 			return npos, dir1, num_conn
 		end
+		return
 	end
 	return self:get_next_teleport_node(pos, dir)
 end
 
 -- Return param2 and tube type ("A"/"S")
 function Tube:encode_param2(dir1, dir2, num_conn)
-	if dir1 > dir2 then
-		dir1, dir2 = dir2, dir1
+	if dir1 and dir2 and num_conn then
+		if dir1 > dir2 then
+			dir1, dir2 = dir2, dir1
+		end
+		local param2, _type = unpack(DirToParam2[dir1 * 10 + dir2] or {0, "S"})
+		return (num_conn * 32) + param2, _type
 	end
-	local param2, _type = unpack(DirToParam2[dir1 * 10 + dir2] or {0, "S"})
-	return (num_conn * 32) + param2, _type
+	return 0, "S"
 end
 
 
@@ -263,13 +286,17 @@ function Tube:determine_tube_dirs(pos, preferred_pos, fdir)
 	-- Check for secondary nodes (chests and so on)
 	for dir = 1,6 do
 		if allowed[dir] then
-			local npos = self:secondary_node(pos, dir)
-			if npos then 
-				if preferred_pos and vector.equals(npos, preferred_pos) then
-					preferred_pos = nil
-					table.insert(tbl, 2, dir)
+			local node,npos = self:get_secondary_node(pos, dir)
+			if npos then
+				if self:is_valid_dir(node, Turn180Deg[dir]) == false then
+					allowed[dir] = false
 				else
-					table.insert(tbl, dir)
+					if preferred_pos and vector.equals(npos, preferred_pos) then
+						preferred_pos = nil
+						table.insert(tbl, 2, dir)
+					else
+						table.insert(tbl, dir)
+					end
 				end
 			end
 		end
@@ -311,6 +338,8 @@ function Tube:add_tube_dir(pos, dir)
 	if param2 then
 		local d1, d2, num = self:decode_param2(npos, param2)
 		if not num then return end
+		-- if invalid face, do nothing
+		if self:is_valid_dir_pos(pos, dir) == false then return end
 		-- not already connected to the new tube?
 		dir = Turn180Deg[dir]
 		if d1 ~= dir and dir ~= d2 then
@@ -358,6 +387,9 @@ end
 function Tube:get_next_teleport_node(pos, dir)
 	if pos then
 		local npos = vector.add(pos, Dir6dToVector[dir or 0])
+		if self:is_valid_dir_pos(npos, Turn180Deg[dir]) == false then
+			return
+		end
 		local meta = M(npos)
 		local s = meta:get_string("tele_pos")
 		if s ~= "" then
@@ -391,9 +423,6 @@ function Tube:walk_tube_line(pos, dir)
 			end
 			pos, dir = new_pos, new_dir
 			cnt = cnt + 1
-		end
-		if cnt > self.max_tube_length then
-			return
 		end
 		if cnt > 0 then
 			return pos, dir, cnt
