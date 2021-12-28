@@ -1,8 +1,5 @@
+local S = minetest.get_translator("pipeworks")
 local assumed_eye_pos = vector.new(0, 1.5, 0)
-
-local function vector_copy(v)
-	return { x = v.x, y = v.y, z = v.z }
-end
 
 local function delay(x)
 	return (function() return x end)
@@ -10,7 +7,7 @@ end
 
 local function set_wielder_formspec(data, meta)
 	meta:set_string("formspec",
-			"invsize[8,"..(6+data.wield_inv_height)..";]"..
+			"size[8,"..(6+data.wield_inv_height)..";]"..
 			"item_image[0,0;1,1;"..data.name_base.."_off]"..
 			"label[1,0;"..minetest.formspec_escape(data.description).."]"..
 			"list[current_name;"..minetest.formspec_escape(data.wield_inv_name)..";"..((8-data.wield_inv_width)*0.5)..",1;"..data.wield_inv_width..","..data.wield_inv_height..";]"..
@@ -39,7 +36,7 @@ local can_tool_dig_node = function(nodename, toolcaps, toolname)
 		-- but a player holding one can - the game seems to fall back to the hand.
 		-- fall back to checking the hand's properties if the tool isn't the correct one.
 		local hand_caps = minetest.registered_items[""].tool_capabilities
-		diggable = minetest.get_dig_params(nodegroups, hand_caps)
+		diggable = minetest.get_dig_params(nodegroups, hand_caps).diggable
 	end
 	return diggable
 end
@@ -259,7 +256,7 @@ if pipeworks.enable_node_breaker then
 	local wield_inv_name = "pick"
 	data = {
 		name_base = name_base,
-		description = "Node Breaker",
+		description = S("Node Breaker"),
 		texture_base = "pipeworks_nodebreaker",
 		texture_stateful = { top = true, bottom = true, side2 = true, side1 = true, front = true },
 		tube_connect_sides = { top=1, bottom=1, left=1, right=1, back=1 },
@@ -352,7 +349,7 @@ if pipeworks.enable_node_breaker then
 							{pos=pointed_thing.under, gain=sound.gain})
 					end
 					wieldstack = virtplayer:get_wielded_item()
-				else
+				--~ else
 					--pipeworks.logger(dname.."couldn't dig node!")
 				end
 			end
@@ -374,10 +371,11 @@ if pipeworks.enable_node_breaker then
 		eject_drops = true,
 	}
 	register_wielder(data)
+	pipeworks.ui_cat_tube_list[#pipeworks.ui_cat_tube_list+1] = "pipeworks:nodebreaker_off"
 	minetest.register_craft({
 		output = "pipeworks:nodebreaker_off",
 		recipe = {
-			{ "pipeworks:gear", "pipeworks:gear",   "pipeworks:gear"    },
+			{ "basic_materials:gear_steel", "basic_materials:gear_steel",   "basic_materials:gear_steel"    },
 			{ "default:stone", "mesecons:piston",   "default:stone" },
 			{ "group:wood",    "mesecons:mesecon",  "group:wood" },
 		}
@@ -408,7 +406,7 @@ end
 if pipeworks.enable_deployer then
 	register_wielder({
 		name_base = "pipeworks:deployer",
-		description = "Deployer",
+		description = S("Deployer"),
 		texture_base = "pipeworks_deployer",
 		texture_stateful = { front = true },
 		tube_connect_sides = { back=1 },
@@ -425,6 +423,7 @@ if pipeworks.enable_deployer then
 		end,
 		eject_drops = false,
 	})
+	pipeworks.ui_cat_tube_list[#pipeworks.ui_cat_tube_list+1] = "pipeworks:deployer_off"
 	minetest.register_craft({
 		output = "pipeworks:deployer_off",
 		recipe = {
@@ -441,7 +440,7 @@ end
 if pipeworks.enable_dispenser then
 	register_wielder({
 		name_base = "pipeworks:dispenser",
-		description = "Dispenser",
+		description = S("Dispenser"),
 		texture_base = "pipeworks_dispenser",
 		texture_stateful = { front = true },
 		tube_connect_sides = { back=1 },
@@ -460,6 +459,7 @@ if pipeworks.enable_dispenser then
 		end,
 		eject_drops = false,
 	})
+	pipeworks.ui_cat_tube_list[#pipeworks.ui_cat_tube_list+1] = "pipeworks:dispenser_off"
 	minetest.register_craft({
 		output = "pipeworks:dispenser_off",
 		recipe = {

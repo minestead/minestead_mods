@@ -5,11 +5,11 @@
 --
 
 pipeworks = {}
-
-local DEBUG = false
+pipeworks.ui_cat_tube_list = {}
 
 pipeworks.worldpath = minetest.get_worldpath()
 pipeworks.modpath = minetest.get_modpath("pipeworks")
+local S = minetest.get_translator("pipeworks")
 
 dofile(pipeworks.modpath.."/default_settings.lua")
 -- Read the external config file if it exists.
@@ -45,7 +45,7 @@ pipeworks.liquid_texture = "default_water.png"
 pipeworks.button_off   = {text="", texture="pipeworks_button_off.png", addopts="false;false;pipeworks_button_interm.png"}
 pipeworks.button_on    = {text="", texture="pipeworks_button_on.png",  addopts="false;false;pipeworks_button_interm.png"}
 pipeworks.button_base  = "image_button[0,4.3;1,0.6"
-pipeworks.button_label = "label[0.9,4.31;Allow splitting incoming stacks from tubes]"
+pipeworks.button_label = "label[0.9,4.31;"..S("Allow splitting incoming stacks from tubes").."]"
 
 -- Helper functions
 
@@ -70,8 +70,8 @@ function pipeworks.may_configure(pos, player)
 	local meta = minetest.get_meta(pos)
 	local owner = meta:get_string("owner")
 
-	if owner ~= "" then -- wielders and filters
-		return owner == name
+	if owner ~= "" and owner == name then -- wielders and filters
+		return true
 	end
 	return not minetest.is_protected(pos, name)
 end
@@ -100,6 +100,10 @@ end
 -- early auto-detection for finite water mode if not explicitly disabled
 if pipeworks.toggles.finite_water == nil then
 	dofile(pipeworks.modpath.."/autodetect-finite-water.lua")
+end
+
+if minetest.get_modpath("signs_lib") then
+	dofile(pipeworks.modpath.."/signs_compat.lua")
 end
 
 dofile(pipeworks.modpath.."/common.lua")
@@ -145,4 +149,16 @@ end
 
 minetest.register_alias("pipeworks:pipe", "pipeworks:pipe_110000_empty")
 
-print("Pipeworks loaded!")
+-- Unified Inventory categories integration
+
+if minetest.global_exists("unified_inventory") and unified_inventory.registered_categories then
+	if not unified_inventory.registered_categories["automation"] then
+		unified_inventory.register_category("automation", {
+			symbol = "pipeworks:lua_tube000000",
+			label = "Automation components"
+		})
+	end
+	unified_inventory.add_category_items("automation", pipeworks.ui_cat_tube_list)
+end
+
+minetest.log("info", "Pipeworks loaded!")

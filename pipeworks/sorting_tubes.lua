@@ -1,3 +1,4 @@
+local S = minetest.get_translator("pipeworks")
 local fs_helpers = pipeworks.fs_helpers
 
 if pipeworks.enable_mese_tube then
@@ -55,7 +56,7 @@ if pipeworks.enable_mese_tube then
 	end
 
 	pipeworks.register_tube("pipeworks:mese_tube", {
-			description = "Sorting Pneumatic Tube Segment",
+			description = S("Sorting Pneumatic Tube Segment"),
 			inventory_image = "pipeworks_mese_tube_inv.png",
 			noctr = {"pipeworks_mese_tube_noctr_1.png", "pipeworks_mese_tube_noctr_2.png", "pipeworks_mese_tube_noctr_3.png",
 				"pipeworks_mese_tube_noctr_4.png", "pipeworks_mese_tube_noctr_5.png", "pipeworks_mese_tube_noctr_6.png"},
@@ -107,11 +108,24 @@ if pipeworks.enable_mese_tube then
 						inv:set_size("line"..tostring(i), 6*1)
 					end
 					update_formspec(pos)
-					meta:set_string("infotext", "Sorting pneumatic tube")
+					meta:set_string("infotext", S("Sorting pneumatic tube"))
+				end,
+				after_place_node = function(pos, placer, itemstack, pointed_thing)
+					if placer and placer:is_player() and placer:get_player_control().aux1 then
+						local meta = minetest.get_meta(pos)
+						for i = 1, 6 do
+							meta:set_int("l"..tostring(i).."s", 0)
+						end
+						update_formspec(pos)
+					end
+					return pipeworks.after_place(pos, placer, itemstack, pointed_thing)
 				end,
 				on_punch = update_formspec,
 				on_receive_fields = function(pos, formname, fields, sender)
-					if not pipeworks.may_configure(pos, sender) then return end
+					if (fields.quit and not fields.key_enter_field)
+							or not pipeworks.may_configure(pos, sender) then
+						return
+					end
 					fs_helpers.on_receive_fields(pos, fields)
 					update_formspec(pos)
 				end,

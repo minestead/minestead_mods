@@ -1,7 +1,11 @@
+local S = minetest.get_translator("pipeworks")
 local filename=minetest.get_worldpath() .. "/teleport_tubes"
 
 local tp_tube_db = nil -- nil forces a read
 local tp_tube_db_version = 2.0
+
+-- cached rceiver list: hash(pos) => {receivers}
+local cache = {}
 
 local function hash(pos)
 	return string.format("%.30g", minetest.hash_node_position(pos))
@@ -17,12 +21,14 @@ local function save_tube_db()
 	else
 		error(err)
 	end
+	-- reset tp-tube cache
+	cache = {}
 end
 
 local function migrate_tube_db()
 		local tmp_db = {}
 		tp_tube_db.version = nil
-		for key, val in pairs(tp_tube_db) do
+		for _, val in pairs(tp_tube_db) do
 			if(val.channel ~= "") then -- skip unconfigured tubes
 				tmp_db[hash(val)] = val
 			end
@@ -49,19 +55,6 @@ local function read_tube_db()
 	tp_tube_db = {}
 	return tp_tube_db
 end
-
--- expose for external batch use (jumpdrive)
-pipeworks.tptube = {
-	hash = hash,
-	save_tube_db = function(...)
-		if not tp_tube_db then -- db not loaded
-			return
-		end
-		return save_tube_db(...)
-	end,
-	get_db = function() return tp_tube_db or read_tube_db() end,
-	tp_tube_db_version = tp_tube_db_version
-}
 
 -- debug formatter for coordinates used below
 local fmt = function(pos)
@@ -113,6 +106,12 @@ local function read_node_with_vm(pos)
 end
 
 local function get_receivers(pos, channel)
+	local hash = minetest.hash_node_position(pos)
+	if cache[hash] then
+		-- re-use cached result
+		return cache[hash]
+	end
+
 	local tubes = tp_tube_db or read_tube_db()
 	local receivers = {}
 	local dirty = false
@@ -133,26 +132,34 @@ local function get_receivers(pos, channel)
 	if dirty then
 		save_tube_db()
 	end
+	-- cache the result for next time
+	cache[hash] = receivers
 	return receivers
 end
 
 local function update_meta(meta, can_receive)
 	meta:set_int("can_receive", can_receive and 1 or 0)
 	local cr_state = can_receive and "on" or "off"
-	meta:set_string("formspec","size[8.6,2.2]"..
-			"field[0.6,0.6;7,1;channel;Channel:;${channel}]"..
-			"label[7.3,0;Receive]"..
-			"image_button[7.3,0.3;1,0.6;pipeworks_button_" .. cr_state .. ".png;cr" .. (can_receive and 0 or 1) .. ";;;false;pipeworks_button_interm.png]"..
-			"image[0.3,1.3;1,1;pipeworks_teleport_tube_inv.png]"..
-			"label[1.6,1.2;channels are public by default]" ..
-			"label[1.6,1.5;use <player>:<channel> for fully private channels]" ..
-			"label[1.6,1.8;use <player>\\;<channel> for private receivers]" ..
-			default.gui_bg..
-			default.gui_bg_img)
+	local itext = S("Channels are public by default").."\n"..
+		S("Use <player>:<channel> for fully private channels").."\n"..
+		S("Use <player>\\;<channel> for private receivers")
+
+	meta:set_string("formspec",
+		"size[8.5,3.5]"..
+		"image[0.2,o;1,1;pipeworks_teleport_tube_inv.png]"..
+		"label[1.2,0.2;"..S("Teleporting Tube").."]"..
+		"field[0.5,1.6;4.6,1;channel;"..S("Channel")..";${channel}]"..
+		"button[4.8,1.3;1.5,1;set_channel;"..S("Set").."]"..
+		"label[7.0,0;"..S("Receive").."]"..
+		"image_button[7.0,0.5;1,0.6;pipeworks_button_" .. cr_state .. ".png;cr" .. (can_receive and 0 or 1) .. ";;;false;pipeworks_button_interm.png]"..
+		"button_exit[6.3,1.3;2,1;close;"..S("Close").."]"..
+		"label[0.2,2.3;"..itext.."]"..
+		default.gui_bg..
+		default.gui_bg_img)
 end
 
 pipeworks.register_tube("pipeworks:teleport_tube", {
-	description = "Teleporting Pneumatic Tube Segment",
+	description = S("Teleporting Pneumatic Tube Segment"),
 	inventory_image = "pipeworks_teleport_tube_inv.png",
 	noctr = { "pipeworks_teleport_tube_noctr.png" },
 	plain = { "pipeworks_teleport_tube_plain.png" },
@@ -182,10 +189,11 @@ pipeworks.register_tube("pipeworks:teleport_tube", {
 		on_construct = function(pos)
 			local meta = minetest.get_meta(pos)
 			update_meta(meta, true)
-			meta:set_string("infotext", "unconfigured Teleportation Tube")
+			meta:set_string("infotext", S("Unconfigured Teleportation Tube"))
 		end,
 		on_receive_fields = function(pos,formname,fields,sender)
 			if not fields.channel -- ignore escaping or clientside manipulation of the form
+			or (fields.quit and not fields.key_enter_field)
 			or not pipeworks.may_configure(pos, sender) then
 				return
 			end
@@ -202,12 +210,14 @@ pipeworks.register_tube("pipeworks:teleport_tube", {
 				if name and mode and name ~= sender_name then
 					--channels starting with '[name]:' can only be used by the named player
 					if mode == ":" then
-						minetest.chat_send_player(sender_name, "Sorry, channel '"..new_channel.."' is reserved for exclusive use by "..name)
+						minetest.chat_send_player(sender_name, S("Sorry, channel '@1' is reserved for exclusive use by @2",
+							new_channel, name))
 						return
-				
+
 					--channels starting with '[name];' can be used by other players, but cannot be received from
 					elseif mode == ";" and (fields.cr1 or (can_receive ~= 0 and not fields.cr0)) then
-						minetest.chat_send_player(sender_name, "Sorry, receiving from channel '"..new_channel.."' is reserved for "..name)
+						minetest.chat_send_player(sender_name, S("Sorry, receiving from channel '@1' is reserved for @2",
+							new_channel, name))
 						return
 					end
 				end
@@ -217,7 +227,7 @@ pipeworks.register_tube("pipeworks:teleport_tube", {
 
 			-- was the channel changed?
 			local channel = meta:get_string("channel")
-			if new_channel ~= channel then
+			if new_channel ~= channel and (fields.key_enter_field == "channel" or fields.set_channel) then
 				channel = new_channel
 				meta:set_string("channel", channel)
 				dirty = true
@@ -239,11 +249,11 @@ pipeworks.register_tube("pipeworks:teleport_tube", {
 				if channel ~= "" then
 					set_tube(pos, channel, can_receive)
 					local cr_description = (can_receive == 1) and "sending and receiving" or "sending"
-					meta:set_string("infotext", string.format("Teleportation Tube %s on '%s'", cr_description, channel))
+					meta:set_string("infotext", S("Teleportation Tube @1 on '@2'", cr_description, channel))
 				else
 					-- remove empty channel tubes, to not have to search through them
 					remove_tube(pos)
-					meta:set_string("infotext", "unconfigured Teleportation Tube")
+					meta:set_string("infotext", S("Unconfigured Teleportation Tube"))
 				end
 			end
 		end,
@@ -271,3 +281,19 @@ if minetest.get_modpath("mesecons_mvps") ~= nil then
 		end
 	end)
 end
+
+-- Expose teleport tube database API for other mods
+pipeworks.tptube = {
+	hash = hash,
+--	save_tube_db = save_tube_db,
+        save_tube_db = function(...)
+            if not tp_tube_db then -- db not loaded
+                return
+            end
+            return save_tube_db(...)
+        end,
+	get_db = function() return tp_tube_db or read_tube_db() end,
+	tp_tube_db_version = tp_tube_db_version
+}
+
+                                                                                        
