@@ -496,6 +496,7 @@ function water_life.hq_attack(self,prty,tgtobj)
 		if mobkit.is_queue_empty_low(self) then
 			local meta = nil
 			local poison = 0
+			local noob = 0 -- QUICK FIX
 			local pos = mobkit.get_stand_pos(self)
 --			local tpos = tgtobj:get_pos()
 			local tpos = mobkit.get_stand_pos(tgtobj)
