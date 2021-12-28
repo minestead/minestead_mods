@@ -3,17 +3,19 @@
 	Tubelib Addons 1
 	================
 
-	Copyright (C) 2017-2019 Joachim Stolberg
+	Copyright (C) 2017-2020 Joachim Stolberg
 
-	LGPLv2.1+
+	AGPL v3
 	See LICENSE.txt for more information
 	
 	liquidsampler.lua
 	
 ]]--
 
+-- Load support for I18n
+local S = tubelib_addons1.S
+
 -- for lazy programmers
-local S = function(pos) if pos then return minetest.pos_to_string(pos) end end
 local P = minetest.string_to_pos
 local M = minetest.get_meta
 
@@ -43,7 +45,7 @@ local State = tubelib.NodeStates:new({
 	node_name_passive = "tubelib_addons1:liquidsampler",
 	node_name_active = "tubelib_addons1:liquidsampler_active",
 	node_name_defect = "tubelib_addons1:liquidsampler_defect",
-	infotext_name = "Liquid Sampler",
+	infotext_name = S("Liquid Sampler"),
 	cycle_time = CYCLE_TIME,
 	standby_ticks = STANDBY_TICKS,
 	has_item_meter = true,
@@ -80,10 +82,10 @@ local function sample_liquid(pos, meta)
 			inv:add_item("dst", ItemStack(giving_back))
 			State:keep_running(pos, meta, COUNTDOWN_TICKS)
 		else
-			State:idle(pos, meta)
+			State:blocked(pos, meta)
 		end
 	else
-		State:fault(pos, meta)
+		State:idle(pos, meta)
 	end
 	State:idle(pos, meta)
 end
@@ -128,7 +130,7 @@ local function on_receive_fields(pos, formname, fields, player)
 end
 
 minetest.register_node("tubelib_addons1:liquidsampler", {
-	description = "Liquid Sampler",
+	description = S("Liquid Sampler"),
 	tiles = {
 		-- up, down, right, left, back, front
 		'tubelib_front.png',
@@ -159,8 +161,8 @@ minetest.register_node("tubelib_addons1:liquidsampler", {
 		return inv:is_empty("dst") and inv:is_empty("src")
 	end,
 
-	after_dig_node = function(pos, oldnode, oldmetadata, digger)
-		State:after_dig_node(pos, oldnode, oldmetadata, digger)
+	on_dig = function(pos, node, player)
+		State:on_dig_node(pos, node, player)
 		tubelib.remove_node(pos)
 	end,
 	
@@ -171,7 +173,6 @@ minetest.register_node("tubelib_addons1:liquidsampler", {
 	allow_metadata_inventory_move = allow_metadata_inventory_move,
 	allow_metadata_inventory_take = allow_metadata_inventory_take,
 
-	drop = "",
 	paramtype = "light",
 	sunlight_propagates = true,
 	paramtype2 = "facedir",
@@ -181,7 +182,7 @@ minetest.register_node("tubelib_addons1:liquidsampler", {
 })
 
 minetest.register_node("tubelib_addons1:liquidsampler_active", {
-	description = "Liquid Sampler",
+	description = S("Liquid Sampler"),
 	tiles = {
 		-- up, down, right, left, back, front
 		'tubelib_front.png',
@@ -201,6 +202,9 @@ minetest.register_node("tubelib_addons1:liquidsampler_active", {
 		'tubelib_addons1_liquidsampler.png',
 	},
 
+	diggable = false,
+	can_dig = function() return false end,
+
 	on_rotate = screwdriver.disallow,
 	on_timer = keep_running,
 	on_receive_fields = on_receive_fields,
@@ -217,7 +221,7 @@ minetest.register_node("tubelib_addons1:liquidsampler_active", {
 })
 
 minetest.register_node("tubelib_addons1:liquidsampler_defect", {
-	description = "Liquid Sampler",
+	description = S("Liquid Sampler"),
 	tiles = {
 		-- up, down, right, left, back, front
 		'tubelib_front.png',
@@ -277,6 +281,7 @@ minetest.register_craft({
 
 tubelib.register_node("tubelib_addons1:liquidsampler", 
 	{"tubelib_addons1:liquidsampler_active", "tubelib_addons1:liquidsampler_defect"}, {
+	invalid_sides = {"L"},
 	on_pull_item = function(pos, side)
 		return tubelib.get_item(M(pos), "dst")
 	end,

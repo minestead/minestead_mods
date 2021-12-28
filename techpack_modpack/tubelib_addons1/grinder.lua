@@ -3,9 +3,9 @@
 	Tubelib Addons 1
 	================
 
-	Copyright (C) 2017-2019 Joachim Stolberg
+	Copyright (C) 2017-2020 Joachim Stolberg
 
-	LGPLv2.1+
+	AGPL v3
 	See LICENSE.txt for more information
 
 	grinder.lua
@@ -14,8 +14,10 @@
 	
 ]]--
 
+-- Load support for I18n
+local S = tubelib_addons1.S
+
 -- for lazy programmers
-local S = function(pos) if pos then return minetest.pos_to_string(pos) end end
 local P = minetest.string_to_pos
 local M = minetest.get_meta
 
@@ -49,7 +51,7 @@ local State = tubelib.NodeStates:new({
 	node_name_passive = "tubelib_addons1:grinder",
 	node_name_active = "tubelib_addons1:grinder_active",
 	node_name_defect = "tubelib_addons1:grinder_defect",
-	infotext_name = "Tubelib Grinder",
+	infotext_name = S("Tubelib Grinder"),
 	cycle_time = CYCLE_TIME,
 	standby_ticks = STANDBY_TICKS,
 	has_item_meter = true,
@@ -81,7 +83,7 @@ local function allow_metadata_inventory_take(pos, listname, index, stack, player
 end
 
 local function grinding(pos, meta, inv)
-	for _,stack in ipairs(inv:get_list("src")) do
+	for _,stack in ipairs(inv:get_list("src") or {}) do
 		if not stack:is_empty() then
 			local name = stack:get_name()
 			if Recipes[name] then
@@ -120,7 +122,7 @@ local function on_receive_fields(pos, formname, fields, player)
 end
 
 minetest.register_node("tubelib_addons1:grinder", {
-	description = "Tubelib Grinder",
+	description = S("Tubelib Grinder"),
 	tiles = {
 		-- up, down, right, left, back, front
 		'tubelib_addons1_grinder.png',
@@ -147,10 +149,11 @@ minetest.register_node("tubelib_addons1:grinder", {
 		return inv:is_empty("dst") and inv:is_empty("src")
 	end,
 
-	after_dig_node = function(pos, oldnode, oldmetadata, digger)
-		State:after_dig_node(pos, oldnode, oldmetadata, digger)
+	on_dig = function(pos, node, player)
+		State:on_dig_node(pos, node, player)
 		tubelib.remove_node(pos)
 	end,
+	
 	
 	on_rotate = screwdriver.disallow,
 	on_timer = keep_running,
@@ -159,7 +162,6 @@ minetest.register_node("tubelib_addons1:grinder", {
 	allow_metadata_inventory_move = allow_metadata_inventory_move,
 	allow_metadata_inventory_take = allow_metadata_inventory_take,
 
-	drop = "",
 	paramtype = "light",
 	sunlight_propagates = true,
 	paramtype2 = "facedir",
@@ -170,7 +172,7 @@ minetest.register_node("tubelib_addons1:grinder", {
 
 
 minetest.register_node("tubelib_addons1:grinder_active", {
-	description = "Tubelib Grinder",
+	description = S("Tubelib Grinder"),
 	tiles = {
 		-- up, down, right, left, back, front
 		{
@@ -191,6 +193,9 @@ minetest.register_node("tubelib_addons1:grinder_active", {
 		"tubelib_front.png",
 	},
 
+	diggable = false,
+	can_dig = function() return false end,
+
 	on_rotate = screwdriver.disallow,
 	on_timer = keep_running,
 	on_receive_fields = on_receive_fields,
@@ -207,7 +212,7 @@ minetest.register_node("tubelib_addons1:grinder_active", {
 })
 
 minetest.register_node("tubelib_addons1:grinder_defect", {
-	description = "Tubelib Grinder",
+	description = S("Tubelib Grinder"),
 	tiles = {
 		-- up, down, right, left, back, front
 		'tubelib_addons1_grinder.png',
@@ -296,7 +301,7 @@ tubelib.register_node("tubelib_addons1:grinder",
 
 if minetest.global_exists("unified_inventory") then
 	unified_inventory.register_craft_type("grinding", {
-		description = "Grinding",
+		description = S("Grinding"),
 		icon = 'tubelib_addons1_grinder.png',
 		width = 1,
 		height = 1,
@@ -310,34 +315,162 @@ function tubelib.add_grinder_recipe(recipe)
 		recipe.type = "grinding"
 		unified_inventory.register_craft(recipe)
 	end
-end	
-
-
-tubelib.add_grinder_recipe({input="default:cobble", output="default:gravel"})
-tubelib.add_grinder_recipe({input="default:desert_cobble", output="default:gravel"})
-tubelib.add_grinder_recipe({input="default:mossycobble", output="default:gravel"})
-tubelib.add_grinder_recipe({input="default:gravel", output="default:sand"})
-tubelib.add_grinder_recipe({input="gravelsieve:sieved_gravel", output="default:sand"})
-tubelib.add_grinder_recipe({input="default:coral_skeleton", output="default:silver_sand"})
-tubelib.add_grinder_recipe({input="tubelib:basalt_stone", output="default:silver_sand"})
-
-if minetest.global_exists("skytest") then
-	tubelib.add_grinder_recipe({input="default:desert_sand", output="skytest:dust"})
-	tubelib.add_grinder_recipe({input="default:silver_sand", output="skytest:dust"})
-	tubelib.add_grinder_recipe({input="default:sand", output="skytest:dust"})
-	tubelib.add_grinder_recipe({input="skytest:dust 12", output="skytest:powder"})
-else
-	tubelib.add_grinder_recipe({input="default:desert_sand", output="default:clay"})
-	tubelib.add_grinder_recipe({input="default:silver_sand", output="default:clay"})
-	tubelib.add_grinder_recipe({input="default:sand", output="default:clay"})
 end
 
-tubelib.add_grinder_recipe({input="default:sandstone", output="default:sand 4"})
-tubelib.add_grinder_recipe({input="default:desert_sandstone", output="default:desert_sand 4"})
-tubelib.add_grinder_recipe({input="default:silver_sandstone", output="default:silver_sand 4"})
+local function remove_unified_inventory_recipe(recipe)
+	if recipe.input and recipe.output then
+		local output_name = ItemStack(recipe.output):get_name()
+		local crafts = unified_inventory.crafts_for.recipe[output_name]
+		if crafts then
+			for i, craft in ipairs(crafts) do
+				if craft.type == recipe.type
+					and ItemStack(craft.output):get_name() == output_name
+					and #craft.items == 1
+					and craft.items[1] == recipe.input
+				then
+					table.remove(crafts, i)
+					break
+				end
+			end
+		end
+	elseif recipe.input then
+		for output_name, crafts in pairs(unified_inventory.crafts_for.recipe) do
+			for i, craft in ipairs(crafts) do
+				if craft.type == recipe.type
+					and #craft.items == 1
+					and craft.items[1] == recipe.input
+				then
+					table.remove(crafts, i)
+					break
+				end
+			end
+		end
+	elseif recipe.output then
+		local output_name = ItemStack(recipe.output):get_name()
+		local crafts = unified_inventory.crafts_for.recipe[output_name]
+		if crafts then
+			for i, craft in ipairs(crafts) do
+				if craft.type == recipe.type
+					and ItemStack(craft.output):get_name() == output_name then
+					table.remove(crafts, i)
+					break
+				end
+			end
+		end
+	end
+end
 
-tubelib.add_grinder_recipe({input="default:tree", output="default:leaves 8"})
-tubelib.add_grinder_recipe({input="default:jungletree", output="default:jungleleaves 8"})
-tubelib.add_grinder_recipe({input="default:pine_tree", output="default:pine_needles 8"})
-tubelib.add_grinder_recipe({input="default:acacia_tree", output="default:acacia_leaves 8"})
-tubelib.add_grinder_recipe({input="default:aspen_tree", output="default:aspen_leaves 8"})
+function tubelib.remove_grinder_recipe(recipe)
+	if recipe.input and recipe.output then
+		if Recipes[recipe.input]:get_name() ~= ItemStack(recipe.output):get_name() then
+			return
+		end
+		Recipes[recipe.input] = nil
+	elseif recipe.input then
+		Recipes[recipe.input] = nil
+	elseif recipe.output then
+		local output_name = ItemStack(recipe.output):get_name()
+		for input_name, output in pairs(Recipes) do
+			if output:get_name() == output_name then
+				Recipes[input_name] = nil
+			end
+		end
+	end
+	if minetest.global_exists("unified_inventory") then
+		remove_unified_inventory_recipe({
+			input = recipe.input,
+			output = recipe.output,
+			type = "grinding"
+		})
+	end
+end
+
+for k,v in pairs({
+	["default:cobble"] = "default:gravel",
+	["default:desert_cobble"] = "default:gravel",
+	["default:mossycobble"] = "default:gravel",
+	["default:gravel"] = "default:sand",
+	["gravelsieve:sieved_gravel"] = "default:sand",
+	["default:coral_skeleton"] = "default:silver_sand",
+	["tubelib:basalt_stone"] = "default:silver_sand",
+	["default:sandstone"] = "default:sand 4",
+	["default:desert_sandstone"] = "default:desert_sand 4",
+	["default:silver_sandstone"] = "default:silver_sand 4",
+	["default:tree"] = "default:leaves 8",
+	["default:jungletree"] = "default:jungleleaves 8",
+	["default:pine_tree"] = "default:pine_needles 8",
+	["default:acacia_tree"] = "default:acacia_leaves 8",
+	["default:aspen_tree"] = "default:aspen_leaves 8"}
+) do
+	tubelib.add_grinder_recipe({input=k, output=v})
+end
+
+if minetest.global_exists("skytest") then
+	temprec = {
+["default:desert_sand"] = "skytest:dust",
+["default:silver_sand"] = "skytest:dust",
+["default:sand"] = "skytest:dust",
+["skytest:dust 12"] = "skytest:powder"}
+else
+	temprec = {
+["default:desert_sand"] = "default:clay",
+["default:silver_sand"] = "default:clay",
+["default:sand"] = "default:clay"}
+end
+
+for k,v in pairs(temprec) do tubelib.add_grinder_recipe({input=k, output=v}) end
+temprec = nil
+
+if minetest.get_modpath("underch") then
+	for regnodename,v in pairs(minetest.registered_nodes) do
+		if string.find(regnodename, "underch:") then
+			if string.find(regnodename, "_cobble") and not string.find(regnodename, "_wall") then
+				print("tubelib.add_grinder_recipe: " .. regnodename)
+				tubelib.add_grinder_recipe({input=regnodename, output="default:gravel"})
+			end
+		end
+	end
+end
+
+--Ethereal trees
+if minetest.get_modpath("ethereal") then
+	for k,v in pairs({
+		["ethereal:sakura_trunk"] = "ethereal:sakura_leaves 8",
+		["ethereal:willow_trunk"] = "ethereal:willow_twig 8",
+		["ethereal:redwood_trunk"] = "ethereal:redwood_leaves 8",
+		["ethereal:frost_tree"] = "ethereal:frost_leaves 8",
+		["ethereal:yellow_trunk"] = "ethereal:yellowleaves 8",
+		["ethereal:palm_trunk"] = "ethereal:palmleaves 8",
+		["ethereal:banana_trunk"] = "ethereal:bananaleaves 8",
+		["ethereal:birch_trunk"] = "ethereal:birch_leaves 8",
+		["ethereal:bamboo"] = "ethereal:bamboo_leaves 8",
+		["ethereal:olive_trunk"] = "ethereal:olive_leaves 8"}
+	) do tubelib.add_grinder_recipe({input=k, output=v}) end
+end
+
+-- Cool Trees
+for _,v in pairs({
+		"baldcypress",
+		"bamboo",
+		"birch",
+		"cherrytree",
+		"chestnuttree",
+		"clementinetree",
+		"ebony",
+		"hollytree",
+		"larch",
+		"lemontree",
+		"mahogany",
+		"maple",
+		"oak",
+		"palm",
+		"plumtree",
+		"pomegranate",
+		"willow"
+	 }) do
+		if minetest.get_modpath(v) then tubelib.add_grinder_recipe({input=v .. ":trunk", output=v .. ":leaves 8"}) end
+end
+
+if minetest.get_modpath("jacaranda") then tubelib.add_grinder_recipe({input="jacaranda:trunk", output = "jacaranda:blossom_leaves 8"}) end
+
+

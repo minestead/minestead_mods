@@ -5,9 +5,9 @@
 
 	Part of the SmartLine mod
 	
-	Copyright (C) 2018 Joachim Stolberg
+	Copyright (C) 2017-2020 Joachim Stolberg
 
-	LGPLv2.1+
+	AGPL v3
 	See LICENSE.txt for more information
 
 	command.lua:
@@ -37,6 +37,8 @@ end
 -- '#' is used as placeholder for rule numbers and has to be escaped
 function smartline.escape(s)
 	s = tostring(s)
+	s  = s:gsub('\\', '')  -- to prevent code injection!!!
+	s  = s:gsub('"', '\\"')  -- to prevent code injection!!!
 	return s:gsub("#", '"..string.char(35).."')
 end
 
@@ -431,7 +433,7 @@ smartline.icta_register_action("chat", {
 		},
 	},
 	code = function(data, environ) 
-		return 'minetest.chat_send_player("'..environ.owner..'", "[SmartLine Controller] '..data.text..'")'
+		return 'minetest.chat_send_player("'..environ.owner..'", "[SmartLine Controller] '..smartline.escape(data.text)..'")'
 	end,
 	button = function(data, environ) 
 		return 'chat("'..data.text:sub(1,12)..'")'
@@ -518,7 +520,7 @@ smartline.icta_register_condition("playerdetector", {
 	},
 	
 	code = function(data, environ) 
-		return 'smartline.icta_player_detect("'..data.number..'", "'..data.name..'")', "~= nil"
+		return 'smartline.icta_player_detect("'..data.number..'", "'..smartline.escape(data.name)..'")', "~= nil"
 	end,
 	button = function(data, environ) 
 		return "detector("..sl.fmt_number(data.number)..","..data.name:sub(1,8)..")"

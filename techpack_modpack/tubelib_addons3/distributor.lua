@@ -3,9 +3,9 @@
 	Tubelib Addons 3
 	================
 
-	Copyright (C) 2018-2019 Joachim Stolberg
+	Copyright (C) 2017-2020 Joachim Stolberg
 
-	LGPLv2.1+
+	AGPL v3
 	See LICENSE.txt for more information
 
 	distributor.lua:
@@ -13,8 +13,10 @@
 	A high performance distributor
 ]]--
 
+-- Load support for I18n
+local S = tubelib_addons3.S
+
 -- for lazy programmers
-local S = function(pos) if pos then return minetest.pos_to_string(pos) end end
 local P = minetest.string_to_pos
 local M = minetest.get_meta
 
@@ -55,7 +57,7 @@ local State = tubelib.NodeStates:new({
 	node_name_passive = "tubelib_addons3:distributor",
 	node_name_active = "tubelib_addons3:distributor_active",
 	node_name_defect = "tubelib_addons3:distributor_defect",
-	infotext_name = "HighPerf Distributor",
+	infotext_name = S("HighPerf Distributor"),
 	cycle_time = CYCLE_TIME,
 	standby_ticks = STANDBY_TICKS,
 	aging_factor = 50,
@@ -110,6 +112,14 @@ local function random_list_elem(list)
 	end
 end
 
+local function rearrange_table(t)
+	if #t > 1 then
+		local elem = table.remove(t, 1)
+		table.insert(t, elem)
+	end
+	return t
+end
+
 local Side2Color = {B="red", L="green", F="blue", R="yellow"}
 local SlotColors = {"red", "green", "blue", "yellow"}
 local Num2Ascii = {"B", "L", "F", "R"} 
@@ -143,30 +153,38 @@ local function filter_settings(pos)
 end
 
 local function allow_metadata_inventory_put(pos, listname, index, stack, player)
-	local meta = M(pos)
-	local inv = meta:get_inventory()
-	local list = inv:get_list(listname)
-	
 	if minetest.is_protected(pos, player:get_player_name()) then
 		return 0
 	end
+	
+	local meta = M(pos)
+	local inv = meta:get_inventory()
+	local list = inv:get_list(listname)
+	local stack_count = stack:get_count()
+	
 	if listname == "src" then
 		if State:get_state(M(pos)) == tubelib.STANDBY then
 			State:start(pos, meta)
 		end
-		return stack:get_count()
-	elseif invlist_num_entries(list) < NUM_FILTER_ELEM then
-		filter_settings(pos)
-		return 1
+		return stack_count
 	end
-	return 0
+	
+	local space_left = NUM_FILTER_ELEM - invlist_num_entries(list)
+	if space_left <= 0 then
+		return 0
+	end
+	
+	filter_settings(pos)
+	return 1
 end
 
 local function allow_metadata_inventory_take(pos, listname, index, stack, player)
 	if minetest.is_protected(pos, player:get_player_name()) then
 		return 0
 	end
-	filter_settings(pos)
+	if listname ~= "src" then
+		filter_settings(pos)
+	end
 	return stack:get_count()
 end
 
@@ -194,7 +212,10 @@ local function distributing(pos, meta)
 	local open_ports = table.copy(FilterCache[hash].OpenPorts)
 	
 	-- no filter configured?
-	if not next(kvFilterItemNames) and not next(open_ports) then return end
+	if not next(kvFilterItemNames) and not next(open_ports) then 
+		State:idle(pos, meta)
+		return
+	end
 	
 	local busy = false
 	local inv = meta:get_inventory()
@@ -215,23 +236,26 @@ local function distributing(pos, meta)
 		local num = stack:get_count()
 		local second_try = false
 		-- try configured output ports
-		local side = random_list_elem(kvFilterItemNames[name])
-		if side then  -- configured
+		for _, side in ipairs(kvFilterItemNames[name] or {}) do  -- configured
 			if tubelib.push_items(pos, side, stack, player_name) then
 				stack:set_count(0)
 				local color = Side2Color[side]
 				counter[color] = counter[color] + num
+				rearrange_table(kvFilterItemNames[name])
 				busy = true
-			else
-				second_try = true  -- port blocked
+				break
+			elseif num ~= stack:get_count() then
+				local color = Side2Color[side]
+				counter[color] = counter[color] + stack:get_count()
+				rearrange_table(kvFilterItemNames[name])
+				busy = true
+				break
 			end
-		else
-			second_try = true  -- not configured
 		end
 		
 		-- try unconfigured open output ports
-		if second_try and (not kvFilterItemNames[name] or #kvFilterItemNames[name] == 1) then
-			side = random_list_elem(open_ports)
+		if not busy then
+			local side = random_list_elem(open_ports)
 			if side then
 				if tubelib.push_items(pos, side, stack, player_name) then
 					stack:set_count(0)
@@ -239,6 +263,10 @@ local function distributing(pos, meta)
 					counter[color] = counter[color] + num
 					busy = true
 				end
+			elseif num ~= stack:get_count() then
+				local color = Side2Color[side]
+				counter[color] = counter[color] + stack:get_count()
+				busy = true
 			end
 		end
 	end
@@ -267,7 +295,7 @@ local function on_receive_fields(pos, formname, fields, player)
 		return
 	end
 	local meta = M(pos)
-	local filter = minetest.deserialize(meta:get_string("filter"))
+	local filter = minetest.deserialize(meta:get_string("filter")) or {false,false,false,false}
 	if fields.filter1 ~= nil then
 		filter[1] = fields.filter1 == "true"
 	elseif fields.filter2 ~= nil then
@@ -292,7 +320,7 @@ end
 local function change_filter_settings(pos, slot, val)
 	local slots = {["red"] = 1, ["green"] = 2, ["blue"] = 3, ["yellow"] = 4}
 	local meta = M(pos)
-	local filter = minetest.deserialize(meta:get_string("filter"))
+	local filter = minetest.deserialize(meta:get_string("filter")) or {false,false,false,false}
 	local num = slots[slot] or 1
 	if num >= 1 and num <= 4 then
 		filter[num] = val == "on"
@@ -306,7 +334,7 @@ local function change_filter_settings(pos, slot, val)
 end
 
 minetest.register_node("tubelib_addons3:distributor", {
-	description = "HighPerf Distributor",
+	description = S("HighPerf Distributor"),
 	tiles = {
 		-- up, down, right, left, back, front
 		'tubelib_distributor.png^tubelib_addons3_node_frame.png',
@@ -343,9 +371,9 @@ minetest.register_node("tubelib_addons3:distributor", {
 		local inv = M(pos):get_inventory()
 		return inv:is_empty("src")
 	end,
-
-	after_dig_node = function(pos, oldnode, oldmetadata, digger)
-		State:after_dig_node(pos, oldnode, oldmetadata, digger)
+	
+	on_dig = function(pos, node, player)
+		State:on_dig_node(pos, node, player)
 		tubelib.remove_node(pos)
 	end,
 	
@@ -356,7 +384,6 @@ minetest.register_node("tubelib_addons3:distributor", {
 	on_timer = keep_running,
 	on_rotate = screwdriver.disallow,
 	
-	drop = "",
 	paramtype = "light",
 	sunlight_propagates = true,
 	paramtype2 = "facedir",
@@ -367,7 +394,7 @@ minetest.register_node("tubelib_addons3:distributor", {
 
 
 minetest.register_node("tubelib_addons3:distributor_active", {
-	description = "HighPerf Distributor",
+	description = S("HighPerf Distributor"),
 	tiles = {
 		-- up, down, right, left, back, front
 		{
@@ -396,6 +423,9 @@ minetest.register_node("tubelib_addons3:distributor_active", {
 	on_timer = keep_running,
 	on_rotate = screwdriver.disallow,
 
+	diggable = false,
+	can_dig = function() return false end,
+
 	paramtype = "light",
 	sunlight_propagates = true,
 	paramtype2 = "facedir",
@@ -405,7 +435,7 @@ minetest.register_node("tubelib_addons3:distributor_active", {
 })
 
 minetest.register_node("tubelib_addons3:distributor_defect", {
-	description = "HighPerf Distributor",
+	description = S("HighPerf Distributor"),
 	tiles = {
 		-- up, down, right, left, back, front
 		'tubelib_distributor.png^tubelib_addons3_node_frame.png',
@@ -477,6 +507,9 @@ tubelib.register_node("tubelib_addons3:distributor",
 	{"tubelib_addons3:distributor_active", "tubelib_addons3:distributor_defect"}, {
 	on_pull_item = function(pos, side)
 		return tubelib.get_item(M(pos), "src")
+	end,
+	on_pull_stack = function(pos, side)
+		return tubelib.get_stack(M(pos), "src")
 	end,
 	on_push_item = function(pos, side, item)
 		return tubelib.put_item(M(pos), "src", item)

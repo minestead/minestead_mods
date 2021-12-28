@@ -3,9 +3,9 @@
 	Tubelib Addons 3
 	================
 
-	Copyright (C) 2017-2018 Joachim Stolberg
+	Copyright (C) 2017-2020 Joachim Stolberg
 
-	LGPLv2.1+
+	AGPL v3
 	See LICENSE.txt for more information
 	
 	teleporter.lua
@@ -14,14 +14,18 @@
 
 ]]--
 
+-- Load support for I18n
+local S = tubelib_addons3.S
+local M = minetest.get_meta
+
 local Tube = tubelib.Tube
 
 local sFormspec = "size[7.5,3]"..
-	"field[0.5,1;7,1;channel;Enter channel string;]" ..
-	"button_exit[2,2;3,1;exit;Save]"
+	"field[0.5,1;7,1;channel;"..S("Enter channel string")..";]" ..
+	"button_exit[2,2;3,1;exit;"..S("Save").."]"
 
 minetest.register_node("tubelib_addons3:teleporter", {
-	description = "Tubelib Teleporter",
+	description = S("Tubelib Teleporter"),
 	tiles = {
 		-- up, down, right, left, back, front
 		'tubelib_addons3_chest_bottom.png',
@@ -35,7 +39,7 @@ minetest.register_node("tubelib_addons3:teleporter", {
 	after_place_node = function(pos, placer)
 		tubelib.add_node(pos, "tubelib_addons3:teleporter")
 		-- determine the tube side
-		local tube_dir = ((minetest.dir_to_facedir(placer:get_look_dir()) + 1) % 4) + 1
+		local tube_dir = tubelib2.side_to_dir("R", minetest.dir_to_facedir(placer:get_look_dir()))
 		Tube:prepare_pairing(pos, tube_dir, sFormspec)
 		Tube:after_place_node(pos, {tube_dir})
 	end,
@@ -72,3 +76,4 @@ minetest.register_craft({
 })
 
 Tube:add_secondary_node_names({"tubelib_addons3:teleporter"})
+Tube:set_valid_sides("tubelib_addons3:teleporter", {"R"})

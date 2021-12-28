@@ -1,6 +1,180 @@
 # Release Notes for ModPack TechPack [techpack]
 
 
+## V2.06.00 (2021-06-06)
+
+### Additions
+- Add chest cart for the mod minecart (optional)
+- Add support for the mod "underch" (#88)
+
+### Removals
+
+### Changes
+- Account for new red & yellow pepper varieties (#86)
+- Pusher improvements (#84, #83)
+
+### Fixes
+- Fix crash with "ethereal:strawberry" (#89)
+
+
+## V2.05.00 (2021-01-24)
+
+### Additions
+
+### Removals
+
+### Changes
+- Pushers only connect from the left & right
+- Detectors only connect from the left & right, still need condition to stop pushing in from the right
+- Funnels refuse to connect from the top
+- Liquid samplers & quarries refuse to connect from the front (left)
+- Black hole push filter replaced with valid_sides logic
+
+### Fixes
+- Pushers can be used to send items into the invalid faces of a node (#72)
+
+
+## V2.04.01 (2020-12-18)
+
+### Additions
+
+### Removals
+
+### Changes
+- Suggestion to check replanting against commonly plantable nodes
+  instead of quarry-able GroundNodes (pull request #60 from oversword)
+- Add a on_blast callback to tubes so they update after being destroyed
+  (pull request #58 from oversword)
+- Disallow non-fuel items to be accepted as fuel quarries and harvesters
+  (pull request #57 from oversword)
+- Check harvester protection for each node it attempts to harvest
+  (pull request #59 from oversword)
+
+### Fixes
+- Warehouse voiding items when both pushing in and pulling out
+  (issue #61, fixed by oversword)
+
+
+
+## V2.04.00 (2020-11-20)
+
+### Additions
+- Add minetest.translator support (issue #56)
+- Add German translation
+- Add new minetest v5 nodes
+
+### Removals
+
+### Changes
+- Switch from LGPL to AGPL v3
+
+### Fixes
+- tubelib_addons2:doorblock works incorrectly (issue #55)
+
+
+
+## V2.03.12 (2020-07-23)
+
+### Additions
+
+### Removals
+
+### Changes
+
+### Fixes
+- string.split bugfix (issue #49)
+
+
+## V2.03.11 (2020-07-21)
+
+### Additions
+
+### Removals
+
+### Changes
+
+### Fixes
+- SaferLua Controller comments bugfix (issue #48)
+- SmartLine Controller bugfix
+
+
+## V2.03.10 (2020-06-06)
+
+### Additions
+
+### Removals
+
+### Changes
+Merged fork from BlockySurvival back to base (pull request #46)
+
+### Fixes
+
+
+
+## V2.03.09 (2020-03-23)
+
+### Additions
+
+### Removals
+
+### Changes
+Tubelib database optimized to reduce the size of the mod storage file (based on issue #41)
+
+### Fixes
+
+
+
+## V2.03.08 (2020-03-03)
+
+### Additions
+
+### Removals
+
+### Changes
+
+### Fixes
+Set Idle state instead of fault when there is no liquid (issue #44)
+
+
+
+## V2.03.07 (2019-09-14)
+
+### Additions
+
+### Removals
+
+### Changes
+
+### Fixes
+- Stack overflow bugfix for the detector from fluxionary (issue #39)
+
+
+
+## V2.03.06 (2019-08-08)
+
+### Additions
+
+### Removals
+
+### Changes
+
+### Fixes
+- Fixes to distributor metadata_inventory functions
+
+
+
+## V2.03.05 (2019-08-06)
+
+### Additions
+- Tubelib_addons3 "HighPerf Funnel" added (see isssue #36)
+
+### Removals
+
+### Changes
+
+### Fixes
+
+
 
 ## V2.03.04 (2019-07-20)
 

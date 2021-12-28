@@ -3,9 +3,9 @@
 	Tube Library
 	============
 
-	Copyright (C) 2017 Joachim Stolberg
+	Copyright (C) 2017-2020 Joachim Stolberg
 
-	LGPLv2.1+
+	AGPL v3
 	See LICENSE.txt for more information
 
 	pusher.lua:
@@ -29,21 +29,25 @@
 --               |        |/
 --               +--------+
 
+-- Load support for I18n
+local S = tubelib.S
+
 -- for lazy programmers
-local S = function(pos) if pos then return minetest.pos_to_string(pos) end end
 local P = minetest.string_to_pos
 local M = minetest.get_meta
 
 local STANDBY_TICKS = 5
 local COUNTDOWN_TICKS = 5
 local CYCLE_TIME = 2
+local FIRST_CYCLE = 0.5
 
 local State = tubelib.NodeStates:new({
 	node_name_passive = "tubelib:pusher",
 	node_name_active = "tubelib:pusher_active",
 	node_name_defect = "tubelib:pusher_defect",
-	infotext_name = "Tubelib Pusher",
+	infotext_name = S("Tubelib Pusher"),
 	cycle_time = CYCLE_TIME,
+	first_cycle_time = FIRST_CYCLE,
 	standby_ticks = STANDBY_TICKS,
 	has_item_meter = true,
 	aging_factor = 10,
@@ -59,7 +63,9 @@ local function pushing(pos, meta)
 			State:blocked(pos, meta)
 			return
 		end
-		State:keep_running(pos, meta, COUNTDOWN_TICKS)
+		if State.get_state(pos, meta) ~= tubelib.STOPPED then
+			State:keep_running(pos, meta, COUNTDOWN_TICKS)
+		end
 		return
 	end
 	State:idle(pos, meta)
@@ -75,7 +81,7 @@ local function keep_running(pos, elapsed)
 end	
 
 minetest.register_node("tubelib:pusher", {
-	description = "Tubelib Pusher",
+	description = S("Tubelib Pusher"),
 	tiles = {
 		-- up, down, right, left, back, front
 		'tubelib_pusher1.png',
@@ -99,15 +105,14 @@ minetest.register_node("tubelib:pusher", {
 		end
 	end,
 
-	after_dig_node = function(pos, oldnode, oldmetadata, digger)
-		tubelib.remove_node(pos) -- <<=== tubelib
-		State:after_dig_node(pos, oldnode, oldmetadata, digger)
+	on_dig = function(pos, node, player)
+		State:on_dig_node(pos, node, player)
+		tubelib.remove_node(pos)
 	end,
 	
 	on_timer = keep_running,
 	on_rotate = screwdriver.disallow,
 
-	drop = "",
 	paramtype = "light",
 	sunlight_propagates = true,
 	paramtype2 = "facedir",
@@ -118,7 +123,7 @@ minetest.register_node("tubelib:pusher", {
 
 
 minetest.register_node("tubelib:pusher_active", {
-	description = "Tubelib Pusher",
+	description = S("Tubelib Pusher"),
 	tiles = {
 		-- up, down, right, left, back, front
 		{
@@ -173,7 +178,10 @@ minetest.register_node("tubelib:pusher_active", {
 	
 	on_timer = keep_running,
 	on_rotate = screwdriver.disallow,
-	
+
+	diggable = false,
+	can_dig = function() return false end,
+
 	paramtype = "light",
 	sunlight_propagates = true,
 	paramtype2 = "facedir",
@@ -183,7 +191,7 @@ minetest.register_node("tubelib:pusher_active", {
 })
 
 minetest.register_node("tubelib:pusher_defect", {
-	description = "Tubelib Pusher",
+	description = S("Tubelib Pusher"),
 	tiles = {
 		-- up, down, right, left, back, front
 		'tubelib_pusher1.png',
@@ -234,7 +242,7 @@ tubelib.register_node("tubelib:pusher",
 	on_push_item = nil,			-- pusher has no inventory
 	on_unpull_item = nil,		-- pusher has no inventory
 	is_pusher = true,           -- is a pulling/pushing node
-	
+	valid_sides = {"R","L"},
 	on_recv_message = function(pos, topic, payload)
 		local resp = State:on_receive_message(pos, topic, payload)
 		if resp then

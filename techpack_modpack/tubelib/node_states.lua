@@ -3,9 +3,9 @@
 	Tube Library
 	============
 
-	Copyright (C) 2017-2019 Joachim Stolberg
+	Copyright (C) 2017-2020 Joachim Stolberg
 
-	LGPLv2.1+
+	AGPL v3
 	See LICENSE.txt for more information
 
 	node_states.lua:
@@ -84,6 +84,7 @@ function NodeStates:new(attr)
 	local o = {
 		-- mandatory
 		cycle_time = attr.cycle_time, -- for running state
+		first_cycle_time = attr.first_cycle_time, -- for first run, not required
 		standby_ticks = attr.standby_ticks, -- for standby state
 		has_item_meter = attr.has_item_meter, -- true/false
 		-- optional
@@ -175,8 +176,26 @@ function NodeStates:start(pos, meta, called_from_on_timer)
 		if self.formspec_func then
 			meta:set_string("formspec", self.formspec_func(self, pos, meta))
 		end
-		minetest.get_node_timer(pos):start(self.cycle_time)
+		local cycle_time = self.cycle_time
+		if self.first_cycle_time then
+			if meta:get_int("tubelib_first_run") == 1 then
+				meta:set_int("tubelib_first_run", 0)
+				cycle_time = self.cycle_time
+			else
+				meta:set_int("tubelib_first_run", 1)
+				cycle_time = self.first_cycle_time
+			end
+		end
+		minetest.get_node_timer(pos):start(cycle_time)
 		return true
+	end
+	if self.first_cycle_time and meta:get_int("tubelib_first_run") == 1 then
+		local cycle_time = self.cycle_time
+		local timer = minetest.get_node_timer(pos)
+		minetest.after(0, function ()
+			timer:set(cycle_time, timer:get_elapsed())
+		end)
+		meta:set_int("tubelib_first_run", 0)
 	end
 	return false
 end
@@ -302,6 +321,7 @@ function NodeStates:keep_running(pos, meta, val, num_items)
 	self:start(pos, meta, true)
 	meta:set_int("tubelib_countdown", val)
 	meta:set_int("tubelib_item_meter", meta:get_int("tubelib_item_meter") + (num_items or 1))
+		
 	if self.aging_level1 then
 		local cnt = meta:get_int("tubelib_aging") + num_items
 		meta:set_int("tubelib_aging", cnt)
@@ -427,15 +447,39 @@ function NodeStates:on_node_repair(pos)
 	return false
 end	
 
--- Return working or defect machine, depending on machine lifetime
-function NodeStates:after_dig_node(pos, oldnode, oldmetadata, digger)
-	local inv = minetest.get_inventory({type="player", name=digger:get_player_name()})
-	local cnt = oldmetadata.fields.tubelib_aging and tonumber(oldmetadata.fields.tubelib_aging)
-	if not cnt or cnt < 1 then cnt = 1 end
-	local is_defect = cnt > self.aging_level1 and math.random(math.max(1, math.floor(self.aging_level2 / cnt))) == 1
-	if self.node_name_defect and is_defect then
-		inv:add_item("main", ItemStack(self.node_name_defect))
-	else
-		inv:add_item("main", ItemStack(self.node_name_passive))
+
+--[[
+Callback after digging a node but before removing the node.
+
+The tubelib node becomes defect after digging it:
+	- always if the aging counter "tubelib_aging" is greater than self.aging_level2
+	- with a certain probability if the aging counter "tubelib_aging" is greater than self.aging_level1
+	but smaller than self.aging_level2
+	
+Info: If a tubelib machine has been running quite some time but is dropped as a non-defect machine and then placed back again, the
+tubelib machine will be reset to new (digging will reset the aging counter). So this code tries to prevent this exploit
+
+]]--
+function NodeStates:on_dig_node(pos, node, player)
+	local meta = M(pos)
+	local cnt = tonumber(meta:get_string("tubelib_aging"))
+	if (not cnt or cnt < 1) then
+		cnt = 1
 	end
+	
+	local is_defect = (cnt > self.aging_level1) and ( math.random(math.max(1, math.floor(self.aging_level2 / cnt))) == 1 )
+	
+	if is_defect then
+			self:defect(pos, meta) -- replace node with defect one 
+		node = minetest.get_node(pos) 
+	end
+	
+	
+	minetest.node_dig(pos, node, player) -- default behaviour (this function is called automatically if on_dig() callback isn't set)
+
 end
+
+
+
+
+

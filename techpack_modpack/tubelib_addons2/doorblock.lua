@@ -3,14 +3,17 @@
 	Tubelib Addons 2
 	================
 
-	Copyright (C) 2017 Joachim Stolberg
+	Copyright (C) 2017-2020 Joachim Stolberg
 
-	LGPLv2.1+
+	AGPL v3
 	See LICENSE.txt for more information
 
 	doorblock.lua:
 	
 ]]--
+
+-- Load support for I18n
+local S = tubelib_addons2.S
 
 local sTextures = "Gate Wood,Aspen Wood,Jungle Wood,Pine Wood,"..
                   "Cobblestone,Sandstone,Stone,Desert Sandstone,"..
@@ -32,7 +35,7 @@ local tPgns = {"tubelib_addon2_door.png", "default_aspen_wood.png", "default_jun
 local not_in_inventory=nil
 for idx,pgn in ipairs(tPgns) do
 	minetest.register_node("tubelib_addons2:doorblock"..idx, {
-		description = "Tubelib Door Block",
+		description = S("Tubelib Door Block"),
 		tiles = {
 			pgn.."^[transformR90",
 			pgn,
@@ -52,24 +55,22 @@ for idx,pgn in ipairs(tPgns) do
 		after_place_node = function(pos, placer)
 			local meta = minetest.get_meta(pos)
 			local node = minetest.get_node(pos)
-			local number = tubelib.add_node(pos, "tubelib_addons2:doorblock"..idx)
-			tubelib.set_data(number, "facedir", node.param2)
+			local number = tubelib.add_node(pos, node.name)
 			meta:set_string("number", number)
-			meta:set_string("infotext", "Tubelib Door Block "..number)
+			meta:set_string("infotext", S("Tubelib Door Block").." "..number)
 			meta:set_string("formspec", "size[3,2]"..
-			"label[0,0;Select texture]"..
+			"label[0,0;"..S("Select texture").."]"..
 			"dropdown[0,0.5;3;type;"..sTextures..";1]".. 
-			"button_exit[0.5,1.5;2,1;exit;Save]")
+			"button_exit[0.5,1.5;2,1;exit;"..S("Save").."]")
 		end,
 
 		on_receive_fields = function(pos, formname, fields, player)
 			local meta = minetest.get_meta(pos)
 			local node = minetest.get_node(pos)
-			local number = meta:get_string("number")
 			if fields.type then
 				node.name = "tubelib_addons2:doorblock"..tTextures[fields.type]
 				minetest.swap_node(pos, node)
-				tubelib.set_data(number, "texture", node.name)
+				tubelib.add_node(pos, node.name)
 			end
 			if fields.exit then
 				meta:set_string("formspec", nil)
@@ -96,14 +97,16 @@ for idx,pgn in ipairs(tPgns) do
 		on_recv_message = function(pos, topic, payload)
 			local node = minetest.get_node(pos)
 			if topic == "on" then
+				local meta = minetest.get_meta(pos)
+				local number = meta:get_string("number")
 				minetest.remove_node(pos)
+				tubelib.temporary_remove_node(pos, number, node.name, {param2 = node.param2})
 			elseif topic == "off" then
-				local num = tubelib.get_node_number(pos)
-				local name = tubelib.get_data(num, "texture") or "tubelib_addons2:doorblock1"
-				if name then
-					minetest.add_node(pos, {name=name, 
-							paramtype2="facedir", 
-							param2=tubelib.get_data(num, "facedir")})
+				local data = tubelib.temporary_remove_node(pos)
+				if data then
+					minetest.add_node(pos, {name = data.name, param2 = data.param2})
+					local meta = minetest.get_meta(pos)
+					meta:set_string("number", data.number)
 				end
 			end
 		end,

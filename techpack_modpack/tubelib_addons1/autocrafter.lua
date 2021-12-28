@@ -3,9 +3,9 @@
 	Tubelib Addons
 	==============
 
-	Copyright (C) 2017-2019 Joachim Stolberg
+	Copyright (C) 2017-2020 Joachim Stolberg
 
-	LGPLv2.1+
+	AGPL v3
 	See LICENSE.txt for more information
 
 	The autocrafter is derived from pipeworks: 
@@ -15,8 +15,10 @@
 	
 ]]--
 
+-- Load support for I18n
+local S = tubelib_addons1.S
+
 -- for lazy programmers
-local S = function(pos) if pos then return minetest.pos_to_string(pos) end end
 local P = minetest.string_to_pos
 local M = minetest.get_meta
 
@@ -47,7 +49,7 @@ local State = tubelib.NodeStates:new({
 	node_name_passive = "tubelib_addons1:autocrafter",
 	node_name_active = "tubelib_addons1:autocrafter_active",
 	node_name_defect = "tubelib_addons1:autocrafter_defect",
-	infotext_name = "Tubelib Autocrafter",
+	infotext_name = S("Tubelib Autocrafter"),
 	cycle_time = CYCLE_TIME,
 	standby_ticks = STANDBY_TICKS,
 	has_item_meter = true,
@@ -287,7 +289,7 @@ end
 
 
 minetest.register_node("tubelib_addons1:autocrafter", {
-	description = "Tubelib Autocrafter",
+	description = S("Tubelib Autocrafter"),
 	drawtype = "normal",
 	tiles = {
 		'tubelib_front.png', 
@@ -312,10 +314,10 @@ minetest.register_node("tubelib_addons1:autocrafter", {
 		return inv:is_empty("dst") and inv:is_empty("src")
 	end,
 
-	after_dig_node = function(pos, oldnode, oldmetadata, digger)
+	on_dig = function(pos, node, player)
 		autocrafterCache[minetest.hash_node_position(pos)] = nil
+		State:on_dig_node(pos, node, player)
 		tubelib.remove_node(pos)
-		State:after_dig_node(pos, oldnode, oldmetadata, digger)
 	end,
 	
 	on_rotate = screwdriver.disallow,
@@ -326,7 +328,6 @@ minetest.register_node("tubelib_addons1:autocrafter", {
 	allow_metadata_inventory_take = allow_metadata_inventory_take,
 	allow_metadata_inventory_move = allow_metadata_inventory_move,
 
-	drop = "",
 	paramtype = "light",
 	sunlight_propagates = true,
 	paramtype2 = "facedir",
@@ -336,7 +337,7 @@ minetest.register_node("tubelib_addons1:autocrafter", {
 })
 
 minetest.register_node("tubelib_addons1:autocrafter_active", {
-	description = "Tubelib Autocrafter",
+	description = S("Tubelib Autocrafter"),
 	drawtype = "normal",
 	tiles = {
 		'tubelib_front.png', 
@@ -352,6 +353,9 @@ minetest.register_node("tubelib_addons1:autocrafter_active", {
 			},
 		},
 	},
+
+	diggable = false,
+	can_dig = function() return false end,
 	
 	on_rotate = screwdriver.disallow,
 	on_timer = keep_running,
@@ -369,7 +373,7 @@ minetest.register_node("tubelib_addons1:autocrafter_active", {
 })
 
 minetest.register_node("tubelib_addons1:autocrafter_defect", {
-	description = "Tubelib Autocrafter",
+	description = S("Tubelib Autocrafter"),
 	drawtype = "normal",
 	tiles = {
 		'tubelib_front.png', 

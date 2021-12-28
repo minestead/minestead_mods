@@ -3,23 +3,25 @@
 	TechPack Warehouse
 	==================
 
-	Copyright (C) 2019 Joachim Stolberg
+	Copyright (C) 2017-2020 Joachim Stolberg
 
-	LGPLv2.1+
+	AGPL v3
 	See LICENSE.txt for more information
 	
 	box_copper.lua
 
 ]]--
 
+-- Load support for I18n
+local S = techpack_warehouse.S
+
 --- for lazy programmers
-local S = function(pos) if pos then return minetest.pos_to_string(pos) end end
 local P = minetest.string_to_pos
 local M = minetest.get_meta
 local wh = techpack_warehouse
 
 local NODE_NAME = "techpack_warehouse:box_copper"
-local DESCRIPTION = "Warehouse Box Copper"
+local DESCRIPTION = S("Warehouse Box Copper")
 local INV_SIZE = 1200
 local BACKGROUND_IMG = "default_copper_block.png" 
 
@@ -47,8 +49,8 @@ minetest.register_node(NODE_NAME, {
 	can_dig = function(pos)
 		return wh.can_dig(Box, pos)
 	end,
-	after_dig_node = function(pos, oldnode, oldmetadata, digger)
-		wh.after_dig_node(Box, pos, oldnode, oldmetadata, digger)
+	on_dig = function(pos, node, player)
+		wh.on_dig_node(Box, pos, node, player)
 	end,
 	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
 		return wh.allow_metadata_inventory_put(Box, pos, listname, index, stack, player)
@@ -58,7 +60,6 @@ minetest.register_node(NODE_NAME, {
 	allow_metadata_inventory_move = wh.allow_metadata_inventory_move,
 	
 	on_rotate = screwdriver.disallow,
-	drop = "",
 	paramtype = "light",
 	sunlight_propagates = true,
 	paramtype2 = "facedir",
@@ -86,6 +87,9 @@ minetest.register_node(NODE_NAME.."_active", {
 	on_metadata_inventory_put = wh.on_metadata_inventory_put,
 	allow_metadata_inventory_take = wh.allow_metadata_inventory_take,
 	allow_metadata_inventory_move = wh.allow_metadata_inventory_move,
+  
+	diggable = false,
+	can_dig = function() return false end,
 	
 	on_rotate = screwdriver.disallow,
 	paramtype = "light",
@@ -107,8 +111,8 @@ minetest.register_node(NODE_NAME.."_defect", {
 	can_dig = function(pos)
 		return wh.can_dig(Box, pos)
 	end,
-	after_dig_node = function(pos, oldnode, oldmetadata, digger)
-		wh.after_dig_node(Box, pos, oldnode, oldmetadata, digger)
+	on_dig = function(pos, node, player)
+		wh.on_dig_node(Box, pos, node, player)
 	end,
 	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
 		return wh.allow_metadata_inventory_put(Box, pos, listname, index, stack, player)
@@ -131,7 +135,7 @@ tubelib.register_node(NODE_NAME,
 	on_push_item = function(pos, side, item)
 		local meta = M(pos)
 		meta:set_string("push_dir", wh.Turn180[side])
-		local num = wh.numbers_to_shift(Box, meta, item)
+		local num = wh.inv_add_item(Box, meta, item)
 		if num > 0 then
 			item:set_count(num)
 			return tubelib.put_item(meta, "shift", item)
@@ -145,7 +149,14 @@ tubelib.register_node(NODE_NAME,
 		return tubelib.get_item(M(pos), "main")
 	end,
 	on_unpull_item = function(pos, side, item)
-		return tubelib.put_item(M(pos), "main", item)
+		local meta = M(pos)
+		local num = wh.inv_add_item(Box, meta, item)
+		if num > 0 then
+			-- this should never happen, but better safe than sorry
+			item:set_count(num)
+			return tubelib.put_item(meta, "shift", item)
+		end
+		return true
 	end,
 
 	on_recv_message = function(pos, topic, payload)

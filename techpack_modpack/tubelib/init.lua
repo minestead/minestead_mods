@@ -3,9 +3,9 @@
 	Tube Library
 	============
 
-	Copyright (C) 2017-2019 Joachim Stolberg
+	Copyright (C) 2017-2020 Joachim Stolberg
 
-	LGPLv2.1+
+	AGPL v3
 	See LICENSE.txt for more information
 
 	History:
@@ -33,6 +33,10 @@
 tubelib = {
 	NodeDef = {},		-- node registration info
 }
+
+-- Load support for I18n
+tubelib.S = minetest.get_translator("tubelib")
+local S = tubelib.S
 
 tubelib.version = 2.00
 
@@ -78,7 +82,7 @@ minetest.register_lbm({
 })
 
 minetest.register_craftitem("tubelib:wlanchip", {
-	description = "Tubelib WLAN Chip",
+	description = S("Tubelib WLAN Chip"),
 	inventory_image = "tubelib_wlanchip.png",
 })
 
@@ -93,8 +97,8 @@ minetest.register_craft({
 })
 
 
-if tubelib2.version < 0.8 then
-	minetest.log("error", "TechPack/Tubelib requires tubelib2 version 0.8 or newer!!!")
+if tubelib2.version < 2.0 then
+	error("TechPack/Tubelib requires tubelib2 version 2.0 or newer!!!")
 else
 	dofile(minetest.get_modpath("tubelib") .. "/tubes.lua")
 	dofile(minetest.get_modpath("tubelib") .. "/command.lua")

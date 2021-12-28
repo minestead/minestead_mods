@@ -3,9 +3,9 @@
 	Tubelib Addons 3
 	================
 
-	Copyright (C) 2018 Joachim Stolberg
+	Copyright (C) 2017-2020 Joachim Stolberg
 
-	LGPLv2.1+
+	AGPL v3
 	See LICENSE.txt for more information
 	
 	pusher.lua
@@ -14,21 +14,25 @@
 
 ]]--
 
+-- Load support for I18n
+local S = tubelib_addons3.S
+
 -- for lazy programmers
-local S = function(pos) if pos then return minetest.pos_to_string(pos) end end
 local P = minetest.string_to_pos
 local M = minetest.get_meta
 
 local STANDBY_TICKS = 5
 local COUNTDOWN_TICKS = 5
 local CYCLE_TIME = 2
+local FIRST_CYCLE = 0.5
 
 local State = tubelib.NodeStates:new({
 	node_name_passive = "tubelib_addons3:pusher",
 	node_name_active = "tubelib_addons3:pusher_active",
 	node_name_defect = "tubelib_addons3:pusher_defect",
-	infotext_name = "HighPerf Pusher",
+	infotext_name = S("HighPerf Pusher"),
 	cycle_time = CYCLE_TIME,
+	first_cycle_time = FIRST_CYCLE,
 	standby_ticks = STANDBY_TICKS,
 	has_item_meter = true,
 	aging_factor = 50,
@@ -38,13 +42,19 @@ local function pushing(pos, meta)
 	local player_name = meta:get_string("player_name")
 	local items = tubelib.pull_stack(pos, "L", player_name)
 	if items ~= nil then
+		local count = items:get_count()
 		if tubelib.push_items(pos, "R", items, player_name) == false then
 			-- place item back
 			tubelib.unpull_items(pos, "L", items, player_name)
-			State:blocked(pos, meta)
-			return
+			-- Complete stack rejected
+			if count == items:get_count() then
+				State:blocked(pos, meta)
+				return
+			end
 		end
-		State:keep_running(pos, meta, COUNTDOWN_TICKS, 1)
+		if State.get_state(pos, meta) ~= tubelib.STOPPED then
+			State:keep_running(pos, meta, COUNTDOWN_TICKS, 1)
+		end
 		return
 	end
 	State:idle(pos, meta)
@@ -60,7 +70,7 @@ local function keep_running(pos, elapsed)
 end	
 
 minetest.register_node("tubelib_addons3:pusher", {
-	description = "HighPerf Pusher",
+	description = S("HighPerf Pusher"),
 	tiles = {
 		-- up, down, right, left, back, front
 		'tubelib_pusher1.png^tubelib_addons3_node_frame4.png',
@@ -84,15 +94,14 @@ minetest.register_node("tubelib_addons3:pusher", {
 		end
 	end,
 
-	after_dig_node = function(pos, oldnode, oldmetadata, digger)
+	on_dig = function(pos, node, player)
+		State:on_dig_node(pos, node, player)
 		tubelib.remove_node(pos)
-		State:after_dig_node(pos, oldnode, oldmetadata, digger)
 	end,
 	
 	on_timer = keep_running,
 	on_rotate = screwdriver.disallow,
 
-	drop = "",
 	paramtype = "light",
 	sunlight_propagates = true,
 	paramtype2 = "facedir",
@@ -103,7 +112,7 @@ minetest.register_node("tubelib_addons3:pusher", {
 
 
 minetest.register_node("tubelib_addons3:pusher_active", {
-	description = "HighPerf Pusher",
+	description = S("HighPerf Pusher"),
 	tiles = {
 		-- up, down, right, left, back, front
 		{
@@ -158,7 +167,10 @@ minetest.register_node("tubelib_addons3:pusher_active", {
 	
 	on_timer = keep_running,
 	on_rotate = screwdriver.disallow,
-	
+
+	diggable = false,
+	can_dig = function() return false end,
+
 	paramtype = "light",
 	sunlight_propagates = true,
 	paramtype2 = "facedir",
@@ -168,7 +180,7 @@ minetest.register_node("tubelib_addons3:pusher_active", {
 })
 
 minetest.register_node("tubelib_addons3:pusher_defect", {
-	description = "HighPerf Pusher",
+	description = S("HighPerf Pusher"),
 	tiles = {
 		-- up, down, right, left, back, front
 		'tubelib_pusher1.png^tubelib_addons3_node_frame4.png',
@@ -215,6 +227,7 @@ minetest.register_craft({
 tubelib.register_node("tubelib_addons3:pusher", 
 	{"tubelib_addons3:pusher_active", "tubelib_addons3:pusher_defect"}, {
 	is_pusher = true,           -- is a pulling/pushing node
+	valid_sides = {"R","L"},
 
 	on_recv_message = function(pos, topic, payload)
 		local resp = State:on_receive_message(pos, topic, payload)
