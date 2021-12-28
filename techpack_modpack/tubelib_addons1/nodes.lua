@@ -3,14 +3,12 @@
 	Tubelib Addons 1
 	================
 
-	Copyright (C) 2017,2018 Joachim Stolberg
+	Copyright (C) 2017-2020 Joachim Stolberg
 
-	LGPLv2.1+
+	AGPL v3
 	See LICENSE.txt for more information
 
 ]]--
-
-tubelib_addons1 = {}
 
 -- tables needed for Harvester
 tubelib_addons1.FarmingNodes = {}
@@ -59,6 +57,13 @@ tn("default:pine_tree",   "default:pine_tree",   "default:pine_sapling")
 tn("default:acacia_tree", "default:acacia_tree", "default:acacia_sapling")
 tn("default:jungletree",  "default:jungletree",  "default:junglesapling")
 
+tn("default:bush_stem", "default:bush_stem", "default:bush_sapling")
+tn("default:acacia_bush_stem", "default:acacia_bush_stem", "default:acacia_bush_sapling")
+tn("default:pine_bush_stem", "default:pine_bush_stem", "default:pine_bush_sapling")
+
+fn("default:pine_bush_needles")
+tubelib_addons1.FarmingNodes["default:pine_bush_needles"].leaves = true -- accepted as leaves
+
 fn("default:leaves")
 fn("default:aspen_leaves")
 fn("default:pine_needles")
@@ -68,6 +73,7 @@ fn("default:jungleleaves")
 
 fn("default:bush_leaves")
 fn("default:acacia_bush_leaves")
+fn("default:blueberry_bush_leaves")
 
 fn("default:cactus", "default:cactus", "default:cactus")
 fn("default:papyrus", "default:papyrus", "default:papyrus")
@@ -77,47 +83,58 @@ fn("default:apple")
 if farming.mod ~= "redo" then
 	dn("farming:wheat_8",  "farming:wheat",  "farming:wheat_1")
 	dn("farming:cotton_8", "farming:cotton", "farming:cotton_1")
+	dn("farming:blueberry_bush_leaves_with_berries", "default:blueberries", "farming:blueberry_bush_leaves")
 end
 
 -------------------------------------------------------------------------------
 -- Farming Redo
 -----------------------------------------------   --------------------------------
 if farming.mod == "redo" then
-	fn("farming:wheat_8",     "farming:wheat",          "farming:wheat_1")
-	fn("farming:cotton_8",    "farming:cotton",         "farming:cotton_1")
-	fn("farming:carrot_8",    "farming:carrot 2",       "farming:carrot_1")
-	fn("farming:potato_4",    "farming:potato 3",       "farming:potato_1")
-	fn("farming:tomato_8",    "farming:tomato 3",       "farming:tomato_1")
-	fn("farming:cucumber_4",  "farming:cucumber 2",     "farming:cucumber_1")
-	fn("farming:corn_8",      "farming:corn 2",         "farming:corn_1")
-	fn("farming:coffee_5",    "farming:coffee_beans 2", "farming:coffee_1")
-	fn("farming:melon_8",     "farming:melon_slice 4",  "farming:melon_1")
-	fn("farming:pumpkin_8",   "farming:pumpkin_slice 4","farming:pumpkin_1")
-	fn("farming:raspberry_4", "farming:raspberries",    "farming:raspberry_1")
-	fn("farming:blueberry_4", "farming:blueberries",    "farming:blueberry_1")
-	fn("farming:rhubarb_3",   "farming:rhubarb 2",      "farming:rhubarb_1")
-	fn("farming:beanpole_5",  "farming:beans 3",        "farming:beanpole_1")
-	fn("farming:grapes_8",    "farming:grapes 3",       "farming:grapes_1")
-	fn("farming:barley_7",    "farming:barley",         "farming:barley_1")
-	fn("farming:chili_8",     "farming:chili_pepper 2", "farming:chili_1")
-	fn("farming:hemp_8",      "farming:hemp_leaf",      "farming:hemp_1")
-	fn("farming:oat_8",       "farming:oat",            "farming:oat_1")
-	fn("farming:rye_8",       "farming:rye",            "farming:rye_1")
-	fn("farming:rice_8",      "farming:rice",           "farming:rice_1")
-	fn('farming:beetroot_5',  'farming:beetroot 2',     'farming:beetroot_1')
-	fn('farming:cocoa_4',     'farming:cocoa_beans 2',  'farming:cocoa_1')
-	fn('farming:garlic_5',    'farming:garlic 2',       'farming:garlic_1')
-	fn('farming:onion_5',     'farming:onion 2',        'farming:onion_1')
-	fn('farming:pea_5',       'farming:pea_pod 3',      'farming:pea_1')
-	fn('farming:pepper_5',    'farming:pepper 2',       'farming:pepper_1')
-	fn('farming:pineapple_8', 'farming:pineapple 1',    'farming:pineapple_1')
+	fn("farming:artichoke_5",  "farming:artichoke",       "farming:artichoke_1")
+	fn("farming:barley_7",     "farming:barley",          "farming:barley_1")
+	fn("farming:beanpole_5",   "farming:beans 3",         "farming:beanpole_1")
+	fn("farming:beetroot_5",   "farming:beetroot 2",      "farming:beetroot_1")
+	fn("farming:blackberry_4", "farming:blackberry",      "farming:blackberry_1")
+	fn("farming:blueberry_4",  "farming:blueberries",     "farming:blueberry_1")
+	fn("farming:cabbage_6",    "farming:cabbage",         "farming:cabbage_1")
+	fn("farming:carrot_8",     "farming:carrot 2",        "farming:carrot_1")
+	fn("farming:chili_8",      "farming:chili_pepper 2",  "farming:chili_1")
+	fn("farming:cocoa_4",      "farming:cocoa_beans 2",   "farming:cocoa_1")
+	fn("farming:coffee_5",     "farming:coffee_beans 2",  "farming:coffee_1")
+	fn("farming:corn_8",       "farming:corn 2",          "farming:corn_1")
+	fn("farming:cotton_8",     "farming:cotton",          "farming:cotton_1")
+	fn("farming:cucumber_4",   "farming:cucumber 2",      "farming:cucumber_1")
+	fn("farming:garlic_5",     "farming:garlic 2",        "farming:garlic_1")
+	fn("farming:grapes_8",     "farming:grapes 3",        "farming:grapes_1")
+	fn("farming:hemp_8",       "farming:hemp_leaf",       "farming:hemp_1")
+	fn("farming:lettuce_5",    "farming:lettuce",         "farming:lettuce_1")
+	fn("farming:melon_8",      "farming:melon_slice 4",   "farming:melon_1")
+	fn("farming:mint_4",       "farming:mint_leaf 2",     "farming:mint_1")
+	fn("farming:oat_8",        "farming:oat",             "farming:oat_1")
+	fn("farming:onion_5",      "farming:onion 2",         "farming:onion_1")
+	fn("farming:parsley_3",    "farming:parsley",         "farming:parsley_1")
+	fn("farming:pea_5",        "farming:pea_pod 3",       "farming:pea_1")
+	fn("farming:pepper_5",     "farming:pepper 2",        "farming:pepper_1")
+	fn("farming:pepper_6",     "farming:pepper_yellow 2", "farming:pepper_1")
+	fn("farming:pepper_7",     "farming:pepper_red 2",    "farming:pepper_1")
+	fn("farming:pineapple_8",  "farming:pineapple 1",     "farming:pineapple_1")
+	fn("farming:potato_4",     "farming:potato 3",        "farming:potato_1")
+	fn("farming:pumpkin_8",    "farming:pumpkin_slice 4", "farming:pumpkin_1")
+	fn("farming:raspberry_4",  "farming:raspberries",     "farming:raspberry_1")
+	fn("farming:rhubarb_3",    "farming:rhubarb 2",       "farming:rhubarb_1")
+	fn("farming:rice_8",       "farming:rice",            "farming:rice_1")
+	fn("farming:rye_8",        "farming:rye",             "farming:rye_1")
+	fn("farming:soy_7",        "farming:soy_pod",         "farming:soy_1")
+	fn("farming:tomato_8",     "farming:tomato 3",        "farming:tomato_1")
+	fn("farming:vanilla_8",    "farming:vanilla 2",       "farming:vanilla_1")
+	fn("farming:wheat_8",      "farming:wheat",           "farming:wheat_1")
 end
 
 -------------------------------------------------------------------------------
 -- Ethereal Farming
 -------------------------------------------------------------------------------
-fn("ethereal:strawberry_8",   "ethereal:strawberry 2",	     "ethereal:strawberry 1")
-fn("ethereal:onion_5",		  "ethereal:wild_onion_plant 2", "ethereal:onion_1")
+fn("ethereal:strawberry_8",   "ethereal:strawberry 2",	     "ethereal:strawberry_1")
+fn("ethereal:onion_5",        "ethereal:wild_onion_plant 2", "ethereal:onion_1")
 
 
 fn("ethereal:willow_trunk",   "ethereal:willow_trunk", "ethereal:willow_sapling")
@@ -146,6 +163,7 @@ fn("ethereal:bamboo_leaves")
 fn("ethereal:banana")
 fn("ethereal:orange")
 fn("ethereal:coconut")
+fn("ethereal:golden_apple")
 
 -------------------------------------------------------------------------------
 -- Default Ground
@@ -162,24 +180,28 @@ gn("default:ice")
 gn("default:snowblock")
 gn("default:snow")
 gn("default:obsidian")
-
+gn("default:mese")
 gn("stairs:stair_cobble")
 gn("stairs:stair_mossycobble")
 gn("stairs:stair_desert_cobble")
+
+gn("default:permafrost")
+gn("default:permafrost_with_moss")
+gn("default:permafrost_with_stones")
 
 gn("default:stone",             "default:cobble")
 gn("default:desert_stone",      "default:desert_cobble")
 gn("default:sandstone",         "default:sandstone")
 gn("default:desert_sandstone",  "default:desert_sandstone")
+gn("default:silver_sandstone",  "default:silver_sandstone")
 gn("default:clay",              "default:clay_lump")
+
 gn("default:stone_with_coal",   "default:coal_lump")
 gn("default:stone_with_iron",   "default:iron_lump")
 gn("default:stone_with_copper", "default:copper_lump")
 gn("default:stone_with_gold",   "default:gold_lump")
 gn("default:stone_with_tin",    "default:tin_lump")
-
 gn("default:stone_with_mese",   "default:mese_crystal")
-
 gn("default:stone_with_diamond",  "default:diamond")
 
 gn("default:dirt_with_grass",             "default:dirt")
@@ -188,6 +210,13 @@ gn("default:dirt_with_dry_grass",         "default:dirt")
 gn("default:dirt_with_snow",              "default:dirt")
 gn("default:dirt_with_rainforest_litter", "default:dirt")
 gn("default:dirt_with_grass",             "default:dirt")
+gn("default:dirt_with_coniferous_litter", "default:dirt")
+gn("default:dry_dirt",                    "default:dry_dirt")
+gn("default:dry_dirt_with_dry_grass",     "default:dry_dirt")
+
+gn("default:dirt_with_coniferous_litter")
+gn("default:dirt_with_coniferous_litter")
+gn("default:dirt_with_coniferous_litter")
 
 gn("default:coral_skeleton",  "default:coral_skeleton")
 gn("default:coral_orange",    "default:coral_skeleton")
@@ -241,6 +270,21 @@ gn("ethereal:illumishroom")
 gn("ethereal:illumishroom2")
 gn("ethereal:illumishroom3")
 
+-------------------------------------------------------------------------------
+-- underch Ground
+-------------------------------------------------------------------------------
+
+if minetest.get_modpath("underch") then
+	for regnodename,v in pairs(minetest.registered_nodes) do
+		if string.find(regnodename, "underch:") then
+			if string.find(regnodename, "_cobble") and not string.find(regnodename, "_wall") then
+				gnname = string.gsub(regnodename, "_cobble", "")
+				print("tubelib_addons1.register_ground_node: " .. gnname)
+				gn(gnname, regnodename)
+			end
+		end
+	end
+end
 
 -------------------------------------------------------------------------------
 -- Registered flowers
@@ -310,3 +354,5 @@ end
 tn('palm:palm_tree_trunk', 'palm:palm_tree_trunk', 'palm:coconut')
 fn('palm:palm_tree_leaves')
 fn('palm:coconut')
+tn('oak_steampunk:oak_tree_trunk', 'oak_steampunk:oak_tree_trunk', 'oak_steampunk:oak_acorn')
+fn('oak_steampunk:oak_tree_leaves')
